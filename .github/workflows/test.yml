@@ -1,5 +1,6 @@
 # Run the unit test suite on every push and pull request.
-# Requires a shared scheme: SwordFight (see docs/TESTING.md).
+# Requires: Xcode project with a shared scheme named "VGB" (so CI can run it without opening Xcode).
+# In Xcode: Product → Scheme → Manage Schemes → check "Shared" for the app scheme.
 
 name: Test
 
@@ -15,16 +16,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Project uses Xcode project format 77; default runner Xcode is 15.4, so select 16.x
-      - name: Select Xcode 16.2
+      - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
 
-      # This runner only exposes visionOS Simulator (and My Mac) to xcodebuild; use it for tests.
       - name: Run tests
         run: |
           xcodebuild test \
-            -scheme SwordFight \
-            -destination 'platform=visionOS Simulator,name=Apple Vision Pro,OS=2.2' \
+            -scheme VGB \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             -resultBundlePath TestResults.xcresult \
             -quiet
         working-directory: ${{ github.workspace }}
