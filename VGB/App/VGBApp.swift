@@ -4,7 +4,7 @@ import SwiftUI
 struct VGBApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            BacklogListView()
         }
     }
 }

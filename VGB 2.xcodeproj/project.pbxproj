@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		156B08104A28B3645D7B7DF8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE8BDA8019C972A6972C868 /* ContentView.swift */; };
 		63E8D4B855E15A47273EBEB9 /* VGBApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A24FB1195840A54D9117F8 /* VGBApp.swift */; };
-		55AA55BB55CC55DD55EE55FF /* BacklogListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44AA44BB44CC44DD44EE44FF /* BacklogListView.swift */; };
-		CCCC11BB22CC33DD44EE55FF /* AppScaffoldTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBB11BB22CC33DD44EE55FF /* AppScaffoldTests.swift */; };
+		990B68442A67DF3CB658A12A /* VGBTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 900AC37F0DEFD22D0AB14811 /* VGBTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -24,9 +24,9 @@
 
 /* Begin PBXFileReference section */
 		05A24FB1195840A54D9117F8 /* VGBApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VGBApp.swift; sourceTree = "<group>"; };
-		0BFD25FD239D36E39B81796A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		44AA44BB44CC44DD44EE44FF /* BacklogListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogListView.swift; sourceTree = "<group>"; };
-		BBBB11BB22CC33DD44EE55FF /* AppScaffoldTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppScaffoldTests.swift; sourceTree = "<group>"; };
+		0BFD25FD239D36E39B81796A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		2AE8BDA8019C972A6972C868 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		900AC37F0DEFD22D0AB14811 /* VGBTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VGBTests.swift; sourceTree = "<group>"; };
 		AABF64DA1FEC1CD8AE9C727B /* VGBTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VGBTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D266180422E28B6163D27F5C /* VGB.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = VGB.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -35,17 +35,9 @@
 		0EAABE8F932E0CDD1174C819 /* VGBTests */ = {
 			isa = PBXGroup;
 			children = (
-				AAAAABBBBBCCCCCDDDDDEEEEFF /* Unit */,
+				900AC37F0DEFD22D0AB14811 /* VGBTests.swift */,
 			);
 			path = VGBTests;
-			sourceTree = "<group>";
-		};
-		AAAAABBBBBCCCCCDDDDDEEEEFF /* Unit */ = {
-			isa = PBXGroup;
-			children = (
-				BBBB11BB22CC33DD44EE55FF /* AppScaffoldTests.swift */,
-			);
-			path = Unit;
 			sourceTree = "<group>";
 		};
 		348A5F9AABE0C0D1F167C2DC = {
@@ -69,43 +61,11 @@
 		AB18A61825D295D11819A3CE /* VGB */ = {
 			isa = PBXGroup;
 			children = (
-				66AA66BB66CC66DD66EE66FF /* App */,
-				88AA88BB88CC88DD88EE88FF /* Features */,
+				2AE8BDA8019C972A6972C868 /* ContentView.swift */,
+				0BFD25FD239D36E39B81796A /* Info.plist */,
+				05A24FB1195840A54D9117F8 /* VGBApp.swift */,
 			);
 			path = VGB;
-			sourceTree = "<group>";
-		};
-		66AA66BB66CC66DD66EE66FF /* App */ = {
-			isa = PBXGroup;
-			children = (
-				05A24FB1195840A54D9117F8 /* VGBApp.swift */,
-				77AA77BB77CC77DD77EE77FF /* Resources */,
-			);
-			path = App;
-			sourceTree = "<group>";
-		};
-		77AA77BB77CC77DD77EE77FF /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				0BFD25FD239D36E39B81796A /* Info.plist */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
-		88AA88BB88CC88DD88EE88FF /* Features */ = {
-			isa = PBXGroup;
-			children = (
-				99AA99BB99CC99DD99EE99FF /* Backlog */,
-			);
-			path = Features;
-			sourceTree = "<group>";
-		};
-		99AA99BB99CC99DD99EE99FF /* Backlog */ = {
-			isa = PBXGroup;
-			children = (
-				44AA44BB44CC44DD44EE44FF /* BacklogListView.swift */,
-			);
-			path = Backlog;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -180,7 +140,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CCCC11BB22CC33DD44EE55FF /* AppScaffoldTests.swift in Sources */,
+				990B68442A67DF3CB658A12A /* VGBTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -188,8 +148,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				156B08104A28B3645D7B7DF8 /* ContentView.swift in Sources */,
 				63E8D4B855E15A47273EBEB9 /* VGBApp.swift in Sources */,
-				55AA55BB55CC55DD55EE55FF /* BacklogListView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -208,10 +168,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				INFOPLIST_FILE = VGB/App/Resources/Info.plist;
+				INFOPLIST_FILE = VGB/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = (
@@ -287,8 +245,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -368,10 +324,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				INFOPLIST_FILE = VGB/App/Resources/Info.plist;
+				INFOPLIST_FILE = VGB/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = (
@@ -391,8 +345,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

@@ -17,9 +17,6 @@ build/
 *.xccheckout
 *.xcscmblueprint
 
-# Swift Package Manager
-.build/
-
 # CocoaPods
 # Pods/  # uncomment if you don't commit Pods
 

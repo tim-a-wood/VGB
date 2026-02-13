@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ContentView: View {
+struct BacklogListView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 12) {
@@ -17,5 +17,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    BacklogListView()
 }

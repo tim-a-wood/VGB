@@ -9,6 +9,13 @@ VGB is an iOS app for gamers to track and prioritize their video game backlog.
 - Unit test target: `VGBTests`
 - Shared scheme for CI: `VGB`
 
+## Project structure
+
+- `VGB/App/` — app entry and shared app resources
+- `VGB/Features/` — feature UI modules (currently backlog)
+- `VGBTests/Unit/` — unit tests
+- `project.yml` — XcodeGen project spec
+
 See:
 - `prompts/project-overview.md` for product direction
 - `prompts/project-features.md` for MVP vs post-release scope
@@ -38,11 +45,3 @@ If `xcodegen` is installed:
 ```bash
 xcodegen generate
 ```
-
-In this workspace, a local source-built binary was used at:
-
-```bash
-./.tools/XcodeGen/.build/release/xcodegen generate
-```
-
-`.tools/` is ignored by git and intended for local tooling only.

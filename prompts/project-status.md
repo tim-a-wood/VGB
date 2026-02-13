@@ -22,15 +22,15 @@ Details: see **What's implemented** and **What's not implemented** below.
 ## What’s implemented
 
 ### Project structure
-- Planning docs established under `prompts/`
-- Xcode project scaffold created:
-  - `VGB.xcodeproj` with shared `VGB` scheme
-  - `project.yml` (XcodeGen spec)
-  - `VGB/` app sources and `VGBTests/` unit test target
-  - Verified with `xcodebuild -list` and placeholder test run
+- Planning docs under `prompts/`
+- Clean app layout:
+  - `VGB/App/` — `VGBApp.swift`, `App/Resources/Info.plist`
+  - `VGB/Features/Backlog/` — `BacklogListView.swift`
+  - `VGBTests/Unit/` — `AppScaffoldTests.swift`
+- `VGB.xcodeproj` updated to match (shared scheme `VGB`); `project.yml` describes same layout for XcodeGen if used
 
 ### Assets and UI
-- Minimal SwiftUI placeholder screen in place (`ContentView`)
+- Placeholder screen: `BacklogListView` (Features → Backlog)
 - No production assets yet
 
 ### Context / docs
@@ -64,7 +64,7 @@ Full task checklist: **prompts/project-plan.md**
 | `prompts/project-features.md` | Scope guardrails (MVP vs post-release) | Added |
 | `prompts/project-plan.md` | Timeline and execution checklist | Phase 1 started |
 | `prompts/project-status.md` | Current progress snapshot | Updated with scaffold progress |
-| `project.yml` | XcodeGen project spec | Added |
-| `VGB.xcodeproj` | iOS app + tests project | Generated with shared scheme |
+| `project.yml` | XcodeGen spec (optional regenerate) | Matches folder layout |
+| `VGB.xcodeproj` | iOS app + tests, shared scheme | Aligned with VGB/App, VGB/Features, VGBTests/Unit |
 
 ---

@@ -12,7 +12,7 @@ targets:
     sources:
       - path: VGB
     info:
-      path: VGB/Info.plist
+      path: VGB/App/Resources/Info.plist
       properties:
         UILaunchScreen: {}
     settings:
