@@ -9,6 +9,7 @@ struct BacklogListView: View {
                 Text("Your video game backlog, organized.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                Spacer()
             }
             .padding()
             .navigationTitle("Backlog")

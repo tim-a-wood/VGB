@@ -6,7 +6,6 @@ xcuserdata/
 *.dSYM
 timeline.xctimeline
 playground.xcworkspace
-.build/
 DerivedData/
 .derivedData/
 build/
@@ -17,28 +16,19 @@ build/
 *.xccheckout
 *.xcscmblueprint
 
-# CocoaPods
-# Pods/  # uncomment if you don't commit Pods
-
-# Carthage
-Carthage/Build/
-
-# fastlane
-fastlane/report.xml
-fastlane/Preview.html
-fastlane/screenshots/**/*.png
-fastlane/test_output
+# Swift Package Manager
+.build/
 
 # macOS
 .DS_Store
-.AppleDouble
-.LSOverride
+
+# Local tooling
+.tools/
 
 # Cursor / IDE
 .cursor/
-.tools/
 
-# Env and secrets (e.g. API keys for metadata provider)
+# Env and secrets
 .env
 *.xcconfig
 Secrets.xcconfig
