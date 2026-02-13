@@ -1,0 +1,35 @@
+---
+description: When generating a commit message, describe project file changes and .cursor/ changes
+alwaysApply: true
+---
+
+# Commit message format
+
+When generating a new commit message, include:
+
+## Project files
+
+List and describe:
+- **Additions** — New files and what they do
+- **Updates** — Modified files and what changed
+- **Deletions** — Removed files and why
+
+## .cursor/ files
+
+Describe any changes to files under `.cursor/` (rules, prompts, preferences, images):
+- What was added, updated, or removed
+- Why it matters (e.g. new rule for X, updated project status)
+
+## Example
+
+```
+Add tap-to-block mechanic and evolve-user-preferences rule
+
+Project:
+- GameScene.swift: Replace template with minimal scene; tap spawns green circle
+- README.md: Add project overview, setup, status, roadmap
+
+.cursor/:
+- rules/evolve-user-preferences.mdc: New rule to update user-preferences.md after each prompt
+- prompts/project-status.md: Mark step 1 done, update GameScene state
+```

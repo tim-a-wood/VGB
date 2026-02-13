@@ -1,0 +1,45 @@
+# Xcode
+xcuserdata/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+timeline.xctimeline
+playground.xcworkspace
+.build/
+DerivedData/
+build/
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xccheckout
+*.xcscmblueprint
+
+# Swift Package Manager
+.build/
+
+# CocoaPods
+# Pods/  # uncomment if you don't commit Pods
+
+# Carthage
+Carthage/Build/
+
+# fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Cursor / IDE
+.cursor/
+
+# Env and secrets (e.g. API keys for metadata provider)
+.env
+*.xcconfig
+Secrets.xcconfig

@@ -1,0 +1,31 @@
+---
+description: After every prompt, check README.md for required updates and apply them automatically
+alwaysApply: true
+---
+
+# Update README.md
+
+With each response in this project, check `README.md` to determine if updates are required. Apply updates automatically when the README no longer reflects the current project state.
+
+## When to update
+
+- **Status section**: Phase, Implemented, or Planned tables diverge from `.cursor/prompts/project-status.md`
+- **Project structure**: Files added, removed, or renamed in the `SwordFight/` tree
+- **Roadmap**: Week focus or plan changes that affect the Roadmap table
+- **Tech stack / getting started**: Dependencies, setup steps, or requirements change
+
+## What to change
+
+- **Status → Phase**: Match the current phase in project-status.
+- **Status → Implemented / Planned**: Sync with project-status "What's implemented" and "What's not implemented".
+- **Project Structure**: Update the tree if files or directories change.
+- **Roadmap**: Update if project-plan's timeline or focus changes materially.
+
+## When to skip
+
+- Purely conversational replies with no code or project changes
+- User only asked to create or edit a rule
+- No progress was made on the game or docs
+- README already matches current state
+
+Keep updates minimal and accurate so the README stays a reliable entry point for humans and tooling.

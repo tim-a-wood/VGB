@@ -1,0 +1,26 @@
+---
+description: After modifying code, analyze for refactoring opportunities and recommend if beneficial
+alwaysApply: true
+---
+
+# Refactor recommendations
+
+When modifying the codebase, analyze the code to determine if and when refactoring would be beneficial as files grow and the project becomes more complex.
+
+## When to recommend
+
+Consider refactoring when:
+- A file exceeds ~200–300 lines or has multiple distinct responsibilities
+- Logic is duplicated across files
+- A class or module handles too many concerns
+- New features would add significant complexity without restructuring
+
+## When to report
+
+**After completing the requested task**, if refactoring would improve maintainability, readability, or structure, provide a brief recommendation:
+
+- What to refactor and why
+- Suggested approach (e.g. extract type, split scene, move logic to helper)
+- Priority (optional): low / medium / high
+
+Do not refactor unless the user approves. Only recommend.

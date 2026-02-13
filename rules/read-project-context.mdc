@@ -1,0 +1,12 @@
+---
+description: Read project-context.md before each response and follow any references
+alwaysApply: true
+---
+
+# Read project context
+
+Before responding to each prompt, read `.cursor/prompts/project-context.md`.
+
+- Use it as primary context for the project (design, status, next steps).
+- If it references other files (e.g. `project-overview.md`, `project-plan.md`, `project-status.md`), read those too and apply their contents.
+- If the file is empty or missing, proceed as usual.

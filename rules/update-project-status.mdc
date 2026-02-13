@@ -1,0 +1,30 @@
+---
+description: Keep project-status.md in sync with progress after each response
+alwaysApply: true
+---
+
+# Update project-status.md
+
+With each response in this project, keep `.cursor/prompts/project-status.md` up to date with joint progress. Whenever an update to `.cursor/prompts/project-status.md` is made, evaluate the file and the project progress for structural improvements and apply them if deemed appropriate.
+
+## When to update
+
+- **After implementing or changing code**: Update "What's implemented", "What's not implemented", and the "Key files" table so they match the current codebase.
+- **After completing a task from "Recommended next steps"**: Move it to implemented; adjust the list and "Current phase" table.
+- **When the status file would otherwise be wrong**: Fix "Last updated" date and any section that no longer reflects reality.
+
+## What to change
+
+- **Last updated**: Set to today's date (YYYY-MM-DD) when you edit the file.
+- **Current phase**: Update the status table if overall phase or item status changes.
+- **What's implemented**: Add new files/features; revise descriptions if behavior changed.
+- **What's not implemented**: Uncheck or remove items that are now done; keep the list accurate.
+- **Key files**: Update "Current state" for any file you modified.
+- **Recommended next steps**: Reorder or add steps if priorities change; remove steps that are done.
+
+## When to skip
+
+- Do not update the file for purely conversational replies (e.g. answering "how do I…" with no code or project changes).
+- Do not update when the user only asks to create or edit a rule, or when no progress was made on the game or docs.
+
+Keep updates minimal and accurate so the file remains a reliable context for the next turn.

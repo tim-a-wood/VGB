@@ -1,0 +1,14 @@
+---
+description: Apply user working preferences from user-preferences.md to every response
+alwaysApply: true
+---
+
+# User preferences
+
+Before responding, read `.cursor/user-preferences.md` and apply the preferences listed there to your response.
+
+- **Tone, length, and style**: Match any requested communication style (e.g. concise, detailed, formal).
+- **Workflow**: Follow any stated preferences (e.g. confirm before big changes, prefer small edits, explain reasoning).
+- **Defaults**: Use any default choices the user has specified (e.g. naming, formatting, tools).
+
+If the file is empty or missing, proceed as usual. When you update this rule or the preferences file, do not treat that as game/docs progress for project-status updates.

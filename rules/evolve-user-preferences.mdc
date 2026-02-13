@@ -1,0 +1,41 @@
+---
+description: After each prompt, evaluate interactions and update user-preferences.md when preferences emerge
+alwaysApply: true
+---
+
+# Evolve user preferences
+
+After each response, determine if `.cursor/user-preferences.md` should be updated based on the interaction.
+
+## When to update
+
+Add or refine preferences when the user:
+- **Corrects your style** (e.g. "be more concise", "don't assume that")
+- **Repeats a request** (e.g. asks for plans before edits again)
+- **States a preference** (e.g. "I'd rather you…", "Please always…")
+- **Reacts positively** to a style (e.g. thanks you for a plan, appreciates brevity)
+- **Clarifies how they work** (e.g. "I'm new to iOS", "I prefer small commits")
+
+## What to add
+
+Update `user-preferences.md` using existing sections: **Communication**, **Workflow**, **Code / project**. Add new sections if needed (e.g. **Context**, **Feedback**). Be specific and actionable.
+
+```
+## Communication
+- Prefer concise replies unless I ask for detail.
+- Explain non-obvious changes in 1–2 sentences.
+
+## Workflow
+- Suggest a plan before making large edits.
+- Prefer multiple small edits over one big change.
+```
+
+## When not to update
+
+- Purely conversational replies with no preference signal
+- One-off requests that don't reflect ongoing preferences
+- Changes that would contradict existing preferences (ask first)
+
+## Execution
+
+If an update is warranted: apply it directly to `user-preferences.md` before ending your response. Keep changes minimal; one or two lines per interaction is enough. Do not mention the update unless it's substantial or the user asked for it.

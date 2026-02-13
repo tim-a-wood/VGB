@@ -1,0 +1,19 @@
+---
+description: Discuss changes and get approval before editing, unless explicitly asked to implement
+alwaysApply: true
+---
+
+# Confirm before changes
+
+After receiving a prompt, **do not make any edits** without first:
+
+1. Discussing the proposed approach with the user
+2. Receiving explicit approval
+
+## Exception
+
+If the user **explicitly asks** you to implement, add, fix, or apply something in the original prompt (e.g. "implement tap-to-block", "add this feature", "apply the fix"), you may proceed with edits without the approval step.
+
+## When in doubt
+
+If the request is ambiguous, propose a plan and ask for confirmation before editing.
