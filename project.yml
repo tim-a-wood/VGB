@@ -1,0 +1,48 @@
+name: VGB
+options:
+  deploymentTarget:
+    iOS: "18.0"
+settings:
+  base:
+    SWIFT_VERSION: 6.0
+targets:
+  VGB:
+    type: application
+    platform: iOS
+    sources:
+      - path: VGB
+    info:
+      path: VGB/Info.plist
+      properties:
+        UILaunchScreen: {}
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.timwood.vgb
+        CODE_SIGNING_ALLOWED: NO
+        CODE_SIGNING_REQUIRED: NO
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: true
+        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: true
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone:
+          - UIInterfaceOrientationPortrait
+  VGBTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: VGBTests
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGNING_ALLOWED: NO
+        CODE_SIGNING_REQUIRED: NO
+    dependencies:
+      - target: VGB
+schemes:
+  VGB:
+    shared: true
+    build:
+      targets:
+        VGB: all
+        VGBTests: [test]
+    test:
+      targets:
+        - VGBTests

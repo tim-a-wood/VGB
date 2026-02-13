@@ -12,7 +12,7 @@
 |------|--------|
 | Product direction | In progress (backlog tracker concept defined) |
 | MVP scope | Locked (includes live metadata; 2-week target flexible) |
-| Implementation | Not started |
+| Implementation | In progress (Xcode scaffold created) |
 | Release readiness | Not started |
 
 Details: see **What's implemented** and **What's not implemented** below.
@@ -23,10 +23,15 @@ Details: see **What's implemented** and **What's not implemented** below.
 
 ### Project structure
 - Planning docs established under `prompts/`
-- App implementation files not created yet
+- Xcode project scaffold created:
+  - `VGB.xcodeproj` with shared `VGB` scheme
+  - `project.yml` (XcodeGen spec)
+  - `VGB/` app sources and `VGBTests/` unit test target
+  - Verified with `xcodebuild -list` and placeholder test run
 
 ### Assets and UI
-- No production UI/assets yet
+- Minimal SwiftUI placeholder screen in place (`ContentView`)
+- No production assets yet
 
 ### Context / docs
 - **prompts/project-overview.md** — product vision, constraints, monetization direction.
@@ -34,13 +39,13 @@ Details: see **What's implemented** and **What's not implemented** below.
 - **prompts/project-features.md** — feature split between MVP and post-release.
 - **prompts/project-context.md** — references for agent grounding.
 - **prompts/project-status.md** — implementation source of truth.
+- **README.md** — setup, generation, and CI notes.
 - **docs/** — TBD
 
 ---
 
 ## What’s not implemented
 
-- Xcode project scaffolding
 - Data model and persistence layer (including sortOrder, externalId, lastSyncedAt for metadata)
 - Backlog list with drag-and-drop reorder and add/edit flows
 - Metadata provider integration (search, prefill, manual refresh, stale indicators)
@@ -57,7 +62,9 @@ Full task checklist: **prompts/project-plan.md**
 |------|------|----------------|
 | `prompts/project-overview.md` | Product brief and goals | Updated for VGB backlog tracker |
 | `prompts/project-features.md` | Scope guardrails (MVP vs post-release) | Added |
-| `prompts/project-plan.md` | Timeline and execution checklist | Updated for 2-week track |
-| `prompts/project-status.md` | Current progress snapshot | Updated |
+| `prompts/project-plan.md` | Timeline and execution checklist | Phase 1 started |
+| `prompts/project-status.md` | Current progress snapshot | Updated with scaffold progress |
+| `project.yml` | XcodeGen project spec | Added |
+| `VGB.xcodeproj` | iOS app + tests project | Generated with shared scheme |
 
 ---
