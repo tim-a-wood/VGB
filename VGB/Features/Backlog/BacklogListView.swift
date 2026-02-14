@@ -27,9 +27,20 @@ struct BacklogListView: View {
 
     // MARK: - Derived data
 
-    /// Unique platforms across all games (for filter menu).
+    /// Splits a combined platform string (e.g. "PS5, PC" from IGDB) into individual platforms.
+    private static func platformComponents(_ platformString: String) -> [String] {
+        let trimmed = platformString.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else { return [] }
+        return trimmed
+            .components(separatedBy: CharacterSet(charactersIn: ",|/"))
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+    }
+
+    /// Unique individual platforms across all games (split from combined strings for filter menu).
     private var platforms: [String] {
-        Array(Set(games.map(\.platform).filter { !$0.isEmpty })).sorted()
+        let all = games.flatMap { Self.platformComponents($0.platform) }
+        return Array(Set(all)).sorted()
     }
 
     /// Unique genres across all games (for filter menu).
@@ -62,9 +73,11 @@ struct BacklogListView: View {
             result = result.filter { $0.status == status }
         }
 
-        // Platform filter
+        // Platform filter (match if the game's platform list contains the selected platform)
         if let platform = filterPlatform {
-            result = result.filter { $0.platform == platform }
+            result = result.filter { game in
+                Self.platformComponents(game.platform).contains(platform)
+            }
         }
 
         // Genre filter
