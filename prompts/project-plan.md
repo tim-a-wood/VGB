@@ -8,12 +8,12 @@
 
 ## Development Timeline
 
-**Current focus:** Phase 1 scaffolding and core model setup
+**Current focus:** Phase 1 — backlog list, add/edit form, status updates
 
 ### Phase 1: Core backlog (foundation)
 - [x] Create Xcode project structure for SwiftUI + SwiftData
 - [x] Validate scaffold with `xcodebuild` (project lists + placeholder test passes)
-- [ ] Define `Game` model (title, platform, status, sortOrder, release date, estimated hours, notes, ratings, externalId, lastSyncedAt, etc.)
+- [x] Define `Game` model (title, platform, status, priorityPosition, releaseDate, estimatedHours, personalNotes, personalRating, metacriticScore, openCriticScore, genre, developer, coverImageURL, externalId, lastSyncedAt)
 - [ ] Build backlog list with empty state and drag-and-drop reorder (priority order)
 - [ ] Build add/edit game form (manual entry first)
 - [ ] Implement status updates (`Backlog`, `Playing`, `Completed`, `Dropped`)
@@ -38,7 +38,7 @@
 ## Recommended next steps
 
 1. Lock MVP scope to `project-features.md`; live metadata is in scope, timeline flexible.
-2. Implement `Game` SwiftData model and replace placeholder `ContentView` with backlog list.
+2. Wire SwiftData `.modelContainer` in VGBApp and replace placeholder UI with backlog list.
 3. Build vertical slice first: add game (manual) -> list view -> update status -> drag reorder.
 4. Add metadata provider after core list/add/edit works; keep local model as source of truth.
 5. Reserve final stretch for QA, store assets, and submission.

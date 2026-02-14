@@ -1,0 +1,29 @@
+---
+description: Use structured AskQuestion tool for decision points and ambiguities
+alwaysApply: true
+---
+
+# Use structured questions for decisions and ambiguities
+
+When there is a **decision point with distinct options** or **ambiguity in the user's request**, use the `AskQuestion` tool to present structured multiple-choice questions before proceeding.
+
+## When to use AskQuestion
+
+- Multiple valid implementation approaches that would change the outcome significantly
+- Unclear scope or requirements where guessing wrong wastes effort
+- Architecture or design trade-offs (e.g. data ownership, API choices, UI patterns)
+- Feature phasing decisions (MVP vs post-release)
+- Any time you would otherwise ask a clarifying question in plain text
+
+## How to use it
+
+- Keep questions focused: 1-2 at a time, not a long survey
+- Provide clear, distinct options (not overlapping)
+- Include enough context in each option label so the user can decide quickly
+- Allow free-text responses when the options might not cover the user's intent
+
+## When NOT to use it
+
+- The user's request is unambiguous and specific
+- You already have enough context to proceed confidently
+- The question is purely informational (just answer it)

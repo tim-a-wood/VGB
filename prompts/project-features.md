@@ -13,13 +13,15 @@
   - Title (required)
   - Platform
   - Release Date
-  - Priority Order (e.g., drag and drop to reorder)
+  - Priority Order (drag-and-drop ranked list, like a SCRUM backlog)
   - Estimated hours
   - Personal notes
-  - Ratings
+  - Personal rating (0–100)
+  - Metacritic score (fetched from provider, read-only)
+  - OpenCritic score (fetched from provider, read-only)
 - Filter by status and platform
 - **Live metadata**: integrate a game metadata provider (e.g., RAWG, IGDB); fetch/prefill on add and support manual refresh; show last-synced / stale indicators so users know when data was updated
-- Sort by recently updated, priority, or release date
+- Sort by priority (drag-and-drop rank), rating (Metacritic or OpenCritic), or release date
 - Basic stats screen:
   - Total games
   - Completed games
@@ -29,8 +31,8 @@
 
 ## Post Release
 
+- Community rating (average VGB user rating; requires backend)
 - Additional meta data e.g. Related Games (Sequels, Prequels, Remakes, Spiritual Ancestors, etc.)
-- User rating system
 - Rankings for completed games (all time, by year, by genre etc.)
 - Playtime stats (other stats?)
 - iCloud sync across devices

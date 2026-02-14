@@ -25,6 +25,7 @@ Details: see **What's implemented** and **What's not implemented** below.
 - Planning docs under `prompts/`
 - Clean app layout:
   - `VGB/App/` — `VGBApp.swift`, `App/Resources/Info.plist`
+  - `VGB/Models/` — `Game.swift` (SwiftData @Model), `GameStatus.swift` (enum)
   - `VGB/Features/Backlog/` — `BacklogListView.swift`
   - `VGBTests/Unit/` — `AppScaffoldTests.swift`
 - `VGB.xcodeproj` updated to match (shared scheme `VGB`); `project.yml` describes same layout for XcodeGen if used
@@ -46,7 +47,7 @@ Details: see **What's implemented** and **What's not implemented** below.
 
 ## What’s not implemented
 
-- Data model and persistence layer (including sortOrder, externalId, lastSyncedAt for metadata)
+- Wire SwiftData `.modelContainer` in VGBApp
 - Backlog list with drag-and-drop reorder and add/edit flows
 - Metadata provider integration (search, prefill, manual refresh, stale indicators)
 - Filters, sorting, and stats screen
@@ -65,6 +66,8 @@ Full task checklist: **prompts/project-plan.md**
 | `prompts/project-plan.md` | Timeline and execution checklist | Phase 1 started |
 | `prompts/project-status.md` | Current progress snapshot | Updated with scaffold progress |
 | `project.yml` | XcodeGen spec (optional regenerate) | Matches folder layout |
-| `VGB.xcodeproj` | iOS app + tests, shared scheme | Aligned with VGB/App, VGB/Features, VGBTests/Unit |
+| `VGB/Models/Game.swift` | SwiftData domain model | Implemented with user/provider/system field split |
+| `VGB/Models/GameStatus.swift` | Status enum | Backlog, Playing, Completed, Dropped |
+| `VGB.xcodeproj` | iOS app + tests, shared scheme | Aligned with VGB/App, VGB/Models, VGB/Features, VGBTests/Unit |
 
 ---

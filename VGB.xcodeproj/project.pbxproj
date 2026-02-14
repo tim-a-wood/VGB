@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		63E8D4B855E15A47273EBEB9 /* VGBApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A24FB1195840A54D9117F8 /* VGBApp.swift */; };
 		55AA55BB55CC55DD55EE55FF /* BacklogListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44AA44BB44CC44DD44EE44FF /* BacklogListView.swift */; };
+		DD11AA22BB33CC44DD55EE66 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11AA22BB33CC44DD55EE67 /* Game.swift */; };
+		DD11AA22BB33CC44DD55EE68 /* GameStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11AA22BB33CC44DD55EE69 /* GameStatus.swift */; };
 		CCCC11BB22CC33DD44EE55FF /* AppScaffoldTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBB11BB22CC33DD44EE55FF /* AppScaffoldTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -27,6 +29,8 @@
 		0BFD25FD239D36E39B81796A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		44AA44BB44CC44DD44EE44FF /* BacklogListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogListView.swift; sourceTree = "<group>"; };
 		BBBB11BB22CC33DD44EE55FF /* AppScaffoldTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppScaffoldTests.swift; sourceTree = "<group>"; };
+		DD11AA22BB33CC44DD55EE67 /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
+		DD11AA22BB33CC44DD55EE69 /* GameStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStatus.swift; sourceTree = "<group>"; };
 		AABF64DA1FEC1CD8AE9C727B /* VGBTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VGBTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D266180422E28B6163D27F5C /* VGB.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = VGB.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -71,8 +75,18 @@
 			children = (
 				66AA66BB66CC66DD66EE66FF /* App */,
 				88AA88BB88CC88DD88EE88FF /* Features */,
+				DD11AA22BB33CC44DD55FF00 /* Models */,
 			);
 			path = VGB;
+			sourceTree = "<group>";
+		};
+		DD11AA22BB33CC44DD55FF00 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				DD11AA22BB33CC44DD55EE67 /* Game.swift */,
+				DD11AA22BB33CC44DD55EE69 /* GameStatus.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		66AA66BB66CC66DD66EE66FF /* App */ = {
@@ -190,6 +204,8 @@
 			files = (
 				63E8D4B855E15A47273EBEB9 /* VGBApp.swift in Sources */,
 				55AA55BB55CC55DD55EE55FF /* BacklogListView.swift in Sources */,
+				DD11AA22BB33CC44DD55EE66 /* Game.swift in Sources */,
+				DD11AA22BB33CC44DD55EE68 /* GameStatus.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
