@@ -8,16 +8,16 @@
 
 ## Development Timeline
 
-**Current focus:** Phase 1 — backlog list, add/edit form, status updates
+**Current focus:** Phase 1 wrap-up — unit tests; then Phase 2 (live metadata)
 
 ### Phase 1: Core backlog (foundation)
 - [x] Create Xcode project structure for SwiftUI + SwiftData
 - [x] Validate scaffold with `xcodebuild` (project lists + placeholder test passes)
 - [x] Define `Game` model (title, platform, status, priorityPosition, releaseDate, estimatedHours, personalNotes, personalRating, metacriticScore, openCriticScore, genre, developer, coverImageURL, externalId, lastSyncedAt)
-- [ ] Build backlog list with empty state and drag-and-drop reorder (priority order)
-- [ ] Build add/edit game form (manual entry first)
-- [ ] Implement status updates (`Backlog`, `Playing`, `Completed`, `Dropped`)
-- [ ] Add core filters (status, platform) and sort (updated date, priority order, release date)
+- [x] Build backlog list with empty state and drag-and-drop reorder (priority order)
+- [x] Build add/edit game form (manual entry first)
+- [x] Implement status updates (`Backlog`, `Playing`, `Completed`, `Dropped`)
+- [x] Add core filters (status, platform, genre) and sort (priority, Metacritic, OpenCritic, release date)
 - [x] Add test target scaffold (`VGBTests`) and placeholder test
 - [ ] Add lightweight unit tests for model + filter/sort behavior
 
@@ -37,11 +37,11 @@
 
 ## Recommended next steps
 
-1. Lock MVP scope to `project-features.md`; live metadata is in scope, timeline flexible.
-2. Wire SwiftData `.modelContainer` in VGBApp and replace placeholder UI with backlog list.
-3. Build vertical slice first: add game (manual) -> list view -> update status -> drag reorder.
-4. Add metadata provider after core list/add/edit works; keep local model as source of truth.
-5. Reserve final stretch for QA, store assets, and submission.
+1. Write unit tests for `Game` model defaults, status transitions, and filter/sort logic to close Phase 1.
+2. Research and pick a game metadata API (RAWG, IGDB, or GiantBomb); set up API client.
+3. Add search/lookup to the Add Game flow so users can prefill from the provider.
+4. Implement manual refresh (per game + full list) and show stale indicators.
+5. Reserve final stretch for stats screen, QA, store assets, and submission.
 
 ---
 

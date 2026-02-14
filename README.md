@@ -4,17 +4,18 @@ VGB is an iOS app for gamers to track and prioritize their video game backlog.
 
 ## Current status
 
-- Project scaffold is in place (`VGB.xcodeproj`)
-- SwiftUI app target: `VGB`
-- Unit test target: `VGBTests`
-- Shared scheme for CI: `VGB`
+- **Phase 1 features complete** — backlog list, add/edit, status management, filters, sorting, drag-and-drop reorder
+- Unit tests and Phase 2 (live metadata) up next
+- SwiftUI app target: `VGB` | Test target: `VGBTests` | Shared scheme: `VGB`
 
 ## Project structure
 
-- `VGB/App/` — app entry and shared app resources
-- `VGB/Features/` — feature UI modules (currently backlog)
+- `VGB/App/` — app entry point (`VGBApp.swift`) and resources (`Info.plist`)
+- `VGB/Models/` — domain models (`Game.swift`, `GameStatus.swift`)
+- `VGB/Features/Backlog/` — backlog list, add game form, game detail view
 - `VGBTests/Unit/` — unit tests
 - `project.yml` — XcodeGen project spec
+- `prompts/` — planning and status docs
 
 See:
 - `prompts/project-overview.md` for product direction

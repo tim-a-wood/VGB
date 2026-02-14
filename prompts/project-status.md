@@ -1,8 +1,8 @@
 # VGB — Project Status
 
-**Purpose**: Use this file as context (e.g. `@.cursor/prompts/project-status.md`) so the agent knows exactly what exists today and what’s left to build. Update it as you complete work.
+**Purpose**: Use this file as context (e.g. `@.cursor/prompts/project-status.md`) so the agent knows exactly what exists today and what's left to build. Update it as you complete work.
 
-**Last updated**: 2026-02-13
+**Last updated**: 2026-02-14
 
 ---
 
@@ -10,48 +10,53 @@
 
 | Item | Status |
 |------|--------|
-| Product direction | In progress (backlog tracker concept defined) |
+| Product direction | Done (backlog tracker concept defined) |
 | MVP scope | Locked (includes live metadata; 2-week target flexible) |
-| Implementation | In progress (Xcode scaffold created) |
+| Implementation | Phase 1 features complete; unit tests remaining |
 | Release readiness | Not started |
 
 Details: see **What's implemented** and **What's not implemented** below.
 
 ---
 
-## What’s implemented
+## What's implemented
 
 ### Project structure
 - Planning docs under `prompts/`
 - Clean app layout:
   - `VGB/App/` — `VGBApp.swift`, `App/Resources/Info.plist`
   - `VGB/Models/` — `Game.swift` (SwiftData @Model), `GameStatus.swift` (enum)
-  - `VGB/Features/Backlog/` — `BacklogListView.swift`
+  - `VGB/Features/Backlog/` — `BacklogListView.swift`, `AddGameView.swift`, `GameDetailView.swift`
   - `VGBTests/Unit/` — `AppScaffoldTests.swift`
 - `VGB.xcodeproj` updated to match (shared scheme `VGB`); `project.yml` describes same layout for XcodeGen if used
 
-### Assets and UI
-- Placeholder screen: `BacklogListView` (Features → Backlog)
-- No production assets yet
+### Features (Phase 1)
+- **Backlog list** — displays games sorted by priority; supports drag-and-drop reorder
+- **Add Game form** — manual entry with title, platform, status, estimated hours, personal rating, notes
+- **Game Detail view** — edit status, personal rating, estimated hours, notes; view provider-sourced fields; delete game
+- **Status management** — segmented picker for Backlog / Playing / Completed / Dropped
+- **Filters** — by status, platform, and genre
+- **Sorting** — by priority (drag order), Metacritic score, OpenCritic score, release date
+- **Empty states** — "No Games Yet" and "No Matches" (with clear-filters action)
+- **SwiftData persistence** — `.modelContainer(for: Game.self)` wired in `VGBApp`
+- **Full-screen layout** — proper `UILaunchScreen` and `Info.plist` configuration
 
 ### Context / docs
-- **prompts/project-overview.md** — product vision, constraints, monetization direction.
-- **prompts/project-plan.md** — 2-week delivery timeline, tasks, and test strategy.
-- **prompts/project-features.md** — feature split between MVP and post-release.
-- **prompts/project-context.md** — references for agent grounding.
-- **prompts/project-status.md** — implementation source of truth.
-- **README.md** — setup, generation, and CI notes.
-- **docs/** — TBD
+- **prompts/project-overview.md** — product vision, constraints, monetization direction
+- **prompts/project-plan.md** — delivery timeline, tasks, and test strategy
+- **prompts/project-features.md** — feature split between MVP and post-release
+- **prompts/project-context.md** — references for agent grounding
+- **prompts/project-status.md** — implementation source of truth
+- **README.md** — setup, generation, and CI notes
 
 ---
 
-## What’s not implemented
+## What's not implemented
 
-- Wire SwiftData `.modelContainer` in VGBApp
-- Backlog list with drag-and-drop reorder and add/edit flows
-- Metadata provider integration (search, prefill, manual refresh, stale indicators)
-- Filters, sorting, and stats screen
-- QA pass and App Store submission setup
+- Unit tests for model defaults, status transitions, filter/sort behavior (Phase 1 remaining)
+- Metadata provider integration — API client, search/prefill, manual refresh, stale indicators (Phase 2)
+- Stats screen (Phase 3)
+- QA pass, app icon, launch screen, App Store submission (Phase 3)
 
 Full task checklist: **prompts/project-plan.md**
 
@@ -63,11 +68,14 @@ Full task checklist: **prompts/project-plan.md**
 |------|------|----------------|
 | `prompts/project-overview.md` | Product brief and goals | Updated for VGB backlog tracker |
 | `prompts/project-features.md` | Scope guardrails (MVP vs post-release) | Added |
-| `prompts/project-plan.md` | Timeline and execution checklist | Phase 1 started |
-| `prompts/project-status.md` | Current progress snapshot | Updated with scaffold progress |
+| `prompts/project-plan.md` | Timeline and execution checklist | Phase 1 features done, tests remaining |
+| `prompts/project-status.md` | Current progress snapshot | Updated for Phase 1 completion |
 | `project.yml` | XcodeGen spec (optional regenerate) | Matches folder layout |
 | `VGB/Models/Game.swift` | SwiftData domain model | Implemented with user/provider/system field split |
 | `VGB/Models/GameStatus.swift` | Status enum | Backlog, Playing, Completed, Dropped |
-| `VGB.xcodeproj` | iOS app + tests, shared scheme | Aligned with VGB/App, VGB/Models, VGB/Features, VGBTests/Unit |
+| `VGB/Features/Backlog/BacklogListView.swift` | Main list with filters/sort | Implemented |
+| `VGB/Features/Backlog/AddGameView.swift` | Add game form | Implemented |
+| `VGB/Features/Backlog/GameDetailView.swift` | Game detail/edit view | Implemented |
+| `VGB.xcodeproj` | iOS app + tests, shared scheme | Aligned with full project layout |
 
 ---
