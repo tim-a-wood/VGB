@@ -19,12 +19,17 @@ jobs:
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
 
+      - name: Create Secrets.xcconfig (CI placeholder)
+        run: |
+          printf 'TWITCH_CLIENT_ID = CI_PLACEHOLDER\nTWITCH_CLIENT_SECRET = CI_PLACEHOLDER\n' > Secrets.xcconfig
+
       - name: Run tests
         run: |
           xcodebuild test \
             -scheme VGB \
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             -resultBundlePath TestResults.xcresult \
+            CODE_SIGNING_ALLOWED=NO \
             -quiet
         working-directory: ${{ github.workspace }}
 
