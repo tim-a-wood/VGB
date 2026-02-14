@@ -1,13 +1,25 @@
 import SwiftUI
 import SwiftData
+import WidgetKit
 
+@MainActor
 @main
 struct VGBApp: App {
+    let container: ModelContainer = {
+        do {
+            let c = try StoreConfiguration.sharedContainer()
+            print("[VGB App] Launched — using shared container")
+            return c
+        } catch {
+            fatalError("Failed to configure SwiftData container: \(error)")
+        }
+    }()
+
     var body: some Scene {
         WindowGroup {
             ContentRoot()
         }
-        .modelContainer(for: Game.self)
+        .modelContainer(container)
     }
 }
 
@@ -19,12 +31,38 @@ private struct ContentRoot: View {
 
     var body: some View {
         BacklogListView()
+            .onAppear {
+                pushWidgetSummary(context: modelContext)
+                WidgetCenter.shared.reloadTimelines(ofKind: "VGBWidget")
+            }
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
                     Task {
                         await GameSyncService.shared.refreshStaleGames(in: modelContext)
                     }
+                    pushWidgetSummary(context: modelContext)
+                    WidgetCenter.shared.reloadTimelines(ofKind: "VGBWidget")
                 }
             }
     }
+}
+
+/// Pushes current backlog summary to App Group UserDefaults so the widget can display it.
+private func pushWidgetSummary(context: ModelContext) {
+    print("[VGB App] pushWidgetSummary() called")
+    let descriptor = FetchDescriptor<Game>(sortBy: [SortDescriptor(\.priorityPosition)])
+    guard let games = try? context.fetch(descriptor) else {
+        print("[VGB App] pushWidgetSummary() fetch failed")
+        return
+    }
+    let nextUp = games.first { $0.statusRaw == "Backlog" }
+    print("[VGB App] pushWidgetSummary() games.count=\(games.count) nextUp=\(nextUp?.title ?? "nil") completed=\(games.filter { $0.statusRaw == "Completed" }.count) playing=\(games.filter { $0.statusRaw == "Playing" }.count)")
+    WidgetSummaryStorage.write(
+        nextUpTitle: nextUp?.title,
+        nextUpPlatform: nextUp?.platform.isEmpty == false ? nextUp?.platform : nil,
+        totalGames: games.count,
+        completedGames: games.filter { $0.statusRaw == "Completed" }.count,
+        playingCount: games.filter { $0.statusRaw == "Playing" }.count
+    )
+    print("[VGB App] pushWidgetSummary() done, reloadTimelines next")
 }

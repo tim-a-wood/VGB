@@ -1,6 +1,15 @@
-import WidgetKit
+@preconcurrency import WidgetKit
 import SwiftUI
 import SwiftData
+import os
+
+private let logger = Logger(subsystem: "com.timwood.vgb.widget", category: "Widget")
+
+/// Holds a non-Sendable completion so it can be passed into a @MainActor Task without data race warning.
+private final class SnapshotCompletionHolder: @unchecked Sendable {
+    let completion: (VGBWidgetEntry) -> Void
+    init(_ completion: @escaping (VGBWidgetEntry) -> Void) { self.completion = completion }
+}
 
 // MARK: - Timeline Provider
 
@@ -17,38 +26,60 @@ struct VGBTimelineProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (VGBWidgetEntry) -> Void) {
-        completion(placeholder(in: context))
+        logger.info("getSnapshot() called")
+        let holder = SnapshotCompletionHolder(completion)
+        Task { @MainActor in
+            let entry = fetchEntry()
+            logger.info("getSnapshot() returning entry totalGames=\(entry.totalGames)")
+            holder.completion(entry)
+        }
     }
 
     func getTimeline(in context: Context, completion: @escaping @Sendable (Timeline<VGBWidgetEntry>) -> Void) {
+        logger.info("getTimeline() called")
         Task { @MainActor in
             let entry = fetchEntry()
             let nextUpdate = Calendar.current.date(byAdding: .minute, value: 30, to: Date())!
             let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
+            logger.info("getTimeline() returning timeline with entry totalGames=\(entry.totalGames)")
             completion(timeline)
         }
     }
 
     @MainActor
     private func fetchEntry() -> VGBWidgetEntry {
+        logger.info("fetchEntry() called")
+        // Prefer App Group UserDefaults (written by the app)
+        if let summary = WidgetSummaryStorage.read() {
+            logger.info("fetchEntry() using UserDefaults summary — total=\(summary.totalGames) nextUp=\(summary.nextUpTitle ?? "nil")")
+            return VGBWidgetEntry(
+                date: Date(),
+                nextUpTitle: summary.nextUpTitle,
+                nextUpPlatform: summary.nextUpPlatform,
+                totalGames: summary.totalGames,
+                completedGames: summary.completedGames,
+                playingCount: summary.playingCount
+            )
+        }
+
+        logger.info("fetchEntry() no UserDefaults summary, trying SwiftData")
         let container: ModelContainer
         do {
-            container = try ModelContainer(for: Game.self)
+            container = try StoreConfiguration.sharedContainer()
         } catch {
+            logger.error("fetchEntry() SwiftData failed: \(error.localizedDescription) — returning empty entry")
             return VGBWidgetEntry(date: Date(), nextUpTitle: nil, nextUpPlatform: nil, totalGames: 0, completedGames: 0, playingCount: 0)
         }
 
         let context = container.mainContext
         let descriptor = FetchDescriptor<Game>(sortBy: [SortDescriptor(\.priorityPosition)])
-
         guard let games = try? context.fetch(descriptor) else {
+            logger.error("fetchEntry() SwiftData fetch failed — returning empty entry")
             return VGBWidgetEntry(date: Date(), nextUpTitle: nil, nextUpPlatform: nil, totalGames: 0, completedGames: 0, playingCount: 0)
         }
 
-        // "Next up" = first game in Backlog status by priority
-        let nextUp = games.first(where: { $0.statusRaw == "Backlog" })
-
-        return VGBWidgetEntry(
+        let nextUp = games.first { $0.statusRaw == "Backlog" }
+        let entry = VGBWidgetEntry(
             date: Date(),
             nextUpTitle: nextUp?.title,
             nextUpPlatform: nextUp?.platform,
@@ -56,6 +87,8 @@ struct VGBTimelineProvider: TimelineProvider {
             completedGames: games.filter { $0.statusRaw == "Completed" }.count,
             playingCount: games.filter { $0.statusRaw == "Playing" }.count
         )
+        logger.info("fetchEntry() using SwiftData — total=\(entry.totalGames) nextUp=\(entry.nextUpTitle ?? "nil")")
+        return entry
     }
 }
 
