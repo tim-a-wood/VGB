@@ -5,6 +5,12 @@ struct GameDetailView: View {
     @Bindable var game: Game
     @Environment(\.modelContext) private var modelContext
 
+    @State private var isRefreshing = false
+    @State private var refreshFailed = false
+
+    /// Whether this game is linked to IGDB (has an externalId).
+    private var isLinked: Bool { game.externalId != nil }
+
     var body: some View {
         Form {
             // MARK: - Status
@@ -73,16 +79,59 @@ struct GameDetailView: View {
                     .lineLimit(3...6)
             }
 
-            // MARK: - Metadata
+            // MARK: - Sync Info
 
-            Section("Metadata") {
-                if let synced = game.lastSyncedAt {
-                    LabeledContent("Last Synced", value: synced, format: .relative(presentation: .named))
-                } else {
-                    LabeledContent("Last Synced", value: "Never")
+            Section {
+                // Stale indicator
+                HStack {
+                    if isLinked {
+                        if let synced = game.lastSyncedAt {
+                            let isStale = GameSyncService.shared.isStale(game)
+                            Label {
+                                Text("Synced \(synced, format: .relative(presentation: .named))")
+                            } icon: {
+                                Image(systemName: isStale ? "exclamationmark.arrow.circlepath" : "checkmark.circle")
+                                    .foregroundStyle(isStale ? .orange : .green)
+                            }
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        } else {
+                            Label("Never synced", systemImage: "exclamationmark.triangle")
+                                .font(.subheadline)
+                                .foregroundStyle(.orange)
+                        }
+                    } else {
+                        Label("Added manually", systemImage: "pencil")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Spacer()
+
+                    // Manual refresh button
+                    if isLinked {
+                        Button {
+                            Task { await refreshGame() }
+                        } label: {
+                            if isRefreshing {
+                                ProgressView()
+                            } else {
+                                Image(systemName: "arrow.clockwise")
+                            }
+                        }
+                        .disabled(isRefreshing)
+                    }
+                }
+
+                if refreshFailed {
+                    Text("Refresh failed. Your local data is unchanged.")
+                        .font(.caption)
+                        .foregroundStyle(.red)
                 }
 
                 LabeledContent("Added", value: game.createdAt, format: .dateTime.year().month().day())
+            } header: {
+                Text("Metadata")
             }
 
             // MARK: - Delete
@@ -108,6 +157,20 @@ struct GameDetailView: View {
             game.updatedAt = Date()
         }
     }
+
+    // MARK: - Refresh
+
+    private func refreshGame() async {
+        isRefreshing = true
+        refreshFailed = false
+
+        let success = await GameSyncService.shared.refreshGame(game)
+        if !success {
+            refreshFailed = true
+        }
+
+        isRefreshing = false
+    }
 }
 
 #Preview {
@@ -118,6 +181,8 @@ struct GameDetailView: View {
             g.estimatedHours = 80
             g.personalRating = 92
             g.personalNotes = "Amazing open world"
+            g.externalId = "119133"
+            g.lastSyncedAt = Date().addingTimeInterval(-8 * 24 * 60 * 60) // 8 days ago (stale)
             return g
         }())
     }

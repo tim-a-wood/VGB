@@ -22,14 +22,14 @@
 - [x] Add lightweight unit tests for model + filter/sort behavior (41 tests, 0 failures)
 
 ### Phase 2: Live metadata integration (IGDB via Twitch OAuth2)
-- [ ] Set up Twitch OAuth2 client credentials flow (token fetch + refresh)
-- [ ] Build IGDB API client (search games, fetch game details); map response to `Game` fields
-- [ ] Update `Game` model: rename `metacriticScore` → `igdbRating`, remove `openCriticScore` (post-release)
-- [ ] Add search/lookup on add flow to prefill from IGDB
-- [ ] Implement manual refresh (per game or full list) and persist `lastSyncedAt`
-- [ ] Show last-synced / stale indicators in UI (e.g., "Updated 2 days ago" or subtle stale state)
-- [ ] Handle offline and API errors gracefully (local data remains source of truth)
-- [ ] Add unit tests for API response mapping and token refresh
+- [x] Set up Twitch OAuth2 client credentials flow (token fetch + refresh)
+- [x] Build IGDB API client (search games, fetch game details); map response to `Game` fields
+- [x] Update `Game` model: rename `metacriticScore` → `igdbRating`, remove `openCriticScore` (post-release)
+- [x] Add search/lookup on add flow to prefill from IGDB
+- [x] Auto-refresh stale games on app foreground (>7 days) + manual per-game refresh button
+- [x] Show last-synced / stale indicators in UI (green checkmark vs orange warning)
+- [x] Handle offline and API errors gracefully (local data remains source of truth)
+- [ ] Add unit tests for API response mapping and sync logic
 
 ### Phase 3: Polish and ship
 - [ ] Build simple stats screen (total, completed, completion rate)

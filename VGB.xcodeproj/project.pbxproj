@@ -22,6 +22,7 @@
 		BB22CC33DD44EE55FF660031 /* IGDBError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22CC33DD44EE55FF660032 /* IGDBError.swift */; };
 		BB22CC33DD44EE55FF660041 /* IGDBModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22CC33DD44EE55FF660042 /* IGDBModels.swift */; };
 		BB22CC33DD44EE55FF660051 /* IGDBClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22CC33DD44EE55FF660052 /* IGDBClient.swift */; };
+		BB22CC33DD44EE55FF660061 /* GameSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22CC33DD44EE55FF660062 /* GameSyncService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +48,7 @@
 		BB22CC33DD44EE55FF660032 /* IGDBError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IGDBError.swift; sourceTree = "<group>"; };
 		BB22CC33DD44EE55FF660042 /* IGDBModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IGDBModels.swift; sourceTree = "<group>"; };
 		BB22CC33DD44EE55FF660052 /* IGDBClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IGDBClient.swift; sourceTree = "<group>"; };
+		BB22CC33DD44EE55FF660062 /* GameSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSyncService.swift; sourceTree = "<group>"; };
 		BB22CC33DD44EE55FF660099 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		DD11AA22BB33CC44DD55EE67 /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
 		DD11AA22BB33CC44DD55EE69 /* GameStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStatus.swift; sourceTree = "<group>"; };
@@ -112,6 +114,7 @@
 				BB22CC33DD44EE55FF660052 /* IGDBClient.swift */,
 				BB22CC33DD44EE55FF660032 /* IGDBError.swift */,
 				BB22CC33DD44EE55FF660042 /* IGDBModels.swift */,
+				BB22CC33DD44EE55FF660062 /* GameSyncService.swift */,
 				BB22CC33DD44EE55FF660022 /* TwitchAuthManager.swift */,
 			);
 			path = Services;
@@ -255,6 +258,7 @@
 				BB22CC33DD44EE55FF660031 /* IGDBError.swift in Sources */,
 				BB22CC33DD44EE55FF660041 /* IGDBModels.swift in Sources */,
 				BB22CC33DD44EE55FF660051 /* IGDBClient.swift in Sources */,
+				BB22CC33DD44EE55FF660061 /* GameSyncService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
