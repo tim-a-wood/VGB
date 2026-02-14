@@ -8,7 +8,7 @@
 
 ## Development Timeline
 
-**Current focus:** Phase 1 wrap-up — unit tests; then Phase 2 (live metadata)
+**Current focus:** Phase 2 — live metadata integration
 
 ### Phase 1: Core backlog (foundation)
 - [x] Create Xcode project structure for SwiftUI + SwiftData
@@ -19,7 +19,7 @@
 - [x] Implement status updates (`Backlog`, `Playing`, `Completed`, `Dropped`)
 - [x] Add core filters (status, platform, genre) and sort (priority, Metacritic, OpenCritic, release date)
 - [x] Add test target scaffold (`VGBTests`) and placeholder test
-- [ ] Add lightweight unit tests for model + filter/sort behavior
+- [x] Add lightweight unit tests for model + filter/sort behavior (41 tests, 0 failures)
 
 ### Phase 2: Live metadata integration
 - [ ] Choose and integrate a game metadata provider (e.g., RAWG, IGDB); add API client and map response to `Game` fields

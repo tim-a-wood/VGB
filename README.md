@@ -34,7 +34,7 @@ open VGB.xcodeproj
 ```bash
 xcodebuild -list -project VGB.xcodeproj
 xcodebuild -showdestinations -project VGB.xcodeproj -scheme VGB
-xcodebuild test -project VGB.xcodeproj -scheme VGB -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' -derivedDataPath .derivedData
+xcodebuild test -project VGB.xcodeproj -scheme VGB -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' -derivedDataPath .derivedData CODE_SIGNING_ALLOWED=NO
 ```
 
 ## Project generation

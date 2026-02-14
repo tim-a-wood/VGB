@@ -12,7 +12,7 @@
 |------|--------|
 | Product direction | Done (backlog tracker concept defined) |
 | MVP scope | Locked (includes live metadata; 2-week target flexible) |
-| Implementation | Phase 1 features complete; unit tests remaining |
+| Implementation | Phase 1 complete (41 tests passing); Phase 2 next |
 | Release readiness | Not started |
 
 Details: see **What's implemented** and **What's not implemented** below.
@@ -27,7 +27,7 @@ Details: see **What's implemented** and **What's not implemented** below.
   - `VGB/App/` — `VGBApp.swift`, `App/Resources/Info.plist`
   - `VGB/Models/` — `Game.swift` (SwiftData @Model), `GameStatus.swift` (enum)
   - `VGB/Features/Backlog/` — `BacklogListView.swift`, `AddGameView.swift`, `GameDetailView.swift`
-  - `VGBTests/Unit/` — `AppScaffoldTests.swift`
+  - `VGBTests/Unit/` — `AppScaffoldTests.swift`, `GameModelTests.swift`, `GameStatusTests.swift`, `GameFilterSortTests.swift`
 - `VGB.xcodeproj` updated to match (shared scheme `VGB`); `project.yml` describes same layout for XcodeGen if used
 
 ### Features (Phase 1)
@@ -40,6 +40,7 @@ Details: see **What's implemented** and **What's not implemented** below.
 - **Empty states** — "No Games Yet" and "No Matches" (with clear-filters action)
 - **SwiftData persistence** — `.modelContainer(for: Game.self)` wired in `VGBApp`
 - **Full-screen layout** — proper `UILaunchScreen` and `Info.plist` configuration
+- **Unit tests** — 41 tests across 4 suites (model defaults, status transitions, filter/sort, codable)
 
 ### Context / docs
 - **prompts/project-overview.md** — product vision, constraints, monetization direction
@@ -53,7 +54,6 @@ Details: see **What's implemented** and **What's not implemented** below.
 
 ## What's not implemented
 
-- Unit tests for model defaults, status transitions, filter/sort behavior (Phase 1 remaining)
 - Metadata provider integration — API client, search/prefill, manual refresh, stale indicators (Phase 2)
 - Stats screen (Phase 3)
 - QA pass, app icon, launch screen, App Store submission (Phase 3)
@@ -68,8 +68,8 @@ Full task checklist: **prompts/project-plan.md**
 |------|------|----------------|
 | `prompts/project-overview.md` | Product brief and goals | Updated for VGB backlog tracker |
 | `prompts/project-features.md` | Scope guardrails (MVP vs post-release) | Added |
-| `prompts/project-plan.md` | Timeline and execution checklist | Phase 1 features done, tests remaining |
-| `prompts/project-status.md` | Current progress snapshot | Updated for Phase 1 completion |
+| `prompts/project-plan.md` | Timeline and execution checklist | Phase 1 complete |
+| `prompts/project-status.md` | Current progress snapshot | Updated — Phase 1 done |
 | `project.yml` | XcodeGen spec (optional regenerate) | Matches folder layout |
 | `VGB/Models/Game.swift` | SwiftData domain model | Implemented with user/provider/system field split |
 | `VGB/Models/GameStatus.swift` | Status enum | Backlog, Playing, Completed, Dropped |
