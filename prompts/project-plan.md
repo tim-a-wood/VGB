@@ -8,7 +8,7 @@
 
 ## Development Timeline
 
-**Current focus:** Phase 2 — IGDB metadata integration
+**Current focus:** Phase 2 complete — moving to Phase 3 (Polish and ship)
 
 ### Phase 1: Core backlog (foundation)
 - [x] Create Xcode project structure for SwiftUI + SwiftData
@@ -29,7 +29,7 @@
 - [x] Auto-refresh stale games on app foreground (>7 days) + manual per-game refresh button
 - [x] Show last-synced / stale indicators in UI (green checkmark vs orange warning)
 - [x] Handle offline and API errors gracefully (local data remains source of truth)
-- [ ] Add unit tests for API response mapping and sync logic
+- [x] Add unit tests for API response mapping and sync logic (25 new tests; 66 total, 0 failures)
 
 ### Phase 3: Polish and ship
 - [ ] Build simple stats screen (total, completed, completion rate)

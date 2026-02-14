@@ -17,6 +17,8 @@
 		AA11BB22CC33DD44EE55FF12 /* GameModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF11 /* GameModelTests.swift */; };
 		AA11BB22CC33DD44EE55FF14 /* GameStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF13 /* GameStatusTests.swift */; };
 		AA11BB22CC33DD44EE55FF16 /* GameFilterSortTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF15 /* GameFilterSortTests.swift */; };
+		CC11DD22EE33FF44AA550011 /* IGDBModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC11DD22EE33FF44AA550012 /* IGDBModelsTests.swift */; };
+		CC11DD22EE33FF44AA550021 /* GameSyncServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC11DD22EE33FF44AA550022 /* GameSyncServiceTests.swift */; };
 		BB22CC33DD44EE55FF660011 /* APIConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22CC33DD44EE55FF660012 /* APIConfig.swift */; };
 		BB22CC33DD44EE55FF660021 /* TwitchAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22CC33DD44EE55FF660022 /* TwitchAuthManager.swift */; };
 		BB22CC33DD44EE55FF660031 /* IGDBError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22CC33DD44EE55FF660032 /* IGDBError.swift */; };
@@ -43,6 +45,8 @@
 		AA11BB22CC33DD44EE55FF11 /* GameModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameModelTests.swift; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF13 /* GameStatusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStatusTests.swift; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF15 /* GameFilterSortTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameFilterSortTests.swift; sourceTree = "<group>"; };
+		CC11DD22EE33FF44AA550012 /* IGDBModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IGDBModelsTests.swift; sourceTree = "<group>"; };
+		CC11DD22EE33FF44AA550022 /* GameSyncServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSyncServiceTests.swift; sourceTree = "<group>"; };
 		BB22CC33DD44EE55FF660012 /* APIConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIConfig.swift; sourceTree = "<group>"; };
 		BB22CC33DD44EE55FF660022 /* TwitchAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchAuthManager.swift; sourceTree = "<group>"; };
 		BB22CC33DD44EE55FF660032 /* IGDBError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IGDBError.swift; sourceTree = "<group>"; };
@@ -73,7 +77,9 @@
 				BBBB11BB22CC33DD44EE55FF /* AppScaffoldTests.swift */,
 				AA11BB22CC33DD44EE55FF15 /* GameFilterSortTests.swift */,
 				AA11BB22CC33DD44EE55FF11 /* GameModelTests.swift */,
+				CC11DD22EE33FF44AA550022 /* GameSyncServiceTests.swift */,
 				AA11BB22CC33DD44EE55FF13 /* GameStatusTests.swift */,
+				CC11DD22EE33FF44AA550012 /* IGDBModelsTests.swift */,
 			);
 			path = Unit;
 			sourceTree = "<group>";
@@ -240,6 +246,8 @@
 				AA11BB22CC33DD44EE55FF16 /* GameFilterSortTests.swift in Sources */,
 				AA11BB22CC33DD44EE55FF12 /* GameModelTests.swift in Sources */,
 				AA11BB22CC33DD44EE55FF14 /* GameStatusTests.swift in Sources */,
+				CC11DD22EE33FF44AA550011 /* IGDBModelsTests.swift in Sources */,
+				CC11DD22EE33FF44AA550021 /* GameSyncServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
