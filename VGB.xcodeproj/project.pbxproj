@@ -13,7 +13,6 @@
 		DD11AA22BB33CC44DD55EE68 /* GameStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11AA22BB33CC44DD55EE69 /* GameStatus.swift */; };
 		EE11AA22BB33CC44DD55EE70 /* AddGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE11AA22BB33CC44DD55EE71 /* AddGameView.swift */; };
 		FF11AA22BB33CC44DD55EE72 /* GameDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF11AA22BB33CC44DD55EE73 /* GameDetailView.swift */; };
-		CCCC11BB22CC33DD44EE55FF /* AppScaffoldTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBB11BB22CC33DD44EE55FF /* AppScaffoldTests.swift */; };
 		AA11BB22CC33DD44EE55FF12 /* GameModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF11 /* GameModelTests.swift */; };
 		AA11BB22CC33DD44EE55FF14 /* GameStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF13 /* GameStatusTests.swift */; };
 		AA11BB22CC33DD44EE55FF16 /* GameFilterSortTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF15 /* GameFilterSortTests.swift */; };
@@ -41,7 +40,6 @@
 		05A24FB1195840A54D9117F8 /* VGBApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VGBApp.swift; sourceTree = "<group>"; };
 		0BFD25FD239D36E39B81796A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		44AA44BB44CC44DD44EE44FF /* BacklogListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogListView.swift; sourceTree = "<group>"; };
-		BBBB11BB22CC33DD44EE55FF /* AppScaffoldTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppScaffoldTests.swift; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF11 /* GameModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameModelTests.swift; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF13 /* GameStatusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStatusTests.swift; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF15 /* GameFilterSortTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameFilterSortTests.swift; sourceTree = "<group>"; };
@@ -74,7 +72,6 @@
 		AAAAABBBBBCCCCCDDDDDEEEEFF /* Unit */ = {
 			isa = PBXGroup;
 			children = (
-				BBBB11BB22CC33DD44EE55FF /* AppScaffoldTests.swift */,
 				AA11BB22CC33DD44EE55FF15 /* GameFilterSortTests.swift */,
 				AA11BB22CC33DD44EE55FF11 /* GameModelTests.swift */,
 				CC11DD22EE33FF44AA550022 /* GameSyncServiceTests.swift */,
@@ -242,7 +239,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CCCC11BB22CC33DD44EE55FF /* AppScaffoldTests.swift in Sources */,
 				AA11BB22CC33DD44EE55FF16 /* GameFilterSortTests.swift in Sources */,
 				AA11BB22CC33DD44EE55FF12 /* GameModelTests.swift in Sources */,
 				AA11BB22CC33DD44EE55FF14 /* GameStatusTests.swift in Sources */,

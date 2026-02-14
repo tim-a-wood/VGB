@@ -10,7 +10,7 @@ import SwiftData
 ///
 /// Only provider-sourced fields are updated; user-owned fields are never touched.
 @MainActor
-final class GameSyncService: ObservableObject {
+final class GameSyncService {
 
     static let shared = GameSyncService()
 
@@ -18,10 +18,10 @@ final class GameSyncService: ObservableObject {
     let staleThreshold: TimeInterval = 7 * 24 * 60 * 60 // 7 days
 
     /// Whether a background sync is currently running.
-    @Published var isSyncing = false
+    private(set) var isSyncing = false
 
     /// Number of games refreshed in the last auto-sync pass.
-    @Published var lastSyncCount = 0
+    private(set) var lastSyncCount = 0
 
     private init() {}
 

@@ -8,7 +8,9 @@
 
 - Game backlog list with local persistence
 - Add/edit/delete game entries
-- Status tracking: `Backlog`, `Playing`, `Completed`, `Dropped`
+- Status tracking: `Wishlist`, `Backlog`, `Playing`, `Completed`, `Dropped`
+  - Wishlist: games you don't own yet or that aren't released; auto-badges games with a future release date as "Unreleased"
+  - Lifecycle: Wishlist → Backlog → Playing → Completed / Dropped
 - Core metadata per game:
   - Title (required)
   - Platform
@@ -18,19 +20,33 @@
   - Personal notes
   - IGDB aggregated critic score (fetched from IGDB, read-only)
   - Personal rating (0–100)
-- Filter by status and platform
+  - Cover art thumbnail (fetched from IGDB)
+- Cover art thumbnails in backlog list rows
+- Full cover art header in game detail view
+- "Currently Playing" pinned section at top of backlog list
+- Text search bar on backlog list (find games by name)
+- Filter by status, platform, and genre
 - **Live metadata**: integrate IGDB via Twitch OAuth2; fetch/prefill on add and support manual refresh; show last-synced / stale indicators so users know when data was updated
 - Sort by priority (drag-and-drop rank), critic score, or release date
-- Basic stats screen:
+- Swipe actions on list rows for quick status changes
+- Share a game via iOS share sheet
+- "Completed" celebration animation when marking a game as completed
+- Home screen widget (next-up game / quick stats)
+- Dark mode polish (custom accent color, intentional color palette)
+- Stats screen:
   - Total games
   - Completed games
   - Completion rate
+  - Games by status / platform
+  - Average critic score of completed games
+- Onboarding / first-launch walkthrough (2–3 screens)
 - Empty state and simple first-use UX
 - Basic accessibility and reliability pass before release
 
 ## Post Release
 
 - Community rating (average VGB user rating; requires backend)
+- Browse and import from IGDB (popular/trending/new releases discovery)
 - Additional meta data e.g. Related Games (Sequels, Prequels, Remakes, Spiritual Ancestors, etc.)
 - Rankings for completed games (all time, by year, by genre etc.)
 - Playtime stats (other stats?)
@@ -38,7 +54,6 @@
 - Reminders and nudges for in-progress games
 - Advanced analytics (time-to-complete, monthly trend)
 - Smart suggestions (next game to play based on priority/time)
-- Wishlist and "owned vs unowned" separation
 - Import/export and backup options
 - Optional social features (share progress snapshots)
 - Gameification (e.g., points for games completed or 100%, leaderboards, etc.)

@@ -11,6 +11,9 @@ actor IGDBClient {
     private let baseURL = URL(string: "https://api.igdb.com/v4")!
     private let auth = TwitchAuthManager.shared
 
+    /// Shared Apicalypse fields clause for game queries.
+    private let gameFields = "name,cover.image_id,platforms.name,genres.name,involved_companies.company.name,involved_companies.developer,first_release_date,total_rating,summary"
+
     private init() {}
 
     // MARK: - Public API
@@ -19,7 +22,7 @@ actor IGDBClient {
     func searchGames(_ query: String, limit: Int = 15) async throws -> [IGDBGame] {
         let body = """
         search "\(query.sanitizedForQuery)";
-        fields name,cover.image_id,platforms.name,genres.name,involved_companies.company.name,involved_companies.developer,first_release_date,total_rating,summary;
+        fields \(gameFields);
         limit \(limit);
         """
         return try await post(endpoint: "games", body: body)
@@ -28,7 +31,7 @@ actor IGDBClient {
     /// Fetch a single game by IGDB ID with full details.
     func fetchGame(id: Int) async throws -> IGDBGame? {
         let body = """
-        fields name,cover.image_id,platforms.name,genres.name,involved_companies.company.name,involved_companies.developer,first_release_date,total_rating,summary;
+        fields \(gameFields);
         where id = \(id);
         limit 1;
         """

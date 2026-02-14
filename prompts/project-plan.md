@@ -8,7 +8,7 @@
 
 ## Development Timeline
 
-**Current focus:** Phase 2 complete — moving to Phase 3 (Polish and ship)
+**Current focus:** Phase 3 — Enhanced features (ahead of schedule)
 
 ### Phase 1: Core backlog (foundation)
 - [x] Create Xcode project structure for SwiftUI + SwiftData
@@ -31,8 +31,21 @@
 - [x] Handle offline and API errors gracefully (local data remains source of truth)
 - [x] Add unit tests for API response mapping and sync logic (25 new tests; 66 total, 0 failures)
 
-### Phase 3: Polish and ship
-- [ ] Build simple stats screen (total, completed, completion rate)
+### Phase 3: Enhanced features (bonus — ahead of schedule)
+- [ ] Add cover art thumbnails to backlog list rows (`AsyncImage`)
+- [ ] Add text search bar to backlog list (`.searchable` modifier)
+- [ ] Add "Currently Playing" pinned section at top of backlog list
+- [ ] Add `Wishlist` status (5th lifecycle state for unowned/unreleased games); auto-badge games with future release dates as "Unreleased"
+- [ ] Show full cover art header in `GameDetailView`
+- [ ] Add share game via iOS share sheet
+- [ ] Add "Completed" celebration (confetti/congratulatory moment on status change)
+- [ ] Dark mode polish (custom accent color, intentional color palette)
+- [ ] Add swipe actions on list rows (quick status changes without opening detail)
+- [ ] Build home screen widget (next-up game / quick stats)
+
+### Phase 4: Polish and ship
+- [ ] Build stats screen (total, completed, completion rate, games by status/platform, avg critic score)
+- [ ] Onboarding / first-launch walkthrough (2–3 screens explaining the core loop)
 - [ ] UX polish (validation, loading/empty states, accessibility pass)
 - [ ] App icon, launch screen, store-ready screenshots
 - [ ] Device testing (one physical iPhone + simulator), fix bugs, performance pass
@@ -40,12 +53,12 @@
 
 ## Recommended next steps
 
-1. Register a Twitch app for IGDB API access (Client ID + Secret).
-2. Build Twitch OAuth2 token manager (client credentials grant, auto-refresh).
-3. Build IGDB API client (game search, game detail fetch, response → `Game` mapping).
-4. Wire search into Add Game flow for prefill.
-5. Add manual refresh (per game + full list) and stale indicators.
-6. Reserve final stretch for stats screen, QA, store assets, and submission.
+1. Add cover art thumbnails and text search to the backlog list.
+2. Add "Currently Playing" pinned section and `Wishlist` status.
+3. Implement cover art header, share sheet, swipe actions, and completion celebration.
+4. Dark mode polish and home screen widget.
+5. Build stats screen and onboarding walkthrough.
+6. Final UX polish, app icon, device testing, and App Store submission.
 
 ---
 
