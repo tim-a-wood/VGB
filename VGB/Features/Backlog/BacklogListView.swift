@@ -25,6 +25,8 @@ struct BacklogListView: View {
     @State private var filterGenre: String?
     @State private var searchText = ""
     @State private var showCelebration = false
+    /// Which categories are collapsed on the Game Catalog (sectioned) view. Empty = all expanded.
+    @State private var collapsedSections: Set<GameStatus> = []
 
     // MARK: - Derived data
 
@@ -64,14 +66,28 @@ struct BacklogListView: View {
         displayedGames.filter { $0.status == .backlog }
     }
 
-    /// Games completed (when showing status sections).
+    /// Games completed (when showing status sections), ordered by user rating (highest first).
     private var completedGames: [Game] {
-        displayedGames.filter { $0.status == .completed }
+        displayedGames
+            .filter { $0.status == .completed }
+            .sorted { g1, g2 in
+                let r1 = g1.personalRating ?? -1
+                let r2 = g2.personalRating ?? -1
+                if r1 != r2 { return r1 > r2 }
+                return g1.updatedAt > g2.updatedAt
+            }
     }
 
-    /// Games dropped (when showing status sections).
+    /// Games dropped (when showing status sections), ordered by user rating (highest first).
     private var droppedGames: [Game] {
-        displayedGames.filter { $0.status == .dropped }
+        displayedGames
+            .filter { $0.status == .dropped }
+            .sorted { g1, g2 in
+                let r1 = g1.personalRating ?? -1
+                let r2 = g2.personalRating ?? -1
+                if r1 != r2 { return r1 > r2 }
+                return g1.updatedAt > g2.updatedAt
+            }
     }
 
     /// Games on wishlist (when showing status sections).
@@ -137,7 +153,7 @@ struct BacklogListView: View {
                     gameList
                 }
             }
-            .navigationTitle("Backlog")
+            .navigationTitle("Game Catalog")
             .searchable(text: $searchText, prompt: "Search games")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
@@ -318,25 +334,25 @@ struct BacklogListView: View {
         ScrollView {
             LazyVStack(spacing: 24) {
                 if !nowPlaying.isEmpty {
-                    sectionBlock(title: "Now Playing", systemImage: "play.fill", color: .blue, targetStatus: .playing, games: nowPlaying, onMoveToCompleted: nil) { game in
+                    sectionBlock(title: "Now Playing", systemImage: "play.fill", color: .blue, targetStatus: .playing, games: nowPlaying, isExpanded: !collapsedSections.contains(.playing), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.playing]) } }, onMoveToCompleted: nil) { game in
                         swipeCompleted(game)
                         swipeDropped(game)
                     }
                 }
                 if !backlogGames.isEmpty {
-                    sectionBlock(title: "Backlog", systemImage: "list.bullet", color: .gray, targetStatus: .backlog, games: backlogGames, onMoveToCompleted: nil) { game in
+                    sectionBlock(title: "Backlog", systemImage: "list.bullet", color: .gray, targetStatus: .backlog, games: backlogGames, isExpanded: !collapsedSections.contains(.backlog), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.backlog]) } }, onMoveToCompleted: nil) { game in
                         swipeCompleted(game)
                         swipeDropped(game)
                     }
                 }
                 if !wishlistGames.isEmpty {
-                    sectionBlock(title: "Wishlist", systemImage: "heart.fill", color: .purple, targetStatus: .wishlist, games: wishlistGames, onMoveToCompleted: nil)
+                    sectionBlock(title: "Wishlist", systemImage: "heart.fill", color: .purple, targetStatus: .wishlist, games: wishlistGames, isExpanded: !collapsedSections.contains(.wishlist), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.wishlist]) } }, onMoveToCompleted: nil)
                 }
                 if !completedGames.isEmpty {
-                    sectionBlock(title: "Completed", systemImage: "checkmark.circle.fill", color: .green, targetStatus: .completed, games: completedGames, onMoveToCompleted: triggerCelebration)
+                    sectionBlock(title: "Completed", systemImage: "checkmark.circle.fill", color: .green, targetStatus: .completed, games: completedGames, isExpanded: !collapsedSections.contains(.completed), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.completed]) } }, onMoveToCompleted: triggerCelebration)
                 }
                 if !droppedGames.isEmpty {
-                    sectionBlock(title: "Dropped", systemImage: "xmark.circle.fill", color: .orange, targetStatus: .dropped, games: droppedGames, onMoveToCompleted: nil)
+                    sectionBlock(title: "Dropped", systemImage: "xmark.circle.fill", color: .orange, targetStatus: .dropped, games: droppedGames, isExpanded: !collapsedSections.contains(.dropped), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.dropped]) } }, onMoveToCompleted: nil)
                 }
             }
             .padding(.horizontal, 16)
@@ -350,16 +366,35 @@ struct BacklogListView: View {
         color: Color,
         targetStatus: GameStatus,
         games: [Game],
+        isExpanded: Bool,
+        onToggle: @escaping () -> Void,
         onMoveToCompleted: (() -> Void)?,
         @ViewBuilder trailingSwipe: (Game) -> some View = { _ in EmptyView() }
     ) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            SectionHeaderDropZone(title: title, systemImage: systemImage, color: color, targetStatus: targetStatus, onMoveToCompleted: onMoveToCompleted, modelContext: modelContext)
-            ForEach(games) { game in
-                draggableRow(for: game, targetStatus: targetStatus, onMoveToCompleted: onMoveToCompleted)
-                if game.id != games.last?.id {
-                    Divider()
-                        .padding(.leading, 16)
+            SectionHeaderDropZone(
+                title: title,
+                systemImage: systemImage,
+                color: color,
+                targetStatus: targetStatus,
+                isExpanded: isExpanded,
+                onToggle: onToggle,
+                onMoveToCompleted: onMoveToCompleted,
+                modelContext: modelContext
+            )
+            if isExpanded {
+                ForEach(Array(games.enumerated()), id: \.element.id) { index, game in
+                    draggableRow(
+                        for: game,
+                        targetStatus: targetStatus,
+                        onMoveToCompleted: onMoveToCompleted,
+                        rank: targetStatus == .completed && index < 3 ? index + 1 : nil,
+                        isMostAnticipated: targetStatus == .wishlist && index == 0
+                    )
+                    if game.id != games.last?.id {
+                        Divider()
+                            .padding(.leading, 16)
+                    }
                 }
             }
         }
@@ -368,9 +403,9 @@ struct BacklogListView: View {
     }
 
     /// Row used in ScrollView sectioned list: draggable via .onDrag, also accepts drops (move to this category); use context menu to change status.
-    private func draggableRow(for game: Game, targetStatus: GameStatus, onMoveToCompleted: (() -> Void)?) -> some View {
+    private func draggableRow(for game: Game, targetStatus: GameStatus, onMoveToCompleted: (() -> Void)?, rank: Int? = nil, isMostAnticipated: Bool = false) -> some View {
         NavigationLink(value: game) {
-            GameRowView(game: game)
+            GameRowView(game: game, rank: rank, isMostAnticipated: isMostAnticipated)
         }
         .tint(.primary)
         .onDrag {
@@ -488,6 +523,8 @@ struct BacklogListView: View {
                 systemImage: systemImage,
                 color: color,
                 targetStatus: targetStatus,
+                isExpanded: true,
+                onToggle: {},
                 onMoveToCompleted: onMoveToCompleted,
                 modelContext: modelContext
             )
@@ -663,6 +700,10 @@ struct BacklogListView: View {
 
 private struct GameRowView: View {
     let game: Game
+    /// Top-3 rank in Completed section (1 = gold, 2 = silver, 3 = bronze).
+    var rank: Int? = nil
+    /// True for #1 on Wishlist (priority order).
+    var isMostAnticipated: Bool = false
 
     var body: some View {
         HStack(spacing: 12) {
@@ -721,10 +762,41 @@ private struct GameRowView: View {
                     if game.isUnreleased {
                         UnreleasedBadge()
                     }
+
+                    if let rank, (1...3).contains(rank) {
+                        rankBadge(rank: rank)
+                    }
+
+                    if isMostAnticipated {
+                        Label("Most Anticipated", systemImage: "star.fill")
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(.pink)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 3)
+                            .background(Color.pink.opacity(0.2))
+                            .clipShape(Capsule())
+                    }
                 }
             }
         }
         .padding(.vertical, 4)
+    }
+
+    @ViewBuilder
+    private func rankBadge(rank: Int) -> some View {
+        let (icon, color): (String, Color) = switch rank {
+        case 1: ("trophy.fill", .yellow)
+        case 2: ("2.circle.fill", Color(white: 0.75))
+        case 3: ("3.circle.fill", .brown)
+        default: ("circle.fill", .gray)
+        }
+        Image(systemName: icon)
+            .font(.caption)
+            .foregroundStyle(color)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 3)
+            .background(color.opacity(0.2))
+            .clipShape(Capsule())
     }
 }
 
@@ -767,21 +839,32 @@ private struct SectionHeaderDropZone: View {
     let systemImage: String
     let color: Color
     let targetStatus: GameStatus
+    let isExpanded: Bool
+    let onToggle: () -> Void
     let onMoveToCompleted: (() -> Void)?
     let modelContext: ModelContext
 
     @State private var isTargeted = false
 
     var body: some View {
-        Label(title, systemImage: systemImage)
-            .font(.subheadline.weight(.semibold))
-            .foregroundStyle(color)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 16)
-            .background(isTargeted ? color.opacity(0.25) : Color(.tertiarySystemGroupedBackground))
-            .contentShape(Rectangle())
-            .onDrop(of: [.plainText], isTargeted: $isTargeted) { providers in
+        HStack(spacing: 8) {
+            Label(title, systemImage: systemImage)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(color)
+            Spacer(minLength: 0)
+            Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 8)
+        .padding(.horizontal, 16)
+        .background(isTargeted ? color.opacity(0.25) : Color(.tertiarySystemGroupedBackground))
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onToggle()
+        }
+        .onDrop(of: [.plainText], isTargeted: $isTargeted) { providers in
                 guard let provider = providers.first else { return false }
                 provider.loadObject(ofClass: NSString.self) { object, _ in
                     guard let str = object as? String,

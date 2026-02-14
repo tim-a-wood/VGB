@@ -33,7 +33,7 @@ private struct ContentRoot: View {
         TabView {
             BacklogListView()
                 .tabItem {
-                    Label("Backlog", systemImage: "list.bullet")
+                    Label("Game Catalog", systemImage: "books.vertical")
                 }
             StatsView()
                 .tabItem {
