@@ -2,13 +2,13 @@
 
 **Purpose**: Ship v1 of the iOS game backlog tracker with full MVP scope (including live metadata). Timeline is flexible; aim for ~2 weeks but extend as needed to include metadata integration.
 
-**Last updated**: 2026-02-13
+**Last updated**: 2026-02-14
 
 ---
 
 ## Development Timeline
 
-**Current focus:** Phase 2 — live metadata integration
+**Current focus:** Phase 2 — IGDB metadata integration
 
 ### Phase 1: Core backlog (foundation)
 - [x] Create Xcode project structure for SwiftUI + SwiftData
@@ -21,12 +21,15 @@
 - [x] Add test target scaffold (`VGBTests`) and placeholder test
 - [x] Add lightweight unit tests for model + filter/sort behavior (41 tests, 0 failures)
 
-### Phase 2: Live metadata integration
-- [ ] Choose and integrate a game metadata provider (e.g., RAWG, IGDB); add API client and map response to `Game` fields
-- [ ] Add search/lookup on add flow to prefill from provider
+### Phase 2: Live metadata integration (IGDB via Twitch OAuth2)
+- [ ] Set up Twitch OAuth2 client credentials flow (token fetch + refresh)
+- [ ] Build IGDB API client (search games, fetch game details); map response to `Game` fields
+- [ ] Update `Game` model: rename `metacriticScore` → `igdbRating`, remove `openCriticScore` (post-release)
+- [ ] Add search/lookup on add flow to prefill from IGDB
 - [ ] Implement manual refresh (per game or full list) and persist `lastSyncedAt`
-- [ ] Show last-synced / stale indicators in UI (e.g., “Updated 2 days ago” or subtle stale state)
+- [ ] Show last-synced / stale indicators in UI (e.g., "Updated 2 days ago" or subtle stale state)
 - [ ] Handle offline and API errors gracefully (local data remains source of truth)
+- [ ] Add unit tests for API response mapping and token refresh
 
 ### Phase 3: Polish and ship
 - [ ] Build simple stats screen (total, completed, completion rate)
@@ -37,11 +40,12 @@
 
 ## Recommended next steps
 
-1. Write unit tests for `Game` model defaults, status transitions, and filter/sort logic to close Phase 1.
-2. Research and pick a game metadata API (RAWG, IGDB, or GiantBomb); set up API client.
-3. Add search/lookup to the Add Game flow so users can prefill from the provider.
-4. Implement manual refresh (per game + full list) and show stale indicators.
-5. Reserve final stretch for stats screen, QA, store assets, and submission.
+1. Register a Twitch app for IGDB API access (Client ID + Secret).
+2. Build Twitch OAuth2 token manager (client credentials grant, auto-refresh).
+3. Build IGDB API client (game search, game detail fetch, response → `Game` mapping).
+4. Wire search into Add Game flow for prefill.
+5. Add manual refresh (per game + full list) and stale indicators.
+6. Reserve final stretch for stats screen, QA, store assets, and submission.
 
 ---
 
@@ -61,7 +65,8 @@
   - `Game` model validation and defaults
   - Status transitions and edge cases
   - Filter/sort combinations
-  - Metadata mapping from provider response to `Game` (and lastSyncedAt)
+  - IGDB API response mapping to `Game` (and lastSyncedAt)
+  - Twitch OAuth2 token refresh logic
 - Manual testing:
   - Metadata: search prefill, manual refresh, offline/API failure (local data intact, sensible error UI)
   - Add/edit/delete flows

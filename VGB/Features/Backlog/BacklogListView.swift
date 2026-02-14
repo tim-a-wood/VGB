@@ -5,8 +5,7 @@ import SwiftData
 
 enum SortMode: String, CaseIterable, Identifiable {
     case priority    = "Priority"
-    case metacritic  = "Metacritic"
-    case openCritic  = "OpenCritic"
+    case criticScore = "Critic Score"
     case releaseDate = "Release Date"
 
     var id: String { rawValue }
@@ -59,10 +58,8 @@ struct BacklogListView: View {
         case .priority:
             // Already sorted by priorityPosition from @Query
             break
-        case .metacritic:
-            result.sort { ($0.metacriticScore ?? -1) > ($1.metacriticScore ?? -1) }
-        case .openCritic:
-            result.sort { ($0.openCriticScore ?? -1) > ($1.openCriticScore ?? -1) }
+        case .criticScore:
+            result.sort { ($0.igdbRating ?? -1) > ($1.igdbRating ?? -1) }
         case .releaseDate:
             result.sort { ($0.releaseDate ?? .distantPast) > ($1.releaseDate ?? .distantPast) }
         }

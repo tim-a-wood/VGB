@@ -43,12 +43,8 @@ struct GameDetailView: View {
             // MARK: - Scores
 
             Section("Scores") {
-                if let mc = game.metacriticScore {
-                    LabeledContent("Metacritic", value: "\(mc)")
-                }
-
-                if let oc = game.openCriticScore {
-                    LabeledContent("OpenCritic", value: "\(oc)")
+                if let rating = game.igdbRating {
+                    LabeledContent("Critic Score", value: "\(rating)")
                 }
 
                 HStack {
@@ -118,8 +114,7 @@ struct GameDetailView: View {
     NavigationStack {
         GameDetailView(game: {
             let g = Game(title: "Elden Ring", platform: "PS5", status: .playing)
-            g.metacriticScore = 96
-            g.openCriticScore = 95
+            g.igdbRating = 96
             g.estimatedHours = 80
             g.personalRating = 92
             g.personalNotes = "Amazing open world"

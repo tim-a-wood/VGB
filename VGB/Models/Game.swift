@@ -41,11 +41,8 @@ final class Game {
     /// URL string for the game's cover art.
     var coverImageURL: String?
 
-    /// Metacritic score (0–100).
-    var metacriticScore: Int?
-
-    /// OpenCritic score (0–100).
-    var openCriticScore: Int?
+    /// IGDB aggregated critic + user rating (0–100).
+    var igdbRating: Int?
 
     /// Primary genre.
     var genre: String?

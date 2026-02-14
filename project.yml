@@ -2,6 +2,9 @@ name: VGB
 options:
   deploymentTarget:
     iOS: "18.0"
+configFiles:
+  Debug: Secrets.xcconfig
+  Release: Secrets.xcconfig
 settings:
   base:
     SWIFT_VERSION: 6.0

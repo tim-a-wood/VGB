@@ -13,26 +13,22 @@ final class GameFilterSortTests: XCTestCase {
     /// Builds a small test catalogue.
     private func makeSampleGames() -> [Game] {
         let elden = Game(title: "Elden Ring", platform: "PS5", status: .playing, priorityPosition: 0)
-        elden.metacriticScore = 96
-        elden.openCriticScore = 95
+        elden.igdbRating = 96
         elden.genre = "RPG"
         elden.releaseDate = Date(timeIntervalSince1970: 1_645_660_800) // 2022-02-24
 
         let hades = Game(title: "Hades", platform: "Switch", status: .completed, priorityPosition: 1)
-        hades.metacriticScore = 93
-        hades.openCriticScore = 91
+        hades.igdbRating = 93
         hades.genre = "Roguelike"
         hades.releaseDate = Date(timeIntervalSince1970: 1_600_300_800) // 2020-09-17
 
         let zelda = Game(title: "Zelda: TotK", platform: "Switch", status: .backlog, priorityPosition: 2)
-        zelda.metacriticScore = 96
-        zelda.openCriticScore = 97
+        zelda.igdbRating = 97
         zelda.genre = "RPG"
         zelda.releaseDate = Date(timeIntervalSince1970: 1_683_849_600) // 2023-05-12
 
         let cyberpunk = Game(title: "Cyberpunk 2077", platform: "PC", status: .dropped, priorityPosition: 3)
-        cyberpunk.metacriticScore = 86
-        cyberpunk.openCriticScore = 82
+        cyberpunk.igdbRating = 86
         cyberpunk.genre = "RPG"
 
         return [elden, hades, zelda, cyberpunk]
@@ -147,31 +143,22 @@ final class GameFilterSortTests: XCTestCase {
         XCTAssertEqual(sorted.map(\.title), ["Elden Ring", "Hades", "Zelda: TotK", "Cyberpunk 2077"])
     }
 
-    // MARK: - Sort by Metacritic
+    // MARK: - Sort by IGDB rating
 
-    func testSortByMetacriticDescending() {
+    func testSortByIGDBRatingDescending() {
         let games = makeSampleGames()
-        let sorted = games.sorted { ($0.metacriticScore ?? -1) > ($1.metacriticScore ?? -1) }
-        // Elden Ring (96) and Zelda (96) tie, then Hades (93), then Cyberpunk (86)
-        XCTAssertEqual(sorted.first?.metacriticScore, 96)
-        XCTAssertEqual(sorted.last?.metacriticScore, 86)
+        let sorted = games.sorted { ($0.igdbRating ?? -1) > ($1.igdbRating ?? -1) }
+        // Zelda (97) > Elden Ring (96) > Hades (93) > Cyberpunk (86)
+        XCTAssertEqual(sorted.first?.igdbRating, 97)
+        XCTAssertEqual(sorted.last?.igdbRating, 86)
     }
 
-    func testSortByMetacriticNilsGoLast() {
+    func testSortByIGDBRatingNilsGoLast() {
         var games = makeSampleGames()
         let noScore = Game(title: "No Score", platform: "PC")
         games.append(noScore)
-        let sorted = games.sorted { ($0.metacriticScore ?? -1) > ($1.metacriticScore ?? -1) }
+        let sorted = games.sorted { ($0.igdbRating ?? -1) > ($1.igdbRating ?? -1) }
         XCTAssertEqual(sorted.last?.title, "No Score")
-    }
-
-    // MARK: - Sort by OpenCritic
-
-    func testSortByOpenCriticDescending() {
-        let games = makeSampleGames()
-        let sorted = games.sorted { ($0.openCriticScore ?? -1) > ($1.openCriticScore ?? -1) }
-        XCTAssertEqual(sorted.first?.title, "Zelda: TotK") // 97
-        XCTAssertEqual(sorted.last?.title, "Cyberpunk 2077") // 82
     }
 
     // MARK: - Sort by release date

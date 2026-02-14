@@ -41,8 +41,7 @@ final class GameModelTests: XCTestCase {
         XCTAssertNil(game.personalRating)
         XCTAssertNil(game.releaseDate)
         XCTAssertNil(game.coverImageURL)
-        XCTAssertNil(game.metacriticScore)
-        XCTAssertNil(game.openCriticScore)
+        XCTAssertNil(game.igdbRating)
         XCTAssertNil(game.genre)
         XCTAssertNil(game.developer)
         XCTAssertNil(game.externalId)
@@ -128,11 +127,8 @@ final class GameModelTests: XCTestCase {
     func testProviderFieldsAreMutable() {
         let game = Game(title: "Test")
 
-        game.metacriticScore = 96
-        XCTAssertEqual(game.metacriticScore, 96)
-
-        game.openCriticScore = 92
-        XCTAssertEqual(game.openCriticScore, 92)
+        game.igdbRating = 96
+        XCTAssertEqual(game.igdbRating, 96)
 
         game.genre = "RPG"
         XCTAssertEqual(game.genre, "RPG")

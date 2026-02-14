@@ -1,6 +1,6 @@
 # VGB — Project Features
 
-**Last updated**: 2026-02-13
+**Last updated**: 2026-02-14
 
 ---
 
@@ -16,12 +16,11 @@
   - Priority Order (drag-and-drop ranked list, like a SCRUM backlog)
   - Estimated hours
   - Personal notes
+  - IGDB aggregated critic score (fetched from IGDB, read-only)
   - Personal rating (0–100)
-  - Metacritic score (fetched from provider, read-only)
-  - OpenCritic score (fetched from provider, read-only)
 - Filter by status and platform
-- **Live metadata**: integrate a game metadata provider (e.g., RAWG, IGDB); fetch/prefill on add and support manual refresh; show last-synced / stale indicators so users know when data was updated
-- Sort by priority (drag-and-drop rank), rating (Metacritic or OpenCritic), or release date
+- **Live metadata**: integrate IGDB via Twitch OAuth2; fetch/prefill on add and support manual refresh; show last-synced / stale indicators so users know when data was updated
+- Sort by priority (drag-and-drop rank), critic score, or release date
 - Basic stats screen:
   - Total games
   - Completed games
@@ -43,4 +42,6 @@
 - Import/export and backup options
 - Optional social features (share progress snapshots)
 - Gameification (e.g., points for games completed or 100%, leaderboards, etc.)
+- OpenCritic score integration (second API source for critic scores)
+- Metacritic score integration (conditional — only if revenue and user feedback justify the $149/month RAWG commercial API cost)
 - Monetization experiments (ads and/or premium unlock), only after usage validation
