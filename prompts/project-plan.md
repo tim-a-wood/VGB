@@ -45,6 +45,7 @@
 
 ### Phase 4: Polish and ship
 - [ ] Build stats screen (hero ring, status donut, bar charts by status/platform/genre, avg critic for completed, radar chart by genre)
+- [ ] Add **Rankings** page: ranked list of all RATED games (user rating or critic rating — toggleable)
 - [ ] Onboarding / first-launch walkthrough (2–3 screens explaining the core loop)
 - [ ] UX polish (validation, loading/empty states, accessibility pass)
 - [ ] App icon, launch screen, store-ready screenshots
@@ -57,7 +58,7 @@
 2. Add "Currently Playing" pinned section and `Wishlist` status.
 3. Implement cover art header, share sheet, swipe actions, and completion celebration.
 4. Dark mode polish and home screen widget.
-5. Build stats screen and onboarding walkthrough.
+5. Build stats screen, rankings page, and onboarding walkthrough.
 6. Final UX polish, app icon, device testing, and App Store submission.
 
 ---

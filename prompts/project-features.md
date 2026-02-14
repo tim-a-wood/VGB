@@ -39,6 +39,7 @@
   - **Bar charts:** Games by status; by platform; by genre (top N)
   - **Quality block:** Average critic score for completed games; optional score distribution
   - **Radar chart (FM-style):** Axes = genres (or top N genres); value = completed count in that genre. Shows "where you've finished games" (e.g. strong in RPG, light in Sports). Single-user for MVP; post-release overlay friend's radar for comparison (social features).
+- **Rankings page:** New tab/screen showing a ranking of all games that have a rating. Toggle between **user rating** (personal rating 0–100) and **critic rating** (IGDB); list sorted by the selected rating (highest first).
 - Onboarding / first-launch walkthrough (2–3 screens)
 - Empty state and simple first-use UX
 - Basic accessibility and reliability pass before release

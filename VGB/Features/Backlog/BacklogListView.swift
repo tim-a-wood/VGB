@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UniformTypeIdentifiers
 
 // MARK: - Sort Mode
 
@@ -55,7 +56,32 @@ struct BacklogListView: View {
 
     /// Games currently being played (for the pinned section).
     private var nowPlaying: [Game] {
-        games.filter { $0.status == .playing }
+        displayedGames.filter { $0.status == .playing }
+    }
+
+    /// Games in backlog (when showing status sections).
+    private var backlogGames: [Game] {
+        displayedGames.filter { $0.status == .backlog }
+    }
+
+    /// Games completed (when showing status sections).
+    private var completedGames: [Game] {
+        displayedGames.filter { $0.status == .completed }
+    }
+
+    /// Games dropped (when showing status sections).
+    private var droppedGames: [Game] {
+        displayedGames.filter { $0.status == .dropped }
+    }
+
+    /// Games on wishlist (when showing status sections).
+    private var wishlistGames: [Game] {
+        displayedGames.filter { $0.status == .wishlist }
+    }
+
+    /// Show status sections (Now Playing, Backlog, etc.) instead of a single list.
+    private var showStatusSections: Bool {
+        filterStatus == nil && searchText.trimmingCharacters(in: .whitespaces).isEmpty
     }
 
     /// Games after applying search, filters, and sort.
@@ -275,58 +301,297 @@ struct BacklogListView: View {
     // MARK: - Game List
 
     private var gameList: some View {
-        List {
-            // Pinned "Now Playing" section (only when not filtering by status and no search)
-            if !nowPlaying.isEmpty && filterStatus == nil && searchText.trimmingCharacters(in: .whitespaces).isEmpty {
-                Section {
-                    ForEach(nowPlaying) { game in
-                        NavigationLink(value: game) {
-                            GameRowView(game: game)
-                        }
-                        .swipeActions(edge: .trailing) {
-                            swipeCompleted(game)
-                            swipeDropped(game)
-                        }
-                    }
-                } header: {
-                    Label("Now Playing", systemImage: "play.fill")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.blue)
-                }
-            }
-
-            // Main list
-            Section {
-                ForEach(displayedGames) { game in
-                    NavigationLink(value: game) {
-                        GameRowView(game: game)
-                    }
-                    .swipeActions(edge: .leading) {
-                        if !game.isUnreleased {
-                            swipePlayNow(game)
-                        }
-                    }
-                    .swipeActions(edge: .trailing) {
-                        if !game.isUnreleased {
-                            swipeCompleted(game)
-                            swipeDropped(game)
-                        }
-                    }
-                }
-                .onMove { source, destination in
-                    if sortMode == .priority {
-                        reorder(from: source, to: destination)
-                    }
-                }
-                .onDelete(perform: delete)
-            } header: {
-                if !nowPlaying.isEmpty && filterStatus == nil && searchText.trimmingCharacters(in: .whitespaces).isEmpty {
-                    Text("All Games")
-                }
+        Group {
+            if showStatusSections {
+                scrollViewSectionedList
+            } else {
+                List { singleSection }
             }
         }
         .navigationDestination(for: Game.self) { game in
             GameDetailView(game: game)
+        }
+    }
+
+    /// Sectioned list in a ScrollView (not List) so drag-and-drop works.
+    private var scrollViewSectionedList: some View {
+        ScrollView {
+            LazyVStack(spacing: 24) {
+                if !nowPlaying.isEmpty {
+                    sectionBlock(title: "Now Playing", systemImage: "play.fill", color: .blue, targetStatus: .playing, games: nowPlaying, onMoveToCompleted: nil) { game in
+                        swipeCompleted(game)
+                        swipeDropped(game)
+                    }
+                }
+                if !backlogGames.isEmpty {
+                    sectionBlock(title: "Backlog", systemImage: "list.bullet", color: .gray, targetStatus: .backlog, games: backlogGames, onMoveToCompleted: nil) { game in
+                        swipeCompleted(game)
+                        swipeDropped(game)
+                    }
+                }
+                if !wishlistGames.isEmpty {
+                    sectionBlock(title: "Wishlist", systemImage: "heart.fill", color: .purple, targetStatus: .wishlist, games: wishlistGames, onMoveToCompleted: nil)
+                }
+                if !completedGames.isEmpty {
+                    sectionBlock(title: "Completed", systemImage: "checkmark.circle.fill", color: .green, targetStatus: .completed, games: completedGames, onMoveToCompleted: triggerCelebration)
+                }
+                if !droppedGames.isEmpty {
+                    sectionBlock(title: "Dropped", systemImage: "xmark.circle.fill", color: .orange, targetStatus: .dropped, games: droppedGames, onMoveToCompleted: nil)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+        }
+    }
+
+    private func sectionBlock(
+        title: String,
+        systemImage: String,
+        color: Color,
+        targetStatus: GameStatus,
+        games: [Game],
+        onMoveToCompleted: (() -> Void)?,
+        @ViewBuilder trailingSwipe: (Game) -> some View = { _ in EmptyView() }
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            SectionHeaderDropZone(title: title, systemImage: systemImage, color: color, targetStatus: targetStatus, onMoveToCompleted: onMoveToCompleted, modelContext: modelContext)
+            ForEach(games) { game in
+                draggableRow(for: game, targetStatus: targetStatus, onMoveToCompleted: onMoveToCompleted)
+                if game.id != games.last?.id {
+                    Divider()
+                        .padding(.leading, 16)
+                }
+            }
+        }
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+
+    /// Row used in ScrollView sectioned list: draggable via .onDrag, also accepts drops (move to this category); use context menu to change status.
+    private func draggableRow(for game: Game, targetStatus: GameStatus, onMoveToCompleted: (() -> Void)?) -> some View {
+        NavigationLink(value: game) {
+            GameRowView(game: game)
+        }
+        .tint(.primary)
+        .onDrag {
+            NSItemProvider(object: game.id.uuidString as NSString)
+        }
+        .onDrop(of: [.plainText], isTargeted: nil) { providers in
+            guard let provider = providers.first else { return false }
+            provider.loadObject(ofClass: NSString.self) { object, _ in
+                guard let str = object as? String,
+                      let droppedId = UUID(uuidString: str) else { return }
+                DispatchQueue.main.async {
+                    applyDropToGame(droppedId, targetStatus: targetStatus, onMoveToCompleted: onMoveToCompleted)
+                }
+            }
+            return true
+        }
+        .contextMenu {
+            moveToContextMenu(for: game)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+    }
+
+    private func applyDropToGame(_ gameId: UUID, targetStatus: GameStatus, onMoveToCompleted: (() -> Void)?) {
+        var descriptor = FetchDescriptor<Game>(predicate: #Predicate<Game> { $0.id == gameId })
+        descriptor.fetchLimit = 1
+        guard let game = try? modelContext.fetch(descriptor).first else { return }
+        game.status = targetStatus
+        game.updatedAt = Date()
+        if targetStatus == .completed {
+            onMoveToCompleted?()
+        }
+    }
+
+    /// Sections by status (Now Playing, Backlog, Completed, Dropped, Wishlist) when no filter/search.
+    private var statusSections: some View {
+        Group {
+            if !nowPlaying.isEmpty {
+                statusSection(title: "Now Playing", systemImage: "play.fill", color: .blue, targetStatus: .playing, games: nowPlaying, showLeading: false, showTrailing: true, onMoveToCompleted: nil) { game in
+                    swipeCompleted(game)
+                    swipeDropped(game)
+                }
+            }
+            if !backlogGames.isEmpty {
+                statusSection(title: "Backlog", systemImage: "list.bullet", color: .gray, targetStatus: .backlog, games: backlogGames, showLeading: true, showTrailing: true, reorderable: true, onMoveToCompleted: nil) { game in
+                    swipeCompleted(game)
+                    swipeDropped(game)
+                }
+            }
+            if !wishlistGames.isEmpty {
+                statusSection(title: "Wishlist", systemImage: "heart.fill", color: .purple, targetStatus: .wishlist, games: wishlistGames, showLeading: true, showTrailing: false, onMoveToCompleted: nil)
+            }
+            if !completedGames.isEmpty {
+                statusSection(title: "Completed", systemImage: "checkmark.circle.fill", color: .green, targetStatus: .completed, games: completedGames, showLeading: true, showTrailing: false, onMoveToCompleted: triggerCelebration)
+            }
+            if !droppedGames.isEmpty {
+                statusSection(title: "Dropped", systemImage: "xmark.circle.fill", color: .orange, targetStatus: .dropped, games: droppedGames, showLeading: true, showTrailing: false, onMoveToCompleted: nil)
+            }
+        }
+    }
+
+    private func triggerCelebration() {
+        withAnimation { showCelebration = true }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            withAnimation { showCelebration = false }
+        }
+    }
+
+    /// Single list (when filtering by status or searching).
+    private var singleSection: some View {
+        Section {
+            ForEach(displayedGames) { game in
+                row(for: game, showLeading: true, showTrailing: true) {
+                    swipeCompleted(game)
+                    swipeDropped(game)
+                }
+            }
+            .onMove { source, destination in
+                if sortMode == .priority { reorder(from: source, to: destination) }
+            }
+            .onDelete(perform: delete)
+        }
+    }
+
+    private func statusSection(
+        title: String,
+        systemImage: String,
+        color: Color,
+        targetStatus: GameStatus,
+        games: [Game],
+        showLeading: Bool = false,
+        showTrailing: Bool = false,
+        reorderable: Bool = false,
+        onMoveToCompleted: (() -> Void)? = nil,
+        @ViewBuilder trailingSwipe: @escaping (Game) -> some View = { _ in EmptyView() }
+    ) -> some View {
+        Section {
+            ForEach(games) { game in
+                row(
+                    for: game,
+                    showLeading: showLeading,
+                    showTrailing: showTrailing,
+                    targetStatus: targetStatus,
+                    onMoveToCompleted: onMoveToCompleted
+                ) {
+                    trailingSwipe(game)
+                }
+            }
+            .onDelete { offsets in
+                deleteInSection(games: games, at: offsets)
+            }
+        } header: {
+            SectionHeaderDropZone(
+                title: title,
+                systemImage: systemImage,
+                color: color,
+                targetStatus: targetStatus,
+                onMoveToCompleted: onMoveToCompleted,
+                modelContext: modelContext
+            )
+        }
+    }
+
+    private func row(
+        for game: Game,
+        showLeading: Bool,
+        showTrailing: Bool,
+        targetStatus: GameStatus? = nil,
+        onMoveToCompleted: (() -> Void)? = nil,
+        @ViewBuilder trailingSwipe: () -> some View
+    ) -> some View {
+        rowContent(for: game, showLeading: showLeading, showTrailing: showTrailing, trailingSwipe: trailingSwipe)
+            .modifier(RowDropModifier(
+                targetStatus: targetStatus,
+                onMoveToCompleted: onMoveToCompleted,
+                modelContext: modelContext
+            ))
+    }
+
+    private func rowContent(
+        for game: Game,
+        showLeading: Bool,
+        showTrailing: Bool,
+        @ViewBuilder trailingSwipe: () -> some View
+    ) -> some View {
+        NavigationLink(value: game) {
+            GameRowView(game: game)
+        }
+        .draggable(game.id.uuidString)
+        .contextMenu {
+            moveToContextMenu(for: game)
+        }
+        .swipeActions(edge: .leading) {
+            if showLeading && !game.isUnreleased { swipePlayNow(game) }
+        }
+        .swipeActions(edge: .trailing) {
+            if showTrailing {
+                trailingSwipe()
+            } else if !game.isUnreleased {
+                swipeCompleted(game)
+                swipeDropped(game)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func moveToContextMenu(for game: Game) -> some View {
+        ForEach(GameStatus.allCases, id: \.id) { status in
+            if game.status != status {
+                Button {
+                    game.status = status
+                    game.updatedAt = Date()
+                    if status == .completed {
+                        triggerCelebration()
+                    }
+                } label: {
+                    Label("Move to \(status.rawValue)", systemImage: statusIcon(status))
+                }
+            }
+        }
+    }
+
+    private func statusIcon(_ status: GameStatus) -> String {
+        switch status {
+        case .wishlist: return "heart.fill"
+        case .backlog: return "list.bullet"
+        case .playing: return "play.fill"
+        case .completed: return "checkmark.circle.fill"
+        case .dropped: return "xmark.circle.fill"
+        }
+    }
+
+    /// Applies a drop: updates status of dragged games. Call from MainActor.
+    private func applyDrop(uuidStrings: [String], targetStatus: GameStatus, onMoveToCompleted: (() -> Void)?) -> Bool {
+        for uuidString in uuidStrings {
+            guard let droppedId = UUID(uuidString: uuidString) else { continue }
+            var descriptor = FetchDescriptor<Game>(predicate: #Predicate<Game> { $0.id == droppedId })
+            descriptor.fetchLimit = 1
+            guard let game = try? modelContext.fetch(descriptor).first else { continue }
+            game.status = targetStatus
+            game.updatedAt = Date()
+        }
+        if targetStatus == .completed, !uuidStrings.isEmpty {
+            onMoveToCompleted?()
+        }
+        return true
+    }
+
+    private func reorderInSection(games: [Game], from source: IndexSet, to destination: Int) {
+        var newOrder = games
+        newOrder.move(fromOffsets: source, toOffset: destination)
+        let reordered: [Game] = nowPlaying + newOrder + wishlistGames + completedGames + droppedGames
+        for (index, game) in reordered.enumerated() {
+            game.priorityPosition = index
+        }
+    }
+
+    private func deleteInSection(games: [Game], at offsets: IndexSet) {
+        let toDelete = offsets.map { games[$0] }
+        for game in toDelete {
+            modelContext.delete(game)
         }
     }
 
@@ -492,6 +757,93 @@ private struct UnreleasedBadge: View {
             .background(.indigo.opacity(0.15))
             .foregroundStyle(.indigo)
             .clipShape(Capsule())
+    }
+}
+
+// MARK: - Section header as drop zone (uses .onDrop to match .onDrag NSItemProvider)
+
+private struct SectionHeaderDropZone: View {
+    let title: String
+    let systemImage: String
+    let color: Color
+    let targetStatus: GameStatus
+    let onMoveToCompleted: (() -> Void)?
+    let modelContext: ModelContext
+
+    @State private var isTargeted = false
+
+    var body: some View {
+        Label(title, systemImage: systemImage)
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(color)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 8)
+            .padding(.horizontal, 16)
+            .background(isTargeted ? color.opacity(0.25) : Color(.tertiarySystemGroupedBackground))
+            .contentShape(Rectangle())
+            .onDrop(of: [.plainText], isTargeted: $isTargeted) { providers in
+                guard let provider = providers.first else { return false }
+                provider.loadObject(ofClass: NSString.self) { object, _ in
+                    guard let str = object as? String,
+                          let droppedId = UUID(uuidString: str) else { return }
+                    DispatchQueue.main.async {
+                        applyDrop(gameId: droppedId)
+                    }
+                }
+                return true
+            }
+    }
+
+    private func applyDrop(gameId: UUID) {
+        var descriptor = FetchDescriptor<Game>(predicate: #Predicate<Game> { $0.id == gameId })
+        descriptor.fetchLimit = 1
+        guard let game = try? modelContext.fetch(descriptor).first else { return }
+        game.status = targetStatus
+        game.updatedAt = Date()
+        if targetStatus == .completed {
+            onMoveToCompleted?()
+        }
+    }
+}
+
+// MARK: - Row drop (cross-category drag)
+
+private struct RowDropModifier: ViewModifier {
+    let targetStatus: GameStatus?
+    let onMoveToCompleted: (() -> Void)?
+    let modelContext: ModelContext
+
+    func body(content: Content) -> some View {
+        if let targetStatus {
+            content.dropDestination(for: String.self) { uuidStrings, _ in
+                print("[VGB Drop] dropDestination action called — targetStatus=\(targetStatus.rawValue), uuidStrings.count=\(uuidStrings.count), uuidStrings=\(uuidStrings)")
+                for uuidString in uuidStrings {
+                    guard let droppedId = UUID(uuidString: uuidString) else {
+                        print("[VGB Drop]   skip: invalid UUID '\(uuidString)'")
+                        continue
+                    }
+                    var descriptor = FetchDescriptor<Game>(predicate: #Predicate<Game> { $0.id == droppedId })
+                    descriptor.fetchLimit = 1
+                    guard let game = try? modelContext.fetch(descriptor).first else {
+                        print("[VGB Drop]   skip: no game found for id \(droppedId)")
+                        continue
+                    }
+                    let oldStatus = game.status
+                    game.status = targetStatus
+                    game.updatedAt = Date()
+                    print("[VGB Drop]   updated game '\(game.title)' \(oldStatus.rawValue) → \(targetStatus.rawValue)")
+                }
+                if targetStatus == .completed, !uuidStrings.isEmpty {
+                    onMoveToCompleted?()
+                }
+                print("[VGB Drop] returning true")
+                return true
+            } isTargeted: { isTargeted in
+                print("[VGB Drop] isTargeted(\(targetStatus.rawValue)) = \(isTargeted)")
+            }
+        } else {
+            content
+        }
     }
 }
 
