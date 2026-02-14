@@ -23,6 +23,7 @@ struct BacklogListView: View {
     @State private var filterPlatform: String?
     @State private var filterGenre: String?
     @State private var searchText = ""
+    @State private var showCelebration = false
 
     // MARK: - Derived data
 
@@ -111,6 +112,12 @@ struct BacklogListView: View {
             }
             .sheet(isPresented: $showingAddGame) {
                 AddGameView(existingGameCount: games.count)
+            }
+            .overlay {
+                if showCelebration {
+                    CelebrationOverlay()
+                        .allowsHitTesting(false)
+                }
             }
         }
     }
@@ -282,11 +289,15 @@ struct BacklogListView: View {
                         GameRowView(game: game)
                     }
                     .swipeActions(edge: .leading) {
-                        swipePlayNow(game)
+                        if !game.isUnreleased {
+                            swipePlayNow(game)
+                        }
                     }
                     .swipeActions(edge: .trailing) {
-                        swipeCompleted(game)
-                        swipeDropped(game)
+                        if !game.isUnreleased {
+                            swipeCompleted(game)
+                            swipeDropped(game)
+                        }
                     }
                 }
                 .onMove { source, destination in
@@ -337,6 +348,14 @@ struct BacklogListView: View {
         Button {
             game.status = .completed
             game.updatedAt = Date()
+            withAnimation {
+                showCelebration = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                withAnimation {
+                    showCelebration = false
+                }
+            }
         } label: {
             Label("Completed", systemImage: "checkmark.circle.fill")
         }

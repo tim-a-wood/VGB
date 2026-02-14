@@ -29,6 +29,7 @@
 		FF44AA55BB66CC77DD880011 /* VGBWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF44AA55BB66CC77DD880012 /* VGBWidget.swift */; };
 		FF44AA55BB66CC77DD880021 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11AA22BB33CC44DD55EE67 /* Game.swift */; };
 		FF44AA55BB66CC77DD880022 /* GameStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11AA22BB33CC44DD55EE69 /* GameStatus.swift */; };
+		FF44AA55BB66CC77DD880031 /* VGBWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = FF44AA55BB66CC77DD880099 /* VGBWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +39,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = C26B1BA61D007A65E13D0AF1;
 			remoteInfo = VGB;
+		};
+		FF44AA55BB66CC77DD880066 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D235DCD3220CA301ABFBBF0C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FF44AA55BB66CC77DD880077;
+			remoteInfo = VGBWidgetExtension;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -64,6 +72,7 @@
 		DD22EE33FF44AA55BB660012 /* CelebrationOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CelebrationOverlay.swift; sourceTree = "<group>"; };
 		EE33FF44AA55BB66CC770012 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FF44AA55BB66CC77DD880012 /* VGBWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VGBWidget.swift; sourceTree = "<group>"; };
+		FF44AA55BB66CC77DD880013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FF44AA55BB66CC77DD880099 /* VGBWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = VGBWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		AABF64DA1FEC1CD8AE9C727B /* VGBTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VGBTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D266180422E28B6163D27F5C /* VGB.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = VGB.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -94,6 +103,7 @@
 			isa = PBXGroup;
 			children = (
 				FF44AA55BB66CC77DD880012 /* VGBWidget.swift */,
+				FF44AA55BB66CC77DD880013 /* Info.plist */,
 			);
 			path = VGBWidget;
 			sourceTree = "<group>";
@@ -215,10 +225,12 @@
 			buildPhases = (
 				9A33EFBCC83CB348077521BB /* Sources */,
 				EE33FF44AA55BB66CC770099 /* Resources */,
+				FF44AA55BB66CC77DD880050 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				FF44AA55BB66CC77DD880067 /* PBXTargetDependency */,
 			);
 			name = VGB;
 			packageProductDependencies = (
@@ -336,7 +348,26 @@
 			target = C26B1BA61D007A65E13D0AF1 /* VGB */;
 			targetProxy = 99F5DE85A03031D49CDE518B /* PBXContainerItemProxy */;
 		};
+		FF44AA55BB66CC77DD880067 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FF44AA55BB66CC77DD880077 /* VGBWidgetExtension */;
+			targetProxy = FF44AA55BB66CC77DD880066 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		FF44AA55BB66CC77DD880050 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				FF44AA55BB66CC77DD880031 /* VGBWidgetExtension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
 		04D08CFF455CF56DE637C12C /* Release */ = {
@@ -539,11 +570,10 @@
 		FF44AA55BB66CC77DD880033 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGNING_REQUIRED = NO;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = VGBWidget;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_FILE = VGBWidget/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -560,11 +590,10 @@
 		FF44AA55BB66CC77DD880044 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGNING_REQUIRED = NO;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = VGBWidget;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_FILE = VGBWidget/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -32,6 +32,17 @@ struct AddGameView: View {
     /// Whether the user has picked from IGDB results.
     private var hasIGDBSelection: Bool { selectedIGDBGame != nil }
 
+    /// Whether the selected game is unreleased.
+    private var isUnreleasedGame: Bool {
+        guard let date = selectedIGDBGame?.releaseDate else { return false }
+        return date > Date()
+    }
+
+    /// Statuses available for selection — unreleased games can only be Wishlist.
+    private var availableStatuses: [GameStatus] {
+        isUnreleasedGame ? [.wishlist] : Array(GameStatus.allCases)
+    }
+
     var body: some View {
         NavigationStack {
             Form {
@@ -107,7 +118,7 @@ struct AddGameView: View {
 
                 Section("Status") {
                     Picker("Status", selection: $status) {
-                        ForEach(GameStatus.allCases) { s in
+                        ForEach(availableStatuses) { s in
                             Text(s.rawValue).tag(s)
                         }
                     }
@@ -125,13 +136,15 @@ struct AddGameView: View {
                             .frame(width: 80)
                     }
 
-                    HStack {
-                        Text("Your Rating")
-                        Spacer()
-                        TextField("0–100", value: $personalRating, format: .number)
-                            .keyboardType(.numberPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 80)
+                    if !isUnreleasedGame {
+                        HStack {
+                            Text("Your Rating")
+                            Spacer()
+                            TextField("0–100", value: $personalRating, format: .number)
+                                .keyboardType(.numberPad)
+                                .multilineTextAlignment(.trailing)
+                                .frame(width: 80)
+                        }
                     }
 
                     TextField("Notes", text: $personalNotes, axis: .vertical)

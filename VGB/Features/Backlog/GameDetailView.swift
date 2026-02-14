@@ -12,6 +12,11 @@ struct GameDetailView: View {
     /// Whether this game is linked to IGDB (has an externalId).
     private var isLinked: Bool { game.externalId != nil }
 
+    /// Statuses available for selection — unreleased games can only be Wishlist.
+    private var availableStatuses: [GameStatus] {
+        game.isUnreleased ? [.wishlist] : Array(GameStatus.allCases)
+    }
+
     var body: some View {
         Form {
             // MARK: - Cover Art Header
@@ -46,7 +51,7 @@ struct GameDetailView: View {
 
             Section("Status") {
                 Picker("Status", selection: $game.statusRaw) {
-                    ForEach(GameStatus.allCases) { s in
+                    ForEach(availableStatuses, id: \.rawValue) { s in
                         Text(s.rawValue).tag(s.rawValue)
                     }
                 }
@@ -86,22 +91,20 @@ struct GameDetailView: View {
                 if let dev = game.developer, !dev.isEmpty {
                     LabeledContent("Developer", value: dev)
                 }
-            }
 
-            // MARK: - Scores
-
-            Section("Scores") {
                 if let rating = game.igdbRating {
                     LabeledContent("Critic Score", value: "\(rating)")
                 }
 
-                HStack {
-                    Text("Your Rating")
-                    Spacer()
-                    TextField("0–100", value: $game.personalRating, format: .number)
-                        .keyboardType(.numberPad)
-                        .multilineTextAlignment(.trailing)
-                        .frame(width: 80)
+                if !game.isUnreleased {
+                    HStack {
+                        Text("Your Rating")
+                        Spacer()
+                        TextField("0–100", value: $game.personalRating, format: .number)
+                            .keyboardType(.numberPad)
+                            .multilineTextAlignment(.trailing)
+                            .frame(width: 80)
+                    }
                 }
             }
 
