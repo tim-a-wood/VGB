@@ -34,6 +34,10 @@
 		SC11SC22SC33SC44SC55SC68 /* StoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC11SC22SC33SC44SC55SC67 /* StoreConfiguration.swift */; };
 		WS11WS22WS33WS44WS55WS66 /* WidgetSummaryStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS11WS22WS33WS44WS55WS67 /* WidgetSummaryStorage.swift */; };
 		WS11WS22WS33WS44WS55WS68 /* WidgetSummaryStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS11WS22WS33WS44WS55WS67 /* WidgetSummaryStorage.swift */; };
+		A1B2C3D4E5F60202 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60101 /* StatsView.swift */; };
+		A1B2C3D4E5F60404 /* RadarChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60303 /* RadarChartView.swift */; };
+		A1B2C3D4E5F60606 /* GameStatus+Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60505 /* GameStatus+Color.swift */; };
+		RG11RG22RG33RG44RG55RG66 /* RadarGenreCategories.swift in Sources */ = {isa = PBXBuildFile; fileRef = RG11RG22RG33RG44RG55RG67 /* RadarGenreCategories.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,6 +88,10 @@
 		SC11SC22SC33SC44SC55SC69 /* VGB.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VGB.entitlements; sourceTree = "<group>"; };
 		SC11SC22SC33SC44SC55SC70 /* VGBWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VGBWidgetExtension.entitlements; sourceTree = "<group>"; };
 		WS11WS22WS33WS44WS55WS67 /* WidgetSummaryStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSummaryStorage.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60101 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60303 /* RadarChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadarChartView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60505 /* GameStatus+Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameStatus+Color.swift"; sourceTree = "<group>"; };
+		RG11RG22RG33RG44RG55RG67 /* RadarGenreCategories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadarGenreCategories.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -166,6 +174,7 @@
 			children = (
 				DD11AA22BB33CC44DD55EE67 /* Game.swift */,
 				DD11AA22BB33CC44DD55EE69 /* GameStatus.swift */,
+				A1B2C3D4E5F60505 /* GameStatus+Color.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -195,8 +204,19 @@
 			isa = PBXGroup;
 			children = (
 				99AA99BB99CC99DD99EE99FF /* Backlog */,
+				A1B2C3D4E5F60707 /* Stats */,
 			);
 			path = Features;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F60707 /* Stats */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F60101 /* StatsView.swift */,
+				A1B2C3D4E5F60303 /* RadarChartView.swift */,
+				RG11RG22RG33RG44RG55RG67 /* RadarGenreCategories.swift */,
+			);
+			path = Stats;
 			sourceTree = "<group>";
 		};
 		99AA99BB99CC99DD99EE99FF /* Backlog */ = {
@@ -330,6 +350,10 @@
 				BB22CC33DD44EE55FF660051 /* IGDBClient.swift in Sources */,
 				BB22CC33DD44EE55FF660061 /* GameSyncService.swift in Sources */,
 				DD22EE33FF44AA55BB660011 /* CelebrationOverlay.swift in Sources */,
+				A1B2C3D4E5F60202 /* StatsView.swift in Sources */,
+				A1B2C3D4E5F60404 /* RadarChartView.swift in Sources */,
+				A1B2C3D4E5F60606 /* GameStatus+Color.swift in Sources */,
+				RG11RG22RG33RG44RG55RG66 /* RadarGenreCategories.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

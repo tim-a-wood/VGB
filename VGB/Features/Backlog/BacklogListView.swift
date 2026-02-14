@@ -465,15 +465,7 @@ private struct StatusBadge: View {
             .clipShape(Capsule())
     }
 
-    private var color: Color {
-        switch status {
-        case .wishlist:  .purple
-        case .backlog:   .gray
-        case .playing:   .blue
-        case .completed: .green
-        case .dropped:   .orange
-        }
-    }
+    private var color: Color { status.color }
 }
 
 // MARK: - Unreleased Badge

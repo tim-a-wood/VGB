@@ -30,20 +30,29 @@ private struct ContentRoot: View {
     @Environment(\.modelContext) private var modelContext
 
     var body: some View {
-        BacklogListView()
-            .onAppear {
+        TabView {
+            BacklogListView()
+                .tabItem {
+                    Label("Backlog", systemImage: "list.bullet")
+                }
+            StatsView()
+                .tabItem {
+                    Label("Stats", systemImage: "chart.pie")
+                }
+        }
+        .onAppear {
+            pushWidgetSummary(context: modelContext)
+            WidgetCenter.shared.reloadTimelines(ofKind: "VGBWidget")
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                Task {
+                    await GameSyncService.shared.refreshStaleGames(in: modelContext)
+                }
                 pushWidgetSummary(context: modelContext)
                 WidgetCenter.shared.reloadTimelines(ofKind: "VGBWidget")
             }
-            .onChange(of: scenePhase) { _, newPhase in
-                if newPhase == .active {
-                    Task {
-                        await GameSyncService.shared.refreshStaleGames(in: modelContext)
-                    }
-                    pushWidgetSummary(context: modelContext)
-                    WidgetCenter.shared.reloadTimelines(ofKind: "VGBWidget")
-                }
-            }
+        }
     }
 }
 
