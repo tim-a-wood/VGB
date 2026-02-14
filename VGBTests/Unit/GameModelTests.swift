@@ -65,6 +65,10 @@ final class GameModelTests: XCTestCase {
         let game = Game(title: "Test")
         XCTAssertEqual(game.status, .backlog)
 
+        game.status = .wishlist
+        XCTAssertEqual(game.statusRaw, "Wishlist")
+        XCTAssertEqual(game.status, .wishlist)
+
         game.status = .playing
         XCTAssertEqual(game.statusRaw, "Playing")
         XCTAssertEqual(game.status, .playing)
@@ -120,6 +124,25 @@ final class GameModelTests: XCTestCase {
 
         game.priorityPosition = 3
         XCTAssertEqual(game.priorityPosition, 3)
+    }
+
+    // MARK: - isUnreleased
+
+    func testIsUnreleasedTrueForFutureDate() {
+        let game = Game(title: "Future Game")
+        game.releaseDate = Date().addingTimeInterval(365 * 24 * 60 * 60) // 1 year from now
+        XCTAssertTrue(game.isUnreleased)
+    }
+
+    func testIsUnreleasedFalseForPastDate() {
+        let game = Game(title: "Old Game")
+        game.releaseDate = Date(timeIntervalSince1970: 1_645_660_800) // 2022
+        XCTAssertFalse(game.isUnreleased)
+    }
+
+    func testIsUnreleasedFalseWhenNoDate() {
+        let game = Game(title: "No Date")
+        XCTAssertFalse(game.isUnreleased)
     }
 
     // MARK: - Provider-sourced field mutation

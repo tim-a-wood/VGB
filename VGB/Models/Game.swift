@@ -12,7 +12,7 @@ final class Game {
 
     // MARK: - User-owned
 
-    /// Lifecycle status (Backlog, Playing, Completed, Dropped).
+    /// Lifecycle status (Wishlist, Backlog, Playing, Completed, Dropped).
     var statusRaw: String = GameStatus.backlog.rawValue
 
     /// Drag-and-drop priority rank. Lower value = higher priority.
@@ -73,6 +73,12 @@ final class Game {
     var status: GameStatus {
         get { GameStatus(rawValue: statusRaw) ?? .backlog }
         set { statusRaw = newValue.rawValue }
+    }
+
+    /// Whether this game has a release date in the future.
+    var isUnreleased: Bool {
+        guard let date = releaseDate else { return false }
+        return date > Date()
     }
 
     // MARK: - Init

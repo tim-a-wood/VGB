@@ -12,26 +12,31 @@ final class GameFilterSortTests: XCTestCase {
 
     /// Builds a small test catalogue.
     private func makeSampleGames() -> [Game] {
-        let elden = Game(title: "Elden Ring", platform: "PS5", status: .playing, priorityPosition: 0)
+        let gta6 = Game(title: "GTA VI", platform: "PS5", status: .wishlist, priorityPosition: 0)
+        gta6.igdbRating = nil
+        gta6.genre = "Action"
+        gta6.releaseDate = Date(timeIntervalSince1970: 1_893_456_000) // 2029-12-01 (unreleased)
+
+        let elden = Game(title: "Elden Ring", platform: "PS5", status: .playing, priorityPosition: 1)
         elden.igdbRating = 96
         elden.genre = "RPG"
         elden.releaseDate = Date(timeIntervalSince1970: 1_645_660_800) // 2022-02-24
 
-        let hades = Game(title: "Hades", platform: "Switch", status: .completed, priorityPosition: 1)
+        let hades = Game(title: "Hades", platform: "Switch", status: .completed, priorityPosition: 2)
         hades.igdbRating = 93
         hades.genre = "Roguelike"
         hades.releaseDate = Date(timeIntervalSince1970: 1_600_300_800) // 2020-09-17
 
-        let zelda = Game(title: "Zelda: TotK", platform: "Switch", status: .backlog, priorityPosition: 2)
+        let zelda = Game(title: "Zelda: TotK", platform: "Switch", status: .backlog, priorityPosition: 3)
         zelda.igdbRating = 97
         zelda.genre = "RPG"
         zelda.releaseDate = Date(timeIntervalSince1970: 1_683_849_600) // 2023-05-12
 
-        let cyberpunk = Game(title: "Cyberpunk 2077", platform: "PC", status: .dropped, priorityPosition: 3)
+        let cyberpunk = Game(title: "Cyberpunk 2077", platform: "PC", status: .dropped, priorityPosition: 4)
         cyberpunk.igdbRating = 86
         cyberpunk.genre = "RPG"
 
-        return [elden, hades, zelda, cyberpunk]
+        return [gta6, elden, hades, zelda, cyberpunk]
     }
 
     // MARK: - Filter by status
@@ -64,9 +69,16 @@ final class GameFilterSortTests: XCTestCase {
         XCTAssertEqual(result.first?.title, "Cyberpunk 2077")
     }
 
+    func testFilterByStatusWishlist() {
+        let games = makeSampleGames()
+        let result = games.filter { $0.status == .wishlist }
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result.first?.title, "GTA VI")
+    }
+
     func testNoFilterReturnsAll() {
         let games = makeSampleGames()
-        XCTAssertEqual(games.count, 4)
+        XCTAssertEqual(games.count, 5)
     }
 
     // MARK: - Filter by platform
@@ -82,8 +94,7 @@ final class GameFilterSortTests: XCTestCase {
     func testFilterByPlatformPS5() {
         let games = makeSampleGames()
         let result = games.filter { $0.platform == "PS5" }
-        XCTAssertEqual(result.count, 1)
-        XCTAssertEqual(result.first?.title, "Elden Ring")
+        XCTAssertEqual(result.count, 2) // GTA VI + Elden Ring
     }
 
     func testFilterByPlatformNoneMatch() {
@@ -97,7 +108,14 @@ final class GameFilterSortTests: XCTestCase {
     func testFilterByGenreRPG() {
         let games = makeSampleGames()
         let result = games.filter { $0.genre == "RPG" }
-        XCTAssertEqual(result.count, 3)
+        XCTAssertEqual(result.count, 3) // Elden Ring, Zelda, Cyberpunk
+    }
+
+    func testFilterByGenreAction() {
+        let games = makeSampleGames()
+        let result = games.filter { $0.genre == "Action" }
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result.first?.title, "GTA VI")
     }
 
     func testFilterByGenreRoguelike() {
@@ -140,7 +158,7 @@ final class GameFilterSortTests: XCTestCase {
     func testSortByPriority() {
         let games = makeSampleGames().shuffled()
         let sorted = games.sorted { $0.priorityPosition < $1.priorityPosition }
-        XCTAssertEqual(sorted.map(\.title), ["Elden Ring", "Hades", "Zelda: TotK", "Cyberpunk 2077"])
+        XCTAssertEqual(sorted.map(\.title), ["GTA VI", "Elden Ring", "Hades", "Zelda: TotK", "Cyberpunk 2077"])
     }
 
     // MARK: - Sort by IGDB rating
@@ -148,9 +166,9 @@ final class GameFilterSortTests: XCTestCase {
     func testSortByIGDBRatingDescending() {
         let games = makeSampleGames()
         let sorted = games.sorted { ($0.igdbRating ?? -1) > ($1.igdbRating ?? -1) }
-        // Zelda (97) > Elden Ring (96) > Hades (93) > Cyberpunk (86)
+        // Zelda (97) > Elden Ring (96) > Hades (93) > Cyberpunk (86) > GTA VI (nil → -1)
         XCTAssertEqual(sorted.first?.igdbRating, 97)
-        XCTAssertEqual(sorted.last?.igdbRating, 86)
+        XCTAssertEqual(sorted.last?.title, "GTA VI") // nil rating goes last
     }
 
     func testSortByIGDBRatingNilsGoLast() {
@@ -166,8 +184,8 @@ final class GameFilterSortTests: XCTestCase {
     func testSortByReleaseDateDescending() {
         let games = makeSampleGames()
         let sorted = games.sorted { ($0.releaseDate ?? .distantPast) > ($1.releaseDate ?? .distantPast) }
-        // Zelda (2023) > Elden Ring (2022) > Hades (2020) > Cyberpunk (nil → distantPast)
-        XCTAssertEqual(sorted.first?.title, "Zelda: TotK")
+        // GTA VI (2029) > Zelda (2023) > Elden Ring (2022) > Hades (2020) > Cyberpunk (nil → distantPast)
+        XCTAssertEqual(sorted.first?.title, "GTA VI")
         XCTAssertEqual(sorted.last?.title, "Cyberpunk 2077")
     }
 
@@ -190,8 +208,62 @@ final class GameFilterSortTests: XCTestCase {
     func testUniqueGenres() {
         let games = makeSampleGames()
         let genres = Array(Set(games.compactMap(\.genre).filter { !$0.isEmpty })).sorted()
-        XCTAssertEqual(genres, ["RPG", "Roguelike"])
+        XCTAssertEqual(genres, ["Action", "RPG", "Roguelike"])
     }
+
+    // MARK: - Text search
+
+    func testSearchByTitleCaseInsensitive() {
+        let games = makeSampleGames()
+        let query = "elden"
+        let result = games.filter { $0.title.lowercased().contains(query) }
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result.first?.title, "Elden Ring")
+    }
+
+    func testSearchByPartialTitle() {
+        let games = makeSampleGames()
+        let query = "zel"
+        let result = games.filter { $0.title.lowercased().contains(query) }
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(result.first?.title, "Zelda: TotK")
+    }
+
+    func testSearchNoMatch() {
+        let games = makeSampleGames()
+        let query = "minecraft"
+        let result = games.filter { $0.title.lowercased().contains(query) }
+        XCTAssertTrue(result.isEmpty)
+    }
+
+    func testSearchEmptyStringReturnsAll() {
+        let games = makeSampleGames()
+        let query = ""
+        let result: [Game]
+        if query.isEmpty {
+            result = games
+        } else {
+            result = games.filter { $0.title.lowercased().contains(query) }
+        }
+        XCTAssertEqual(result.count, 5)
+    }
+
+    // MARK: - Unreleased badge
+
+    func testUnreleasedGameDetected() {
+        let games = makeSampleGames()
+        let unreleased = games.filter { $0.isUnreleased }
+        XCTAssertEqual(unreleased.count, 1)
+        XCTAssertEqual(unreleased.first?.title, "GTA VI")
+    }
+
+    func testReleasedGamesNotFlaggedAsUnreleased() {
+        let games = makeSampleGames()
+        let released = games.filter { !$0.isUnreleased && $0.releaseDate != nil }
+        XCTAssertEqual(released.count, 3) // Elden Ring, Hades, Zelda
+    }
+
+    // MARK: - Unique platforms / genres extraction
 
     func testEmptyPlatformExcludedFromList() {
         let games = [Game(title: "No Platform")]

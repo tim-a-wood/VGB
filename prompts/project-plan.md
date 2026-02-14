@@ -32,16 +32,16 @@
 - [x] Add unit tests for API response mapping and sync logic (25 new tests; 66 total, 0 failures)
 
 ### Phase 3: Enhanced features (bonus — ahead of schedule)
-- [ ] Add cover art thumbnails to backlog list rows (`AsyncImage`)
-- [ ] Add text search bar to backlog list (`.searchable` modifier)
-- [ ] Add "Currently Playing" pinned section at top of backlog list
-- [ ] Add `Wishlist` status (5th lifecycle state for unowned/unreleased games); auto-badge games with future release dates as "Unreleased"
-- [ ] Show full cover art header in `GameDetailView`
-- [ ] Add share game via iOS share sheet
-- [ ] Add "Completed" celebration (confetti/congratulatory moment on status change)
-- [ ] Dark mode polish (custom accent color, intentional color palette)
-- [ ] Add swipe actions on list rows (quick status changes without opening detail)
-- [ ] Build home screen widget (next-up game / quick stats)
+- [x] Add cover art thumbnails to backlog list rows (`AsyncImage`)
+- [x] Add text search bar to backlog list (`.searchable` modifier)
+- [x] Add "Currently Playing" pinned section at top of backlog list
+- [x] Add `Wishlist` status (5th lifecycle state for unowned/unreleased games); auto-badge games with future release dates as "Unreleased"
+- [x] Show full cover art header in `GameDetailView`
+- [x] Add share game via iOS share sheet
+- [x] Add "Completed" celebration (confetti/congratulatory moment on status change)
+- [x] Dark mode polish (custom accent color, asset catalog, intentional color palette)
+- [x] Add swipe actions on list rows (quick status changes without opening detail)
+- [x] Build home screen widget (next-up game / quick stats; small + medium sizes)
 
 ### Phase 4: Polish and ship
 - [ ] Build stats screen (total, completed, completion rate, games by status/platform, avg critic score)

@@ -7,7 +7,8 @@ final class GameStatusTests: XCTestCase {
 
     func testAllCasesExist() {
         let cases = GameStatus.allCases
-        XCTAssertEqual(cases.count, 4)
+        XCTAssertEqual(cases.count, 5)
+        XCTAssertTrue(cases.contains(.wishlist))
         XCTAssertTrue(cases.contains(.backlog))
         XCTAssertTrue(cases.contains(.playing))
         XCTAssertTrue(cases.contains(.completed))
@@ -17,6 +18,7 @@ final class GameStatusTests: XCTestCase {
     // MARK: - Raw values
 
     func testRawValues() {
+        XCTAssertEqual(GameStatus.wishlist.rawValue, "Wishlist")
         XCTAssertEqual(GameStatus.backlog.rawValue, "Backlog")
         XCTAssertEqual(GameStatus.playing.rawValue, "Playing")
         XCTAssertEqual(GameStatus.completed.rawValue, "Completed")
@@ -24,6 +26,7 @@ final class GameStatusTests: XCTestCase {
     }
 
     func testInitFromRawValue() {
+        XCTAssertEqual(GameStatus(rawValue: "Wishlist"), .wishlist)
         XCTAssertEqual(GameStatus(rawValue: "Backlog"), .backlog)
         XCTAssertEqual(GameStatus(rawValue: "Playing"), .playing)
         XCTAssertEqual(GameStatus(rawValue: "Completed"), .completed)
@@ -34,6 +37,17 @@ final class GameStatusTests: XCTestCase {
         XCTAssertNil(GameStatus(rawValue: ""))
         XCTAssertNil(GameStatus(rawValue: "Unknown"))
         XCTAssertNil(GameStatus(rawValue: "backlog")) // case-sensitive
+    }
+
+    // MARK: - Lifecycle order
+
+    func testLifecycleOrder() {
+        let cases = GameStatus.allCases
+        XCTAssertEqual(cases[0], .wishlist)
+        XCTAssertEqual(cases[1], .backlog)
+        XCTAssertEqual(cases[2], .playing)
+        XCTAssertEqual(cases[3], .completed)
+        XCTAssertEqual(cases[4], .dropped)
     }
 
     // MARK: - Identifiable

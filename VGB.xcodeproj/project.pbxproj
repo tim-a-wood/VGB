@@ -13,6 +13,8 @@
 		DD11AA22BB33CC44DD55EE68 /* GameStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11AA22BB33CC44DD55EE69 /* GameStatus.swift */; };
 		EE11AA22BB33CC44DD55EE70 /* AddGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE11AA22BB33CC44DD55EE71 /* AddGameView.swift */; };
 		FF11AA22BB33CC44DD55EE72 /* GameDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF11AA22BB33CC44DD55EE73 /* GameDetailView.swift */; };
+		DD22EE33FF44AA55BB660011 /* CelebrationOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD22EE33FF44AA55BB660012 /* CelebrationOverlay.swift */; };
+		EE33FF44AA55BB66CC770011 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EE33FF44AA55BB66CC770012 /* Assets.xcassets */; };
 		AA11BB22CC33DD44EE55FF12 /* GameModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF11 /* GameModelTests.swift */; };
 		AA11BB22CC33DD44EE55FF14 /* GameStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF13 /* GameStatusTests.swift */; };
 		AA11BB22CC33DD44EE55FF16 /* GameFilterSortTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF15 /* GameFilterSortTests.swift */; };
@@ -24,6 +26,9 @@
 		BB22CC33DD44EE55FF660041 /* IGDBModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22CC33DD44EE55FF660042 /* IGDBModels.swift */; };
 		BB22CC33DD44EE55FF660051 /* IGDBClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22CC33DD44EE55FF660052 /* IGDBClient.swift */; };
 		BB22CC33DD44EE55FF660061 /* GameSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22CC33DD44EE55FF660062 /* GameSyncService.swift */; };
+		FF44AA55BB66CC77DD880011 /* VGBWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF44AA55BB66CC77DD880012 /* VGBWidget.swift */; };
+		FF44AA55BB66CC77DD880021 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11AA22BB33CC44DD55EE67 /* Game.swift */; };
+		FF44AA55BB66CC77DD880022 /* GameStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11AA22BB33CC44DD55EE69 /* GameStatus.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +61,10 @@
 		DD11AA22BB33CC44DD55EE69 /* GameStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStatus.swift; sourceTree = "<group>"; };
 		EE11AA22BB33CC44DD55EE71 /* AddGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddGameView.swift; sourceTree = "<group>"; };
 		FF11AA22BB33CC44DD55EE73 /* GameDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameDetailView.swift; sourceTree = "<group>"; };
+		DD22EE33FF44AA55BB660012 /* CelebrationOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CelebrationOverlay.swift; sourceTree = "<group>"; };
+		EE33FF44AA55BB66CC770012 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		FF44AA55BB66CC77DD880012 /* VGBWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VGBWidget.swift; sourceTree = "<group>"; };
+		FF44AA55BB66CC77DD880099 /* VGBWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = VGBWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		AABF64DA1FEC1CD8AE9C727B /* VGBTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VGBTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D266180422E28B6163D27F5C /* VGB.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = VGB.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -81,10 +90,19 @@
 			path = Unit;
 			sourceTree = "<group>";
 		};
+		FF44AA55BB66CC77DD880000 /* VGBWidget */ = {
+			isa = PBXGroup;
+			children = (
+				FF44AA55BB66CC77DD880012 /* VGBWidget.swift */,
+			);
+			path = VGBWidget;
+			sourceTree = "<group>";
+		};
 		348A5F9AABE0C0D1F167C2DC = {
 			isa = PBXGroup;
 			children = (
 				AB18A61825D295D11819A3CE /* VGB */,
+				FF44AA55BB66CC77DD880000 /* VGBWidget */,
 				0EAABE8F932E0CDD1174C819 /* VGBTests */,
 				719CB2F87ADF85422FA9F596 /* Products */,
 			);
@@ -94,6 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				D266180422E28B6163D27F5C /* VGB.app */,
+				FF44AA55BB66CC77DD880099 /* VGBWidgetExtension.appex */,
 				AABF64DA1FEC1CD8AE9C727B /* VGBTests.xctest */,
 			);
 			name = Products;
@@ -144,6 +163,7 @@
 		77AA77BB77CC77DD77EE77FF /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				EE33FF44AA55BB66CC770012 /* Assets.xcassets */,
 				0BFD25FD239D36E39B81796A /* Info.plist */,
 			);
 			path = Resources;
@@ -162,6 +182,7 @@
 			children = (
 				EE11AA22BB33CC44DD55EE71 /* AddGameView.swift */,
 				44AA44BB44CC44DD44EE44FF /* BacklogListView.swift */,
+				DD22EE33FF44AA55BB660012 /* CelebrationOverlay.swift */,
 				FF11AA22BB33CC44DD55EE73 /* GameDetailView.swift */,
 			);
 			path = Backlog;
@@ -193,6 +214,7 @@
 			buildConfigurationList = BB464E6347BAF953FE010FEC /* Build configuration list for PBXNativeTarget "VGB" */;
 			buildPhases = (
 				9A33EFBCC83CB348077521BB /* Sources */,
+				EE33FF44AA55BB66CC770099 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -204,6 +226,23 @@
 			productName = VGB;
 			productReference = D266180422E28B6163D27F5C /* VGB.app */;
 			productType = "com.apple.product-type.application";
+		};
+	FF44AA55BB66CC77DD880077 /* VGBWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FF44AA55BB66CC77DD880088 /* Build configuration list for PBXNativeTarget "VGBWidgetExtension" */;
+			buildPhases = (
+				FF44AA55BB66CC77DD880055 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = VGBWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = VGBWidgetExtension;
+			productReference = FF44AA55BB66CC77DD880099 /* VGBWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -229,6 +268,7 @@
 			projectRoot = "";
 			targets = (
 				C26B1BA61D007A65E13D0AF1 /* VGB */,
+				FF44AA55BB66CC77DD880077 /* VGBWidgetExtension */,
 				8F187E8DBDC3079E0ACBA00C /* VGBTests */,
 			);
 		};
@@ -263,10 +303,32 @@
 				BB22CC33DD44EE55FF660041 /* IGDBModels.swift in Sources */,
 				BB22CC33DD44EE55FF660051 /* IGDBClient.swift in Sources */,
 				BB22CC33DD44EE55FF660061 /* GameSyncService.swift in Sources */,
+				DD22EE33FF44AA55BB660011 /* CelebrationOverlay.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FF44AA55BB66CC77DD880055 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF44AA55BB66CC77DD880011 /* VGBWidget.swift in Sources */,
+				FF44AA55BB66CC77DD880021 /* Game.swift in Sources */,
+				FF44AA55BB66CC77DD880022 /* GameStatus.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXResourcesBuildPhase section */
+		EE33FF44AA55BB66CC770099 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EE33FF44AA55BB66CC770011 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
 		A2A43A1391B1E938CD784C17 /* PBXTargetDependency */ = {
@@ -474,6 +536,48 @@
 			};
 			name = Debug;
 		};
+		FF44AA55BB66CC77DD880033 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = VGBWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.timwood.vgb.widget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		FF44AA55BB66CC77DD880044 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = VGBWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.timwood.vgb.widget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -500,6 +604,15 @@
 			buildConfigurations = (
 				E80AC34F79D599B298FCCA10 /* Debug */,
 				197CE95AD584EC756F3FBF3B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FF44AA55BB66CC77DD880088 /* Build configuration list for PBXNativeTarget "VGBWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF44AA55BB66CC77DD880033 /* Debug */,
+				FF44AA55BB66CC77DD880044 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

@@ -7,12 +7,41 @@ struct GameDetailView: View {
 
     @State private var isRefreshing = false
     @State private var refreshFailed = false
+    @State private var showCelebration = false
 
     /// Whether this game is linked to IGDB (has an externalId).
     private var isLinked: Bool { game.externalId != nil }
 
     var body: some View {
         Form {
+            // MARK: - Cover Art Header
+
+            if let urlString = game.coverImageURL, let url = URL(string: urlString) {
+                Section {
+                    HStack {
+                        Spacer()
+                        AsyncImage(url: url) { image in
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                        } placeholder: {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(.quaternary)
+                                .aspectRatio(3/4, contentMode: .fit)
+                                .overlay {
+                                    ProgressView()
+                                }
+                        }
+                        .frame(maxHeight: 260)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .shadow(radius: 4)
+                        Spacer()
+                    }
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                }
+            }
+
             // MARK: - Status
 
             Section("Status") {
@@ -21,7 +50,6 @@ struct GameDetailView: View {
                         Text(s.rawValue).tag(s.rawValue)
                     }
                 }
-                .pickerStyle(.segmented)
             }
 
             // MARK: - Game Info
@@ -34,7 +62,21 @@ struct GameDetailView: View {
                 }
 
                 if let date = game.releaseDate {
-                    LabeledContent("Release Date", value: date, format: .dateTime.year().month().day())
+                    HStack {
+                        Text("Release Date")
+                        Spacer()
+                        Text(date, format: .dateTime.year().month().day())
+                            .foregroundStyle(.secondary)
+                        if game.isUnreleased {
+                            Text("Unreleased")
+                                .font(.caption2.weight(.medium))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(.indigo.opacity(0.15))
+                                .foregroundStyle(.indigo)
+                                .clipShape(Capsule())
+                        }
+                    }
                 }
 
                 if let genre = game.genre, !genre.isEmpty {
@@ -82,7 +124,6 @@ struct GameDetailView: View {
             // MARK: - Sync Info
 
             Section {
-                // Stale indicator
                 HStack {
                     if isLinked {
                         if let synced = game.lastSyncedAt {
@@ -108,7 +149,6 @@ struct GameDetailView: View {
 
                     Spacer()
 
-                    // Manual refresh button
                     if isLinked {
                         Button {
                             Task { await refreshGame() }
@@ -134,18 +174,38 @@ struct GameDetailView: View {
                 Text("Metadata")
             }
 
-            // MARK: - Delete
+            // MARK: - Actions
 
             Section {
+                ShareLink(item: shareText) {
+                    Label("Share Game", systemImage: "square.and.arrow.up")
+                }
+
                 Button("Delete Game", role: .destructive) {
                     modelContext.delete(game)
                 }
             }
         }
+        .overlay {
+            if showCelebration {
+                CelebrationOverlay()
+                    .allowsHitTesting(false)
+            }
+        }
         .navigationTitle(game.title)
         .navigationBarTitleDisplayMode(.inline)
-        .onChange(of: game.statusRaw) {
+        .onChange(of: game.statusRaw) { oldValue, newValue in
             game.updatedAt = Date()
+            if newValue == GameStatus.completed.rawValue && oldValue != newValue {
+                withAnimation {
+                    showCelebration = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                    withAnimation {
+                        showCelebration = false
+                    }
+                }
+            }
         }
         .onChange(of: game.personalRating) {
             game.updatedAt = Date()
@@ -156,6 +216,24 @@ struct GameDetailView: View {
         .onChange(of: game.personalNotes) {
             game.updatedAt = Date()
         }
+    }
+
+    // MARK: - Share
+
+    private var shareText: String {
+        var text = game.title
+        if !game.platform.isEmpty {
+            text += " (\(game.platform))"
+        }
+        text += " — \(game.status.rawValue)"
+        if let rating = game.personalRating {
+            text += " | My rating: \(rating)/100"
+        }
+        if let critic = game.igdbRating {
+            text += " | Critic score: \(critic)"
+        }
+        text += "\n\nTracked with VGB"
+        return text
     }
 
     // MARK: - Refresh
@@ -182,7 +260,8 @@ struct GameDetailView: View {
             g.personalRating = 92
             g.personalNotes = "Amazing open world"
             g.externalId = "119133"
-            g.lastSyncedAt = Date().addingTimeInterval(-8 * 24 * 60 * 60) // 8 days ago (stale)
+            g.coverImageURL = "https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg"
+            g.lastSyncedAt = Date().addingTimeInterval(-8 * 24 * 60 * 60)
             return g
         }())
     }

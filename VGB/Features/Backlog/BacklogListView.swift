@@ -22,6 +22,7 @@ struct BacklogListView: View {
     @State private var filterStatus: GameStatus?
     @State private var filterPlatform: String?
     @State private var filterGenre: String?
+    @State private var searchText = ""
 
     // MARK: - Derived data
 
@@ -40,24 +41,40 @@ struct BacklogListView: View {
         filterStatus != nil || filterPlatform != nil || filterGenre != nil
     }
 
-    /// Games after applying filters and sort.
+    /// Games currently being played (for the pinned section).
+    private var nowPlaying: [Game] {
+        games.filter { $0.status == .playing }
+    }
+
+    /// Games after applying search, filters, and sort.
     private var displayedGames: [Game] {
         var result = games
 
+        // Text search
+        let query = searchText.trimmingCharacters(in: .whitespaces).lowercased()
+        if !query.isEmpty {
+            result = result.filter { $0.title.lowercased().contains(query) }
+        }
+
+        // Status filter
         if let status = filterStatus {
             result = result.filter { $0.status == status }
         }
+
+        // Platform filter
         if let platform = filterPlatform {
             result = result.filter { $0.platform == platform }
         }
+
+        // Genre filter
         if let genre = filterGenre {
             result = result.filter { $0.genre == genre }
         }
 
+        // Sort
         switch sortMode {
         case .priority:
-            // Already sorted by priorityPosition from @Query
-            break
+            break // already sorted by priorityPosition from @Query
         case .criticScore:
             result.sort { ($0.igdbRating ?? -1) > ($1.igdbRating ?? -1) }
         case .releaseDate:
@@ -81,6 +98,7 @@ struct BacklogListView: View {
                 }
             }
             .navigationTitle("Backlog")
+            .searchable(text: $searchText, prompt: "Search games")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button { showingAddGame = true } label: {
@@ -107,15 +125,24 @@ struct BacklogListView: View {
         }
     }
 
-    // MARK: - No Results (filters active but nothing matches)
+    // MARK: - No Results (filters/search active but nothing matches)
 
     private var noResultsState: some View {
         ContentUnavailableView {
             Label("No Matches", systemImage: "line.3.horizontal.decrease.circle")
         } description: {
-            Text("No games match the current filters.")
+            if !searchText.trimmingCharacters(in: .whitespaces).isEmpty {
+                Text("No games match \"\(searchText)\".")
+            } else {
+                Text("No games match the current filters.")
+            }
         } actions: {
-            Button("Clear Filters") { clearFilters() }
+            if isFiltered || !searchText.isEmpty {
+                Button("Clear Filters") {
+                    clearFilters()
+                    searchText = ""
+                }
+            }
         }
     }
 
@@ -229,17 +256,50 @@ struct BacklogListView: View {
 
     private var gameList: some View {
         List {
-            ForEach(displayedGames) { game in
-                NavigationLink(value: game) {
-                    GameRowView(game: game)
+            // Pinned "Now Playing" section (only when not filtering by status and no search)
+            if !nowPlaying.isEmpty && filterStatus == nil && searchText.trimmingCharacters(in: .whitespaces).isEmpty {
+                Section {
+                    ForEach(nowPlaying) { game in
+                        NavigationLink(value: game) {
+                            GameRowView(game: game)
+                        }
+                        .swipeActions(edge: .trailing) {
+                            swipeCompleted(game)
+                            swipeDropped(game)
+                        }
+                    }
+                } header: {
+                    Label("Now Playing", systemImage: "play.fill")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.blue)
                 }
             }
-            .onMove { source, destination in
-                if sortMode == .priority {
-                    reorder(from: source, to: destination)
+
+            // Main list
+            Section {
+                ForEach(displayedGames) { game in
+                    NavigationLink(value: game) {
+                        GameRowView(game: game)
+                    }
+                    .swipeActions(edge: .leading) {
+                        swipePlayNow(game)
+                    }
+                    .swipeActions(edge: .trailing) {
+                        swipeCompleted(game)
+                        swipeDropped(game)
+                    }
+                }
+                .onMove { source, destination in
+                    if sortMode == .priority {
+                        reorder(from: source, to: destination)
+                    }
+                }
+                .onDelete(perform: delete)
+            } header: {
+                if !nowPlaying.isEmpty && filterStatus == nil && searchText.trimmingCharacters(in: .whitespaces).isEmpty {
+                    Text("All Games")
                 }
             }
-            .onDelete(perform: delete)
         }
         .navigationDestination(for: Game.self) { game in
             GameDetailView(game: game)
@@ -261,6 +321,38 @@ struct BacklogListView: View {
         }
     }
 
+    // MARK: - Swipe Actions
+
+    private func swipePlayNow(_ game: Game) -> some View {
+        Button {
+            game.status = .playing
+            game.updatedAt = Date()
+        } label: {
+            Label("Playing", systemImage: "play.fill")
+        }
+        .tint(.blue)
+    }
+
+    private func swipeCompleted(_ game: Game) -> some View {
+        Button {
+            game.status = .completed
+            game.updatedAt = Date()
+        } label: {
+            Label("Completed", systemImage: "checkmark.circle.fill")
+        }
+        .tint(.green)
+    }
+
+    private func swipeDropped(_ game: Game) -> some View {
+        Button {
+            game.status = .dropped
+            game.updatedAt = Date()
+        } label: {
+            Label("Drop", systemImage: "xmark.circle.fill")
+        }
+        .tint(.orange)
+    }
+
     private func reorder(from source: IndexSet, to destination: Int) {
         var ordered = displayedGames
         ordered.move(fromOffsets: source, toOffset: destination)
@@ -276,18 +368,63 @@ private struct GameRowView: View {
     let game: Game
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(game.title)
-                .font(.headline)
+        HStack(spacing: 12) {
+            // Cover art thumbnail
+            if let urlString = game.coverImageURL, let url = URL(string: urlString) {
+                AsyncImage(url: url) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                } placeholder: {
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(.quaternary)
+                        .overlay {
+                            Image(systemName: "gamecontroller")
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
+                        }
+                }
+                .frame(width: 44, height: 58)
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+            } else {
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(.quaternary)
+                    .frame(width: 44, height: 58)
+                    .overlay {
+                        Image(systemName: "gamecontroller")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                    }
+            }
 
-            HStack(spacing: 12) {
-                if !game.platform.isEmpty {
-                    Label(game.platform, systemImage: "desktopcomputer")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+            // Info
+            VStack(alignment: .leading, spacing: 4) {
+                Text(game.title)
+                    .font(.headline)
+                    .lineLimit(1)
+
+                HStack(spacing: 8) {
+                    if !game.platform.isEmpty {
+                        Text(game.platform)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+
+                    if let rating = game.igdbRating {
+                        Label("\(rating)", systemImage: "star.fill")
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                    }
                 }
 
-                StatusBadge(status: game.status)
+                HStack(spacing: 6) {
+                    StatusBadge(status: game.status)
+
+                    if game.isUnreleased {
+                        UnreleasedBadge()
+                    }
+                }
             }
         }
         .padding(.vertical, 4)
@@ -311,11 +448,26 @@ private struct StatusBadge: View {
 
     private var color: Color {
         switch status {
+        case .wishlist:  .purple
         case .backlog:   .gray
         case .playing:   .blue
         case .completed: .green
         case .dropped:   .orange
         }
+    }
+}
+
+// MARK: - Unreleased Badge
+
+private struct UnreleasedBadge: View {
+    var body: some View {
+        Text("Unreleased")
+            .font(.caption2.weight(.medium))
+            .padding(.horizontal, 8)
+            .padding(.vertical, 2)
+            .background(.indigo.opacity(0.15))
+            .foregroundStyle(.indigo)
+            .clipShape(Capsule())
     }
 }
 

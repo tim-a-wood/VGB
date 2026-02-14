@@ -111,7 +111,6 @@ struct AddGameView: View {
                             Text(s.rawValue).tag(s)
                         }
                     }
-                    .pickerStyle(.segmented)
                 }
 
                 // MARK: - Your Details
@@ -205,6 +204,11 @@ struct AddGameView: View {
         // Prefill form fields from IGDB data
         title = igdbGame.name ?? ""
         platform = igdbGame.platformNames.joined(separator: ", ")
+
+        // Auto-set status to Wishlist for unreleased games
+        if let date = igdbGame.releaseDate, date > Date() {
+            status = .wishlist
+        }
     }
 
     private func clearSearch() {
