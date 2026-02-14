@@ -33,18 +33,19 @@
 - "Completed" celebration animation when marking a game as completed
 - Home screen widget (next-up game / quick stats)
 - Dark mode polish (custom accent color, intentional color palette)
-- Stats screen:
-  - Total games
-  - Completed games
-  - Completion rate
-  - Games by status / platform
-  - Average critic score of completed games
+- Stats screen (dopamine-focused, charts):
+  - **Hero:** Big completion % (circular progress ring) or "X games completed" with subtle animation on appear
+  - **Status donut:** Wishlist / Backlog / Playing / Completed / Dropped (existing status colors); optional center label (e.g. completion %)
+  - **Bar charts:** Games by status; by platform; by genre (top N)
+  - **Quality block:** Average critic score for completed games; optional score distribution
+  - **Radar chart (FM-style):** Axes = genres (or top N genres); value = completed count in that genre. Shows "where you've finished games" (e.g. strong in RPG, light in Sports). Single-user for MVP; post-release overlay friend's radar for comparison (social features).
 - Onboarding / first-launch walkthrough (2–3 screens)
 - Empty state and simple first-use UX
 - Basic accessibility and reliability pass before release
 
 ## Post Release
 
+- **Social / comparison:** Compare stats and radar charts with friends (overlay friend's radar on yours; shared completion rates, etc.)
 - Community rating (average VGB user rating; requires backend)
 - Browse and import from IGDB (popular/trending/new releases discovery)
 - Additional meta data e.g. Related Games (Sequels, Prequels, Remakes, Spiritual Ancestors, etc.)

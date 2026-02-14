@@ -44,7 +44,7 @@
 - [x] Build home screen widget (next-up game / quick stats; small + medium sizes)
 
 ### Phase 4: Polish and ship
-- [ ] Build stats screen (total, completed, completion rate, games by status/platform, avg critic score)
+- [ ] Build stats screen (hero ring, status donut, bar charts by status/platform/genre, avg critic for completed, radar chart by genre)
 - [ ] Onboarding / first-launch walkthrough (2–3 screens explaining the core loop)
 - [ ] UX polish (validation, loading/empty states, accessibility pass)
 - [ ] App icon, launch screen, store-ready screenshots
