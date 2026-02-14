@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 @main
 struct VGBApp: App {
@@ -6,5 +7,6 @@ struct VGBApp: App {
         WindowGroup {
             BacklogListView()
         }
+        .modelContainer(for: Game.self)
     }
 }
