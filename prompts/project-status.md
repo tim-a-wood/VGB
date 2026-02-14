@@ -6,6 +6,12 @@
 
 ---
 
+## Codebase audit
+
+Pre–Phase 4 audit (2026-02-14): **no rearchitecture needed.** Plan alignment is good (view vs persistence, local model as source of truth, feature layout). Applied: status literals replaced with `GameStatus` in widget summary logic. Recommended before ship: remove or gate debug logging. Full notes: **prompts/codebase-audit.md**.
+
+---
+
 ## Current phase
 
 | Item | Status |

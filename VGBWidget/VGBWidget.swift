@@ -78,14 +78,14 @@ struct VGBTimelineProvider: TimelineProvider {
             return VGBWidgetEntry(date: Date(), nextUpTitle: nil, nextUpPlatform: nil, totalGames: 0, completedGames: 0, playingCount: 0)
         }
 
-        let nextUp = games.first { $0.statusRaw == "Backlog" }
+        let nextUp = games.first { $0.status == .backlog }
         let entry = VGBWidgetEntry(
             date: Date(),
             nextUpTitle: nextUp?.title,
             nextUpPlatform: nextUp?.platform,
             totalGames: games.count,
-            completedGames: games.filter { $0.statusRaw == "Completed" }.count,
-            playingCount: games.filter { $0.statusRaw == "Playing" }.count
+            completedGames: games.filter { $0.status == .completed }.count,
+            playingCount: games.filter { $0.status == .playing }.count
         )
         logger.info("fetchEntry() using SwiftData — total=\(entry.totalGames) nextUp=\(entry.nextUpTitle ?? "nil")")
         return entry

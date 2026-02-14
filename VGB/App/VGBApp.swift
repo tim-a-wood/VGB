@@ -55,14 +55,14 @@ private func pushWidgetSummary(context: ModelContext) {
         print("[VGB App] pushWidgetSummary() fetch failed")
         return
     }
-    let nextUp = games.first { $0.statusRaw == "Backlog" }
-    print("[VGB App] pushWidgetSummary() games.count=\(games.count) nextUp=\(nextUp?.title ?? "nil") completed=\(games.filter { $0.statusRaw == "Completed" }.count) playing=\(games.filter { $0.statusRaw == "Playing" }.count)")
+    let nextUp = games.first { $0.status == .backlog }
+    print("[VGB App] pushWidgetSummary() games.count=\(games.count) nextUp=\(nextUp?.title ?? "nil") completed=\(games.filter { $0.status == .completed }.count) playing=\(games.filter { $0.status == .playing }.count)")
     WidgetSummaryStorage.write(
         nextUpTitle: nextUp?.title,
         nextUpPlatform: nextUp?.platform.isEmpty == false ? nextUp?.platform : nil,
         totalGames: games.count,
-        completedGames: games.filter { $0.statusRaw == "Completed" }.count,
-        playingCount: games.filter { $0.statusRaw == "Playing" }.count
+        completedGames: games.filter { $0.status == .completed }.count,
+        playingCount: games.filter { $0.status == .playing }.count
     )
     print("[VGB App] pushWidgetSummary() done, reloadTimelines next")
 }
