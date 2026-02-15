@@ -81,6 +81,27 @@ final class Game {
         return date > Date()
     }
 
+    /// Platform string for display (e.g. "PC" instead of "PC (Microsoft Windows)").
+    var displayPlatform: String {
+        Self.displayPlatform(from: platform)
+    }
+
+    /// Normalizes a raw platform string for display (e.g. "PC" not "PC (Microsoft Windows)", "PS5" not "PlayStation 5").
+    static func displayPlatform(from raw: String) -> String {
+        var s = raw
+            .replacingOccurrences(of: " (Microsoft Windows)", with: "")
+        for (full, short) in [
+            ("PlayStation 5", "PS5"),
+            ("PlayStation 4", "PS4"),
+            ("PlayStation 3", "PS3"),
+            ("PlayStation 2", "PS2"),
+            ("PlayStation 1", "PS1"),
+        ] {
+            s = s.replacingOccurrences(of: full, with: short)
+        }
+        return s.trimmingCharacters(in: .whitespaces)
+    }
+
     // MARK: - Init
 
     init(

@@ -68,7 +68,7 @@ private func pushWidgetSummary(context: ModelContext) {
     print("[VGB App] pushWidgetSummary() games.count=\(games.count) nextUp=\(nextUp?.title ?? "nil") completed=\(games.filter { $0.status == .completed }.count) playing=\(games.filter { $0.status == .playing }.count)")
     WidgetSummaryStorage.write(
         nextUpTitle: nextUp?.title,
-        nextUpPlatform: nextUp?.platform.isEmpty == false ? nextUp?.platform : nil,
+        nextUpPlatform: nextUp?.platform.isEmpty == false ? nextUp?.displayPlatform : nil,
         totalGames: games.count,
         completedGames: games.filter { $0.status == .completed }.count,
         playingCount: games.filter { $0.status == .playing }.count

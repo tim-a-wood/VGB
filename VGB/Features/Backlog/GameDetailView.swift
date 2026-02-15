@@ -63,7 +63,7 @@ struct GameDetailView: View {
                 LabeledContent("Title", value: game.title)
 
                 if !game.platform.isEmpty {
-                    LabeledContent("Platform", value: game.platform)
+                    LabeledContent("Platform", value: game.displayPlatform)
                 }
 
                 if let date = game.releaseDate {
@@ -226,7 +226,7 @@ struct GameDetailView: View {
     private var shareText: String {
         var text = game.title
         if !game.platform.isEmpty {
-            text += " (\(game.platform))"
+            text += " (\(game.displayPlatform))"
         }
         text += " — \(game.status.rawValue)"
         if let rating = game.personalRating {

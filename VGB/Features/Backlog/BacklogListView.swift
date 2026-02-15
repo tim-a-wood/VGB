@@ -40,9 +40,9 @@ struct BacklogListView: View {
             .filter { !$0.isEmpty }
     }
 
-    /// Unique individual platforms across all games (split from combined strings for filter menu).
+    /// Unique individual platforms across all games (split from combined strings for filter menu), normalized for display (e.g. "PC" not "PC (Microsoft Windows)").
     private var platforms: [String] {
-        let all = games.flatMap { Self.platformComponents($0.platform) }
+        let all = games.flatMap { Self.platformComponents($0.platform) }.map { Game.displayPlatform(from: $0) }.filter { !$0.isEmpty }
         return Array(Set(all)).sorted()
     }
 
@@ -118,7 +118,7 @@ struct BacklogListView: View {
         // Platform filter (match if the game's platform list contains the selected platform)
         if let platform = filterPlatform {
             result = result.filter { game in
-                Self.platformComponents(game.platform).contains(platform)
+                Self.platformComponents(game.platform).map { Game.displayPlatform(from: $0) }.contains(platform)
             }
         }
 
@@ -387,6 +387,8 @@ struct BacklogListView: View {
                     draggableRow(
                         for: game,
                         targetStatus: targetStatus,
+                        sectionGames: games,
+                        sectionIndex: index,
                         onMoveToCompleted: onMoveToCompleted,
                         rank: targetStatus == .completed && index < 3 ? index + 1 : nil,
                         isMostAnticipated: targetStatus == .wishlist && index == 0
@@ -402,31 +404,33 @@ struct BacklogListView: View {
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
-    /// Row used in ScrollView sectioned list: draggable via .onDrag, also accepts drops (move to this category); use context menu to change status.
-    private func draggableRow(for game: Game, targetStatus: GameStatus, onMoveToCompleted: (() -> Void)?, rank: Int? = nil, isMostAnticipated: Bool = false) -> some View {
-        NavigationLink(value: game) {
-            GameRowView(game: game, rank: rank, isMostAnticipated: isMostAnticipated)
+    /// Row used in ScrollView sectioned list: draggable via .onDrag, also accepts drops (move to this category or reorder within section); use context menu to change status.
+    private func draggableRow(for game: Game, targetStatus: GameStatus, sectionGames: [Game], sectionIndex: Int, onMoveToCompleted: (() -> Void)?, rank: Int? = nil, isMostAnticipated: Bool = false) -> some View {
+        DraggableCatalogRow(
+            game: game,
+            targetStatus: targetStatus,
+            sectionGames: sectionGames,
+            sectionIndex: sectionIndex,
+            onMoveToCompleted: onMoveToCompleted,
+            rank: rank,
+            isMostAnticipated: isMostAnticipated,
+            onHandleRowDrop: handleRowDrop,
+            contextMenuContent: moveToContextMenu
+        )
+    }
+
+    /// Handles drop on a row: reorder within section if same status, otherwise move to this category.
+    private func handleRowDrop(droppedId: UUID, targetStatus: GameStatus, sectionGames: [Game], destinationIndex: Int, onMoveToCompleted: (() -> Void)?) {
+        var descriptor = FetchDescriptor<Game>(predicate: #Predicate<Game> { $0.id == droppedId })
+        descriptor.fetchLimit = 1
+        guard let droppedGame = try? modelContext.fetch(descriptor).first else { return }
+        let sameSection = droppedGame.status == targetStatus
+        let reorderable: Set<GameStatus> = [.playing, .backlog, .wishlist]
+        if sameSection, reorderable.contains(targetStatus), let sourceIndex = sectionGames.firstIndex(where: { $0.id == droppedId }), sourceIndex != destinationIndex {
+            reorderInSection(games: sectionGames, from: IndexSet(integer: sourceIndex), to: destinationIndex, targetStatus: targetStatus)
+        } else {
+            applyDropToGame(droppedId, targetStatus: targetStatus, onMoveToCompleted: onMoveToCompleted)
         }
-        .tint(.primary)
-        .onDrag {
-            NSItemProvider(object: game.id.uuidString as NSString)
-        }
-        .onDrop(of: [.plainText], isTargeted: nil) { providers in
-            guard let provider = providers.first else { return false }
-            provider.loadObject(ofClass: NSString.self) { object, _ in
-                guard let str = object as? String,
-                      let droppedId = UUID(uuidString: str) else { return }
-                DispatchQueue.main.async {
-                    applyDropToGame(droppedId, targetStatus: targetStatus, onMoveToCompleted: onMoveToCompleted)
-                }
-            }
-            return true
-        }
-        .contextMenu {
-            moveToContextMenu(for: game)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
     }
 
     private func applyDropToGame(_ gameId: UUID, targetStatus: GameStatus, onMoveToCompleted: (() -> Void)?) {
@@ -439,6 +443,8 @@ struct BacklogListView: View {
             onMoveToCompleted?()
         }
     }
+
+    // MARK: - Sectioned List (statusSections)
 
     /// Sections by status (Now Playing, Backlog, Completed, Dropped, Wishlist) when no filter/search.
     private var statusSections: some View {
@@ -616,10 +622,15 @@ struct BacklogListView: View {
         return true
     }
 
-    private func reorderInSection(games: [Game], from source: IndexSet, to destination: Int) {
+    private func reorderInSection(games: [Game], from source: IndexSet, to destination: Int, targetStatus: GameStatus) {
         var newOrder = games
         newOrder.move(fromOffsets: source, toOffset: destination)
-        let reordered: [Game] = nowPlaying + newOrder + wishlistGames + completedGames + droppedGames
+        let reordered: [Game] = switch targetStatus {
+        case .playing: newOrder + backlogGames + wishlistGames + completedGames + droppedGames
+        case .backlog: nowPlaying + newOrder + wishlistGames + completedGames + droppedGames
+        case .wishlist: nowPlaying + backlogGames + newOrder + completedGames + droppedGames
+        default: nowPlaying + backlogGames + wishlistGames + completedGames + droppedGames
+        }
         for (index, game) in reordered.enumerated() {
             game.priorityPosition = index
         }
@@ -696,6 +707,91 @@ struct BacklogListView: View {
     }
 }
 
+// MARK: - Drop delegate (hides green + by using .move, drives highlight)
+
+private struct CatalogRowDropDelegate: DropDelegate {
+    @Binding var isTargeted: Bool
+    let targetStatus: GameStatus
+    let sectionGames: [Game]
+    let sectionIndex: Int
+    let onMoveToCompleted: (() -> Void)?
+    let onHandleRowDrop: (UUID, GameStatus, [Game], Int, (() -> Void)?) -> Void
+
+    func dropUpdated(info: DropInfo) -> DropProposal? {
+        DropProposal(operation: .move)
+    }
+
+    func dropEntered(info: DropInfo) {
+        isTargeted = true
+    }
+
+    func dropExited(info: DropInfo) {
+        isTargeted = false
+    }
+
+    func performDrop(info: DropInfo) -> Bool {
+        let providers = info.itemProviders(for: [.plainText])
+        guard let provider = providers.first else { return false }
+        provider.loadObject(ofClass: NSString.self) { object, _ in
+            guard let str = object as? String,
+                  let droppedId = UUID(uuidString: str) else { return }
+            DispatchQueue.main.async {
+                onHandleRowDrop(droppedId, targetStatus, sectionGames, sectionIndex, onMoveToCompleted)
+                isTargeted = false
+            }
+        }
+        return true
+    }
+}
+
+// MARK: - Draggable catalog row (highlight on drop target)
+
+private struct DraggableCatalogRow<ContextMenuContent: View>: View {
+    let game: Game
+    let targetStatus: GameStatus
+    let sectionGames: [Game]
+    let sectionIndex: Int
+    let onMoveToCompleted: (() -> Void)?
+    let rank: Int?
+    let isMostAnticipated: Bool
+    let onHandleRowDrop: (UUID, GameStatus, [Game], Int, (() -> Void)?) -> Void
+    @ViewBuilder let contextMenuContent: (Game) -> ContextMenuContent
+
+    @State private var isTargeted = false
+
+    var body: some View {
+        ZStack(alignment: .leading) {
+            // Full-width highlight behind content
+            Rectangle()
+                .fill(isTargeted ? Color.accentColor.opacity(0.2) : Color.clear)
+                .frame(maxWidth: .infinity)
+
+            NavigationLink(value: game) {
+                GameRowView(game: game, rank: rank, isMostAnticipated: isMostAnticipated)
+            }
+            .tint(.primary)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
+        .onDrag {
+            NSItemProvider(object: game.id.uuidString as NSString)
+        }
+        .onDrop(of: [.plainText], delegate: CatalogRowDropDelegate(
+            isTargeted: $isTargeted,
+            targetStatus: targetStatus,
+            sectionGames: sectionGames,
+            sectionIndex: sectionIndex,
+            onMoveToCompleted: onMoveToCompleted,
+            onHandleRowDrop: onHandleRowDrop
+        ))
+        .contextMenu {
+            contextMenuContent(game)
+        }
+    }
+}
+
 // MARK: - Row
 
 private struct GameRowView: View {
@@ -741,18 +837,33 @@ private struct GameRowView: View {
                     .font(.headline)
                     .lineLimit(1)
 
-                HStack(spacing: 8) {
+                HStack(alignment: .center, spacing: 12) {
                     if !game.platform.isEmpty {
-                        Text(game.platform)
+                        Text(game.displayPlatform)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                     }
 
-                    if let rating = game.igdbRating {
-                        Label("\(rating)", systemImage: "star.fill")
-                            .font(.caption)
-                            .foregroundStyle(.orange)
+                    if !game.isUnreleased {
+                        // Critic (IGDB) rating
+                        if let rating = game.igdbRating {
+                            ratingPill(icon: "star.fill", value: "\(rating)", color: .orange)
+                        }
+
+                        // User (personal) rating
+                        if let rating = game.personalRating {
+                            ratingPill(icon: "star.fill", value: "You \(rating)", color: .blue)
+                        } else {
+                            HStack(spacing: 4) {
+                                Image(systemName: "star.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(.quaternary)
+                                Text("Unrated")
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
                     }
                 }
 
@@ -780,6 +891,17 @@ private struct GameRowView: View {
             }
         }
         .padding(.vertical, 4)
+    }
+
+    private func ratingPill(icon: String, value: String, color: Color) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.caption)
+                .foregroundStyle(color)
+            Text(value)
+                .font(.caption)
+                .foregroundStyle(color)
+        }
     }
 
     @ViewBuilder
@@ -832,7 +954,7 @@ private struct UnreleasedBadge: View {
     }
 }
 
-// MARK: - Section header as drop zone (uses .onDrop to match .onDrag NSItemProvider)
+// MARK: - Section header (tap to expand/collapse; drops on headers disabled)
 
 private struct SectionHeaderDropZone: View {
     let title: String
@@ -843,8 +965,6 @@ private struct SectionHeaderDropZone: View {
     let onToggle: () -> Void
     let onMoveToCompleted: (() -> Void)?
     let modelContext: ModelContext
-
-    @State private var isTargeted = false
 
     var body: some View {
         HStack(spacing: 8) {
@@ -859,32 +979,10 @@ private struct SectionHeaderDropZone: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
-        .background(isTargeted ? color.opacity(0.25) : Color(.tertiarySystemGroupedBackground))
+        .background(Color(.secondarySystemGroupedBackground))
         .contentShape(Rectangle())
         .onTapGesture {
             onToggle()
-        }
-        .onDrop(of: [.plainText], isTargeted: $isTargeted) { providers in
-                guard let provider = providers.first else { return false }
-                provider.loadObject(ofClass: NSString.self) { object, _ in
-                    guard let str = object as? String,
-                          let droppedId = UUID(uuidString: str) else { return }
-                    DispatchQueue.main.async {
-                        applyDrop(gameId: droppedId)
-                    }
-                }
-                return true
-            }
-    }
-
-    private func applyDrop(gameId: UUID) {
-        var descriptor = FetchDescriptor<Game>(predicate: #Predicate<Game> { $0.id == gameId })
-        descriptor.fetchLimit = 1
-        guard let game = try? modelContext.fetch(descriptor).first else { return }
-        game.status = targetStatus
-        game.updatedAt = Date()
-        if targetStatus == .completed {
-            onMoveToCompleted?()
         }
     }
 }
