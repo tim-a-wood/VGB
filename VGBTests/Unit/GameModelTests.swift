@@ -145,6 +145,31 @@ final class GameModelTests: XCTestCase {
         XCTAssertFalse(game.isUnreleased)
     }
 
+    // MARK: - displayPlatform
+
+    func testDisplayPlatformReturnsPlatformWhenNoNormalization() {
+        let game = Game(title: "Test", platform: "Switch")
+        XCTAssertEqual(game.displayPlatform, "Switch")
+    }
+
+    func testDisplayPlatformStripsMicrosoftWindows() {
+        let game = Game(title: "Test", platform: "PC (Microsoft Windows)")
+        XCTAssertEqual(game.displayPlatform, "PC")
+    }
+
+    func testDisplayPlatformPlayStationToOneThroughFive() {
+        XCTAssertEqual(Game.displayPlatform(from: "PlayStation 5"), "PS5")
+        XCTAssertEqual(Game.displayPlatform(from: "PlayStation 4"), "PS4")
+        XCTAssertEqual(Game.displayPlatform(from: "PlayStation 3"), "PS3")
+        XCTAssertEqual(Game.displayPlatform(from: "PlayStation 2"), "PS2")
+        XCTAssertEqual(Game.displayPlatform(from: "PlayStation 1"), "PS1")
+    }
+
+    func testDisplayPlatformCombinedString() {
+        let game = Game(title: "Test", platform: "PlayStation 5, PC (Microsoft Windows)")
+        XCTAssertEqual(game.displayPlatform, "PS5, PC")
+    }
+
     // MARK: - Provider-sourced field mutation
 
     func testProviderFieldsAreMutable() {
