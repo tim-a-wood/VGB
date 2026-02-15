@@ -37,6 +37,10 @@ private struct ContentRoot: View {
                 .tabItem {
                     Label("Game Catalog", systemImage: "books.vertical")
                 }
+            RankingsView()
+                .tabItem {
+                    Label("Rankings", systemImage: "list.number")
+                }
             StatsView()
                 .tabItem {
                     Label("Stats", systemImage: "chart.pie")
