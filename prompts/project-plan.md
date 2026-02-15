@@ -8,7 +8,7 @@
 
 ## Development Timeline
 
-**Current focus:** Phase 3 — Enhanced features (ahead of schedule)
+**Current focus:** Phase 4 — Final polish and ship
 
 ### Phase 1: Core backlog (foundation)
 - [x] Create Xcode project structure for SwiftUI + SwiftData
@@ -44,22 +44,19 @@
 - [x] Build home screen widget (next-up game / quick stats; small + medium sizes)
 
 ### Phase 4: Polish and ship
-- [ ] Build stats screen (hero ring, status donut, bar charts by status/platform/genre, avg critic for completed, radar chart by genre)
-- [ ] Add **Rankings** page: ranked list of all RATED games (user rating or critic rating — toggleable)
-- [ ] Onboarding / first-launch walkthrough (2–3 screens explaining the core loop)
-- [ ] UX polish (validation, loading/empty states, accessibility pass)
+- [x] Build stats screen (hero ring, status donut, bar charts by status/platform/genre, avg critic for completed, radar chart by genre)
+- [x] Add **Rankings** page: ranked list of all RATED games (user rating or critic rating — toggleable)
+- [x] Onboarding / first-launch walkthrough (2–3 screens explaining the core loop)
+- [x] UX polish (validation, loading/empty states, accessibility pass)
 - [ ] App icon, launch screen, store-ready screenshots
 - [ ] Device testing (one physical iPhone + simulator), fix bugs, performance pass
 - [ ] App Store metadata and submit v1
 
 ## Recommended next steps
 
-1. Add cover art thumbnails and text search to the backlog list.
-2. Add "Currently Playing" pinned section and `Wishlist` status.
-3. Implement cover art header, share sheet, swipe actions, and completion celebration.
-4. Dark mode polish and home screen widget.
-5. Build stats screen, rankings page, and onboarding walkthrough.
-6. Final UX polish, app icon, device testing, and App Store submission.
+1. App icon and launch screen
+2. Device testing (physical iPhone + simulator), fix bugs, performance pass
+3. App Store metadata and submit v1
 
 ---
 

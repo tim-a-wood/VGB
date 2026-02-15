@@ -2,7 +2,7 @@
 
 **Purpose**: Use this file as context (e.g. `@.cursor/prompts/project-status.md`) so the agent knows exactly what exists today and what's left to build. Update it as you complete work.
 
-**Last updated**: 2026-02-14
+**Last updated**: 2026-02-15
 
 ---
 
@@ -18,7 +18,7 @@ Pre–Phase 4 audit (2026-02-14): **no rearchitecture needed.** Plan alignment i
 |------|--------|
 | Product direction | Done (backlog tracker concept defined) |
 | MVP scope | Locked (includes live metadata; 2-week target flexible) |
-| Implementation | Phase 1 complete (41 tests passing); Phase 2 next |
+| Implementation | Phases 1–4 complete; final polish and ship next |
 | Release readiness | Not started |
 
 Details: see **What's implemented** and **What's not implemented** below.
@@ -60,9 +60,9 @@ Details: see **What's implemented** and **What's not implemented** below.
 
 ## What's not implemented
 
-- Metadata provider integration — API client, search/prefill, manual refresh, stale indicators (Phase 2)
-- Stats screen (Phase 3)
-- QA pass, app icon, launch screen, App Store submission (Phase 3)
+- App icon, launch screen, store-ready screenshots
+- Device testing (physical + simulator), bug fixes, performance pass
+- App Store metadata and v1 submission
 
 Full task checklist: **prompts/project-plan.md**
 
