@@ -1,20 +1,35 @@
-# Run the unit test suite on every push and pull request.
-# Requires: Xcode project with a shared scheme named "VGB" (so CI can run it without opening Xcode).
-# In Xcode: Product → Scheme → Manage Schemes → check "Shared" for the app scheme.
+# Run the unit test suite on push to main. Tuned to reduce GitHub Actions minutes:
+# - Path filter: only runs when app/test/project files change (skips docs-only pushes).
+# - Caches Xcode DerivedData to shorten rebuilds.
+# Requires: Xcode project with a shared scheme named "VGB".
+# See .github/ACTIONS_BILLING.md for more ways to avoid spending limits.
 
 name: Test
 
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    paths:
+      - 'VGB/**'
+      - 'VGBTests/**'
+      - '*.xcodeproj/**'
+      - '*.xcworkspace/**'
+      - 'project.yml'
+      - 'Secrets.xcconfig'
 
 jobs:
   test:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
+
+      - name: Cache Xcode DerivedData
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData
+          key: xcode-deriveddata-${{ runner.os }}-${{ hashFiles('**/project.yml', 'VGB/**/*.swift', 'VGBTests/**/*.swift') }}
+          restore-keys: |
+            xcode-deriveddata-${{ runner.os }}-
 
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
