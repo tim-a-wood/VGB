@@ -59,7 +59,7 @@ See setup checklist in `project-plan.md`.
 
 ---
 
-**Status and timeline:** See `.cursor/prompts/project-status.md` and `.cursor/prompts/project-plan.md`.
+**Status and timeline:** See `prompts/project-status.md` and `prompts/project-plan.md`.
 
 ## UI/UX
 - Fast add flow: search/lookup from metadata provider to prefill, minimal required fields

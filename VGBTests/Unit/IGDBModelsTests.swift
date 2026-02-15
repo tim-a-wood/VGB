@@ -114,12 +114,13 @@ final class IGDBModelsTests: XCTestCase {
 
     // MARK: - Convenience: primaryGenre
 
-    func testPrimaryGenreReturnsFirst() {
+    func testPrimaryGenrePicksByPriority() {
+        // When multiple genres exist, we pick by precedence (Adventure < RPG < Shooter).
         let game = makeGame(genres: [
             IGDBGenre(id: 1, name: "RPG"),
             IGDBGenre(id: 2, name: "Adventure"),
         ])
-        XCTAssertEqual(game.primaryGenre, "RPG")
+        XCTAssertEqual(game.primaryGenre, "Adventure")
     }
 
     func testPrimaryGenreNilWhenEmpty() {

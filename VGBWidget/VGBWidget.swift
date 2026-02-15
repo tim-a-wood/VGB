@@ -26,32 +26,32 @@ struct VGBTimelineProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (VGBWidgetEntry) -> Void) {
-        logger.info("getSnapshot() called")
+        logger.debug("getSnapshot() called")
         let holder = SnapshotCompletionHolder(completion)
         Task { @MainActor in
             let entry = fetchEntry()
-            logger.info("getSnapshot() returning entry totalGames=\(entry.totalGames)")
+            logger.debug("getSnapshot() returning entry totalGames=\(entry.totalGames)")
             holder.completion(entry)
         }
     }
 
     func getTimeline(in context: Context, completion: @escaping @Sendable (Timeline<VGBWidgetEntry>) -> Void) {
-        logger.info("getTimeline() called")
+        logger.debug("getTimeline() called")
         Task { @MainActor in
             let entry = fetchEntry()
             let nextUpdate = Calendar.current.date(byAdding: .minute, value: 30, to: Date())!
             let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
-            logger.info("getTimeline() returning timeline with entry totalGames=\(entry.totalGames)")
+            logger.debug("getTimeline() returning timeline with entry totalGames=\(entry.totalGames)")
             completion(timeline)
         }
     }
 
     @MainActor
     private func fetchEntry() -> VGBWidgetEntry {
-        logger.info("fetchEntry() called")
+        logger.debug("fetchEntry() called")
         // Prefer App Group UserDefaults (written by the app)
         if let summary = WidgetSummaryStorage.read() {
-            logger.info("fetchEntry() using UserDefaults summary — total=\(summary.totalGames) nextUp=\(summary.nextUpTitle ?? "nil")")
+            logger.debug("fetchEntry() using UserDefaults summary — total=\(summary.totalGames) nextUp=\(summary.nextUpTitle ?? "nil")")
             return VGBWidgetEntry(
                 date: Date(),
                 nextUpTitle: summary.nextUpTitle,
@@ -62,7 +62,7 @@ struct VGBTimelineProvider: TimelineProvider {
             )
         }
 
-        logger.info("fetchEntry() no UserDefaults summary, trying SwiftData")
+        logger.debug("fetchEntry() no UserDefaults summary, trying SwiftData")
         let container: ModelContainer
         do {
             container = try StoreConfiguration.sharedContainer()
@@ -87,7 +87,7 @@ struct VGBTimelineProvider: TimelineProvider {
             completedGames: games.filter { $0.status == .completed }.count,
             playingCount: games.filter { $0.status == .playing }.count
         )
-        logger.info("fetchEntry() using SwiftData — total=\(entry.totalGames) nextUp=\(entry.nextUpTitle ?? "nil")")
+        logger.debug("fetchEntry() using SwiftData — total=\(entry.totalGames) nextUp=\(entry.nextUpTitle ?? "nil")")
         return entry
     }
 }

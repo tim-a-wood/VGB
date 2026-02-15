@@ -1,21 +1,26 @@
-# VGB
+# VGB (Checkpoint)
 
-VGB is an iOS app for gamers to track and prioritize their video game backlog.
+VGB is an iOS app for gamers to track and prioritize their video game backlog. Display name: **Checkpoint**.
 
 ## Current status
 
-- **Phase 1 features complete** — backlog list, add/edit, status management, filters, sorting, drag-and-drop reorder
-- Unit tests and Phase 2 (live metadata) up next
-- SwiftUI app target: `VGB` | Test target: `VGBTests` | Shared scheme: `VGB`
+- **Phases 1–4 complete** — backlog, IGDB metadata, stats, rankings, onboarding, widget
+- **Next:** App icon, device testing, App Store submission
+- SwiftUI app target: `VGB` | Widget: `VGBWidgetExtension` | Test target: `VGBTests` | Shared scheme: `VGB`
 
 ## Project structure
 
-- `VGB/App/` — app entry point (`VGBApp.swift`) and resources (`Info.plist`)
-- `VGB/Models/` — domain models (`Game.swift`, `GameStatus.swift`)
-- `VGB/Features/Backlog/` — backlog list, add game form, game detail view
-- `VGBTests/Unit/` — unit tests
-- `project.yml` — XcodeGen project spec
+- `VGB/App/` — app entry, StoreConfiguration, WidgetSummaryStorage
+- `VGB/Models/` — `Game.swift`, `GameStatus.swift`, `GameStatus+Color.swift`
+- `VGB/Features/Backlog/` — list, add game, game detail, celebration overlay
+- `VGB/Features/Stats/` — stats view, radar chart, genre categories
+- `VGB/Features/Rankings/` — rankings by user/critic rating
+- `VGB/Features/Onboarding/` — first-launch walkthrough
+- `VGB/Services/` — IGDB client, sync, Twitch auth
+- `VGBWidget/` — home screen widget (small + medium)
+- `VGBTests/Unit/` — model, status, filter/sort, IGDB, sync tests
 - `prompts/` — planning and status docs
+- `docs/` — codebase audit
 
 See:
 - `prompts/project-overview.md` for product direction
@@ -34,15 +39,9 @@ open VGB.xcodeproj
 ```bash
 xcodebuild -list -project VGB.xcodeproj
 xcodebuild -showdestinations -project VGB.xcodeproj -scheme VGB
-xcodebuild test -project VGB.xcodeproj -scheme VGB -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' -derivedDataPath .derivedData CODE_SIGNING_ALLOWED=NO
+xcodebuild test -project VGB.xcodeproj -scheme VGB -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' -derivedDataPath .derivedData CODE_SIGNING_ALLOWED=NO
 ```
 
 ## Project generation
 
-The Xcode project is generated from `project.yml` (XcodeGen spec).
-
-If `xcodegen` is installed:
-
-```bash
-xcodegen generate
-```
+`project.yml` is an XcodeGen spec but **outdated** (missing widget, stats, rankings). The `VGB.xcodeproj` is the source of truth. Do not run `xcodegen generate` without updating `project.yml` first.

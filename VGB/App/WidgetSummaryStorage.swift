@@ -26,7 +26,7 @@ enum WidgetSummaryStorage {
     }
 
     static func write(nextUpTitle: String?, nextUpPlatform: String?, totalGames: Int, completedGames: Int, playingCount: Int) {
-        summaryLogger.info("write() suiteName=\(suiteName)")
+        summaryLogger.debug("write() suiteName=\(suiteName)")
         guard let defaults = UserDefaults(suiteName: suiteName) else {
             summaryLogger.error("write() FAILED — UserDefaults(suiteName:) returned nil")
             return
@@ -37,17 +37,17 @@ enum WidgetSummaryStorage {
         defaults.set(completedGames, forKey: keyCompletedGames)
         defaults.set(playingCount, forKey: keyPlayingCount)
         defaults.synchronize()
-        summaryLogger.info("write() OK — totalGames=\(totalGames) nextUpTitle=\(nextUpTitle ?? "nil") completed=\(completedGames) playing=\(playingCount)")
+        summaryLogger.debug("write() OK — totalGames=\(totalGames) nextUpTitle=\(nextUpTitle ?? "nil") completed=\(completedGames) playing=\(playingCount)")
     }
 
     static func read() -> Summary? {
-        summaryLogger.info("read() suiteName=\(suiteName)")
+        summaryLogger.debug("read() suiteName=\(suiteName)")
         guard let defaults = UserDefaults(suiteName: suiteName) else {
             summaryLogger.error("read() FAILED — UserDefaults(suiteName:) returned nil")
             return nil
         }
         guard defaults.object(forKey: keyTotalGames) != nil else {
-            summaryLogger.info("read() no data — keyTotalGames never set")
+            summaryLogger.debug("read() no data — keyTotalGames never set")
             return nil
         }
         let s = Summary(
@@ -57,7 +57,7 @@ enum WidgetSummaryStorage {
             completedGames: defaults.integer(forKey: keyCompletedGames),
             playingCount: defaults.integer(forKey: keyPlayingCount)
         )
-        summaryLogger.info("read() OK — totalGames=\(s.totalGames) nextUpTitle=\(s.nextUpTitle ?? "nil") completed=\(s.completedGames) playing=\(s.playingCount)")
+        summaryLogger.debug("read() OK — totalGames=\(s.totalGames) nextUpTitle=\(s.nextUpTitle ?? "nil") completed=\(s.completedGames) playing=\(s.playingCount)")
         return s
     }
 }

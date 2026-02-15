@@ -17,7 +17,7 @@
 - [x] Build backlog list with empty state and drag-and-drop reorder (priority order)
 - [x] Build add/edit game form (manual entry first)
 - [x] Implement status updates (`Backlog`, `Playing`, `Completed`, `Dropped`)
-- [x] Add core filters (status, platform, genre) and sort (priority, Metacritic, OpenCritic, release date)
+- [x] Add core filters (status, platform, genre) and sort (priority, IGDB critic score, release date)
 - [x] Add test target scaffold (`VGBTests`) and placeholder test
 - [x] Add lightweight unit tests for model + filter/sort behavior (41 tests, 0 failures)
 
