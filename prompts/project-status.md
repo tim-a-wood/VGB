@@ -65,7 +65,7 @@ Details: see **What's implemented** and **What's not implemented** below.
 
 ## What's not implemented
 
-- App icon, launch screen, store-ready screenshots
+- Store-ready screenshots (for App Store)
 - Device testing (physical + simulator), bug fixes, performance pass
 - App Store metadata and v1 submission
 

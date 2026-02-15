@@ -48,7 +48,8 @@
 - [x] Add **Rankings** page: ranked list of all RATED games (user rating or critic rating — toggleable)
 - [x] Onboarding / first-launch walkthrough (2–3 screens explaining the core loop)
 - [x] UX polish (validation, loading/empty states, accessibility pass)
-- [ ] App icon, launch screen, store-ready screenshots
+- [x] App icon, launch screen
+- [ ] Store-ready screenshots
 - [ ] Device testing (one physical iPhone + simulator), fix bugs, performance pass
 - [ ] App Store metadata and submit v1
 
