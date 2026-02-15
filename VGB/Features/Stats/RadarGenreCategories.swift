@@ -8,7 +8,7 @@ enum RadarGenreCategories {
 
     /// Display labels for the 6 axes, in order (top axis first, then clockwise).
     static let labels: [String] = [
-        "Strategy",
+        "Other",
         "Action & Adventure",
         "Shooter",
         "RPG",
@@ -17,11 +17,10 @@ enum RadarGenreCategories {
     ]
 
     /// Maps a raw genre string (e.g. from IGDB) to a category index 0..<6.
-    /// Case-insensitive; unknown genres go to "Action & Adventure" (index 1).
+    /// Case-insensitive; genres that don't match the other five categories go to "Other" (index 0).
     static func categoryIndex(for genre: String) -> Int {
         let lower = genre.lowercased()
-        if lower.contains("strategy") || lower.contains("tactical") || lower.contains("moba")
-            || lower.contains("rts") || lower.contains("tbs") { return 0 }
+        // Check action/adventure before shooter so "Action shooter", "Adventure shooter" etc. map to Action & Adventure
         if lower.contains("adventure") || lower.contains("action") || lower.contains("platform")
             || lower.contains("hack and slash") || lower.contains("beat 'em up")
             || lower.contains("point-and-click") || lower.contains("visual novel")
@@ -29,11 +28,12 @@ enum RadarGenreCategories {
             || lower.contains("indie") || lower.contains("simulator") || lower.contains("music")
             || lower.contains("card") || lower.contains("board") || lower.contains("quiz")
             || lower.contains("pinball") { return 1 }
+        // Check horror/survival before shooter so survival-horror (e.g. Resident Evil) isn’t classed as Shooter
+        if lower.contains("horror") || lower.contains("survival") { return 5 }
         if lower.contains("shooter") { return 2 }
         if lower.contains("role-playing") || lower.contains("rpg") { return 3 }
         if lower.contains("sport") || lower.contains("racing") { return 4 }
-        if lower.contains("horror") || lower.contains("survival") { return 5 }
-        return 1 // Catch-all: Action & Adventure
+        return 0 // Other: strategy, etc. — anything that doesn't fit above
     }
 
     /// Returns (label, value) for all 6 categories; values are counts per category.

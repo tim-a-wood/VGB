@@ -20,7 +20,12 @@ struct RadarChartView: View {
             let maxVal = scaleMax ?? data.map(\.value).max() ?? 1
 
             ZStack {
-                // Grid and axes
+                // Light background over radar area
+                Circle()
+                    .fill(Color.primary.opacity(0.04))
+                    .frame(width: radius * 2, height: radius * 2)
+                    .position(center)
+                // Grid and axes (y-axis = concentric circles, spokes = axis lines)
                 radarGrid(center: center, radius: radius, count: data.count)
                 // Axis labels
                 axisLabels(center: center, radius: radius)
@@ -36,15 +41,15 @@ struct RadarChartView: View {
     private func radarGrid(center: CGPoint, radius: CGFloat, count: Int) -> some View {
         let n = max(2, count)
         return ZStack {
-            // Concentric circles
+            // Y-axis gridlines: concentric circles (value levels)
             ForEach(1..<(Self.gridLevels + 1), id: \.self) { level in
                 let r = radius * CGFloat(level) / CGFloat(Self.gridLevels)
                 Circle()
-                    .stroke(Color.primary.opacity(0.12), lineWidth: 0.5)
+                    .stroke(Color.primary.opacity(0.18), lineWidth: 1)
                     .frame(width: r * 2, height: r * 2)
                     .position(center)
             }
-            // Spokes
+            // Spokes (axis lines from center to each category)
             ForEach(0..<n, id: \.self) { i in
                 let angle = angleForIndex(i, count: n)
                 let end = pointOnCircle(center: center, radius: radius, angle: angle)
@@ -52,7 +57,7 @@ struct RadarChartView: View {
                     p.move(to: center)
                     p.addLine(to: end)
                 }
-                .stroke(Color.primary.opacity(0.15), lineWidth: 0.5)
+                .stroke(Color.primary.opacity(0.2), lineWidth: 1)
             }
         }
     }

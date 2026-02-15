@@ -18,14 +18,6 @@ struct StatsView: View {
         }
     }
 
-    private var genreCounts: [(String, Int)] {
-        let grouped = Dictionary(grouping: games.compactMap(\.genre).filter { !$0.isEmpty }, by: { $0 })
-        return grouped.map { ($0.key, $0.value.count) }
-            .sorted { $0.1 > $1.1 }
-            .prefix(8)
-            .map { ($0.0, $0.1) }
-    }
-
     /// Completed games per radar category (always 6 categories for a consistent chart).
     private var completedPerGenre: [(label: String, value: Double)] {
         let completed = games.filter { $0.status == .completed }
@@ -33,17 +25,29 @@ struct StatsView: View {
         return RadarGenreCategories.completedCountsByCategory(from: genreStrings)
     }
 
-    private var completedWithRating: [Game] {
+    private var completedWithCriticRating: [Game] {
         games.filter { $0.status == .completed && $0.igdbRating != nil }
     }
 
     private var averageCriticScore: Double? {
-        let rated = completedWithRating.compactMap(\.igdbRating).map(Double.init)
+        let rated = completedWithCriticRating.compactMap(\.igdbRating).map(Double.init)
+        guard !rated.isEmpty else { return nil }
+        return rated.reduce(0, +) / Double(rated.count)
+    }
+
+    private var completedWithUserRating: [Game] {
+        games.filter { $0.status == .completed && $0.personalRating != nil }
+    }
+
+    private var averageUserRating: Double? {
+        let rated = completedWithUserRating.compactMap(\.personalRating).map(Double.init)
         guard !rated.isEmpty else { return nil }
         return rated.reduce(0, +) / Double(rated.count)
     }
 
     @State private var heroRingTrim: CGFloat = 0
+    @State private var criticRingTrim: CGFloat = 0
+    @State private var userRingTrim: CGFloat = 0
 
     var body: some View {
         NavigationStack {
@@ -53,10 +57,8 @@ struct StatsView: View {
                 } else {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 24) {
-                            heroSection
+                            threeRingsSection
                             statusDonutSection
-                            barChartsSection
-                            averageCriticSection
                             radarSection
                         }
                         .padding()
@@ -67,6 +69,22 @@ struct StatsView: View {
             .onAppear {
                 withAnimation(.easeOut(duration: 0.8)) {
                     heroRingTrim = completionRate
+                    if let avg = averageCriticScore {
+                        criticRingTrim = CGFloat(avg / 100)
+                    }
+                    if let avg = averageUserRating {
+                        userRingTrim = CGFloat(avg / 100)
+                    }
+                }
+            }
+            .onChange(of: averageCriticScore) { _, newVal in
+                withAnimation(.easeOut(duration: 0.5)) {
+                    criticRingTrim = newVal.map { CGFloat($0 / 100) } ?? 0
+                }
+            }
+            .onChange(of: averageUserRating) { _, newVal in
+                withAnimation(.easeOut(duration: 0.5)) {
+                    userRingTrim = newVal.map { CGFloat($0 / 100) } ?? 0
                 }
             }
         }
@@ -82,41 +100,129 @@ struct StatsView: View {
         }
     }
 
-    // MARK: - Hero
+    // MARK: - Three rings (Completed %, Critic, User rating)
 
-    private var heroSection: some View {
-        VStack(spacing: 8) {
+    private static let ringSize: CGFloat = 76
+    private static let ringStroke: CGFloat = 8
+
+    private var threeRingsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            sectionHeader("Completion & ratings", systemImage: "chart.bar.doc.horizontal")
+            Text("Share completed, critic average, and your average rating")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+            HStack(alignment: .top, spacing: 12) {
+                completedRingTile
+                criticRingTile
+                userRatingRingTile
+            }
+        }
+    }
+
+    private var completedRingTile: some View {
+        VStack(spacing: 6) {
+            Text("Completed %")
+                .font(.caption2.weight(.medium))
+                .foregroundStyle(.secondary)
             ZStack {
                 Circle()
-                    .stroke(Color.primary.opacity(0.15), lineWidth: 12)
-                    .frame(width: 120, height: 120)
+                    .stroke(Color.primary.opacity(0.15), lineWidth: Self.ringStroke)
+                    .frame(width: Self.ringSize, height: Self.ringSize)
                 Circle()
                     .trim(from: 0, to: heroRingTrim)
-                    .stroke(GameStatus.completed.color, style: StrokeStyle(lineWidth: 12, lineCap: .round))
-                    .frame(width: 120, height: 120)
+                    .stroke(GameStatus.completed.color, style: StrokeStyle(lineWidth: Self.ringStroke, lineCap: .round))
+                    .frame(width: Self.ringSize, height: Self.ringSize)
                     .rotationEffect(.degrees(-90))
-                VStack(spacing: 2) {
-                    Text("\(Int(completionRate * 100))%")
-                        .font(.title2.weight(.bold))
-                    Text("complete")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
+                Text("\(Int(completionRate * 100))%")
+                    .font(.subheadline.weight(.bold))
             }
-            Text("You've completed **\(completedCount)** of **\(totalCount)** games")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
+            Text("\(completedCount)/\(totalCount)")
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 8)
+    }
+
+    private var criticRingTile: some View {
+        VStack(spacing: 6) {
+            Text("Critic score")
+                .font(.caption2.weight(.medium))
+                .foregroundStyle(.secondary)
+            ZStack {
+                Circle()
+                    .stroke(Color.primary.opacity(0.15), lineWidth: Self.ringStroke)
+                    .frame(width: Self.ringSize, height: Self.ringSize)
+                Circle()
+                    .trim(from: 0, to: criticRingTrim)
+                    .stroke(Self.criticGold, style: StrokeStyle(lineWidth: Self.ringStroke, lineCap: .round))
+                    .frame(width: Self.ringSize, height: Self.ringSize)
+                    .rotationEffect(.degrees(-90))
+                if let avg = averageCriticScore {
+                    Text(String(format: "%.1f", avg))
+                        .font(.subheadline.weight(.bold))
+                } else {
+                    Text("—")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            if let _ = averageCriticScore {
+                Text("\(completedWithCriticRating.count) rated")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            } else {
+                Text("Rate games")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var userRatingRingTile: some View {
+        VStack(spacing: 6) {
+            Text("Your rating")
+                .font(.caption2.weight(.medium))
+                .foregroundStyle(.secondary)
+            ZStack {
+                Circle()
+                    .stroke(Color.primary.opacity(0.15), lineWidth: Self.ringStroke)
+                    .frame(width: Self.ringSize, height: Self.ringSize)
+                Circle()
+                    .trim(from: 0, to: userRingTrim)
+                    .stroke(Self.userRatingBlue, style: StrokeStyle(lineWidth: Self.ringStroke, lineCap: .round))
+                    .frame(width: Self.ringSize, height: Self.ringSize)
+                    .rotationEffect(.degrees(-90))
+                if let avg = averageUserRating {
+                    Text(String(format: "%.1f", avg))
+                        .font(.subheadline.weight(.bold))
+                } else {
+                    Text("—")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            if let _ = averageUserRating {
+                Text("\(completedWithUserRating.count) rated")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            } else {
+                Text("Rate games")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
+        }
+        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Status donut
 
     private var statusDonutSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            sectionHeader("By status", systemImage: "chart.pie")
+            sectionHeader("Library breakdown", systemImage: "chart.pie")
+            Text("Where your games live — by status")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
             Chart(statusCounts, id: \.0.id) { item in
                 SectorMark(
                     angle: .value("Count", item.1),
@@ -149,61 +255,19 @@ struct StatsView: View {
         .frame(maxWidth: .infinity)
     }
 
-    // MARK: - Bar charts
-
-    private var barChartsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            sectionHeader("By genre", systemImage: "tag")
-            if genreCounts.isEmpty {
-                Text("No genre data")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-                    .frame(height: 120)
-                    .frame(maxWidth: .infinity)
-            } else {
-                Chart(genreCounts, id: \.0) { item in
-                    BarMark(
-                        x: .value("Genre", item.0),
-                        y: .value("Games", item.1)
-                    )
-                    .foregroundStyle(.mint.gradient)
-                }
-                .frame(height: 160)
-            }
-        }
-    }
-
-    // MARK: - Average critic
-
-    private var averageCriticSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            sectionHeader("Completed games — critic score", systemImage: "star.fill")
-            if let avg = averageCriticScore {
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text(String(format: "%.1f", avg))
-                        .font(.title.weight(.semibold))
-                    Text("average")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    Text("(\(completedWithRating.count) rated)")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                }
-            } else {
-                Text("No critic scores for completed games yet.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-        }
-    }
+    private static let criticGold = Color(red: 0.95, green: 0.75, blue: 0.2)
+    private static let userRatingBlue = Color(red: 0.35, green: 0.45, blue: 0.95)
 
     // MARK: - Radar
 
     private var radarSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            sectionHeader("Completed by genre", systemImage: "point.3.connected.trianglepath.dotted")
+            sectionHeader("Your Gamer Profile", systemImage: "point.3.connected.trianglepath.dotted")
+            Text("How your completed games break down by genre")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
             if completedPerGenre.allSatisfy({ $0.value == 0 }) {
-                Text("Complete games with genres to see your radar.")
+                Text("Complete games with genres to see your chart.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)

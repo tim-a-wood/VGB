@@ -36,9 +36,27 @@ struct IGDBGame: Decodable, Sendable {
             .company?.name
     }
 
-    /// Convenience: primary genre name.
+    /// Convenience: primary genre name. When IGDB returns multiple genres, we pick one by precedence (e.g. Adventure/Action over Shooter).
     var primaryGenre: String? {
-        genres?.first?.name
+        guard let genres = genres, !genres.isEmpty else { return nil }
+        let names = genres.compactMap(\.name).filter { !$0.isEmpty }
+        return Self.preferredGenre(from: names)
+    }
+
+    /// Picks a single genre for display when multiple exist; Adventure/Action take precedence over Shooter (and Horror/Survival over Shooter).
+    static func preferredGenre(from names: [String]) -> String? {
+        guard !names.isEmpty else { return nil }
+        return names.min(by: { genrePriority($0) < genrePriority($1) })
+    }
+
+    private static func genrePriority(_ genre: String) -> Int {
+        let lower = genre.lowercased()
+        if lower.contains("adventure") || lower.contains("action") { return 0 }
+        if lower.contains("horror") || lower.contains("survival") { return 1 }
+        if lower.contains("shooter") { return 2 }
+        if lower.contains("role-playing") || lower.contains("rpg") { return 3 }
+        if lower.contains("sport") || lower.contains("racing") { return 4 }
+        return 5
     }
 
     /// Convenience: primary platform name.
