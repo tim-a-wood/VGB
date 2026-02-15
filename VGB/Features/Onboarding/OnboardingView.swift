@@ -49,8 +49,10 @@ struct OnboardingView: View {
 
                 Button {
                     if page < pageCount - 1 {
+                        Haptic.light.play()
                         withAnimation { page += 1 }
                     } else {
+                        Haptic.light.play()
                         OnboardingStorage.hasCompleted = true
                         onComplete()
                     }
@@ -63,6 +65,7 @@ struct OnboardingView: View {
                 .buttonStyle(.borderedProminent)
                 .padding(.horizontal, 24)
                 .padding(.bottom, 40)
+                .accessibilityLabel(page < pageCount - 1 ? "Continue to next screen" : "Get started and open your game catalog")
             }
         }
     }

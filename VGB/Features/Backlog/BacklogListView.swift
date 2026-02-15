@@ -161,9 +161,11 @@ struct BacklogListView: View {
                     Button { showingAddGame = true } label: {
                         Image(systemName: "plus")
                     }
+                    .accessibilityLabel("Add game")
                 }
                 ToolbarItem(placement: .topBarLeading) {
                     filterMenu
+                        .accessibilityLabel("Filter and sort games")
                 }
             }
             .sheet(isPresented: $showingAddGame) {
@@ -443,6 +445,7 @@ struct BacklogListView: View {
     }
 
     private func triggerCelebration() {
+        Haptic.success.play()
         withAnimation { showCelebration = true }
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
             withAnimation { showCelebration = false }

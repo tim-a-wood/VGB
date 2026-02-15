@@ -46,6 +46,7 @@
 
 ## Post Release
 
+- **Game Score:** A single “gamer score” (0–100 or similar) calculated by an algorithm from the user’s stats (completion rate, personal ratings, critic scores, library size/diversity, etc.), weighted for a global/leaderboard-style feel. Shown in the header of each main page (e.g. top right or left) with a small graph or ring similar to the User Rating ring on the Stats page. The algorithm is the main deliverable; the header badge is the UI.
 - **Social / comparison:** Compare stats and radar charts with friends (overlay friend's radar on yours; shared completion rates, etc.)
 - Community rating (average VGB user rating; requires backend)
 - Browse and import from IGDB (popular/trending/new releases discovery)

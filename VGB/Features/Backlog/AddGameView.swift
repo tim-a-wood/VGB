@@ -55,6 +55,8 @@ struct AddGameView: View {
                         TextField("Search games…", text: $searchText)
                             .autocorrectionDisabled()
                             .onSubmit { triggerSearch() }
+                            .accessibilityLabel("Search games on IGDB")
+                            .accessibilityHint("Type to find games and prefill details")
                         if isSearching {
                             ProgressView()
                         }
@@ -71,7 +73,10 @@ struct AddGameView: View {
                 } header: {
                     Text("Search IGDB")
                 } footer: {
-                    if let error = searchError {
+                    if isSearching {
+                        Text("Searching…")
+                            .foregroundStyle(.secondary)
+                    } else if let error = searchError {
                         Text(error)
                             .foregroundStyle(.red)
                     } else if hasIGDBSelection {
@@ -135,6 +140,11 @@ struct AddGameView: View {
                             .multilineTextAlignment(.trailing)
                             .frame(width: 80)
                     }
+                    .onChange(of: estimatedHours) { _, newValue in
+                        if let v = newValue, v < 0 {
+                            estimatedHours = 0
+                        }
+                    }
 
                     if !isUnreleasedGame {
                         HStack {
@@ -144,6 +154,11 @@ struct AddGameView: View {
                                 .keyboardType(.numberPad)
                                 .multilineTextAlignment(.trailing)
                                 .frame(width: 80)
+                        }
+                        .onChange(of: personalRating) { _, newValue in
+                            if let v = newValue, (v < 0 || v > 100) {
+                                personalRating = min(100, max(0, v))
+                            }
                         }
                     }
 
@@ -156,10 +171,13 @@ struct AddGameView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
+                        .accessibilityLabel("Cancel adding game")
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Add") { save() }
                         .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty)
+                        .accessibilityLabel("Add game")
+                        .accessibilityHint(title.trimmingCharacters(in: .whitespaces).isEmpty ? "Enter a title first" : "Saves the game to your catalog")
                 }
             }
             .onChange(of: searchText) {
@@ -240,9 +258,9 @@ struct AddGameView: View {
             status: status,
             priorityPosition: existingGameCount
         )
-        game.estimatedHours = estimatedHours
+        game.estimatedHours = estimatedHours.map { max(0, $0) }
         game.personalNotes = personalNotes
-        game.personalRating = personalRating
+        game.personalRating = personalRating.map { min(100, max(0, $0)) }
 
         // Apply IGDB metadata if selected
         if let igdb = selectedIGDBGame {
@@ -256,6 +274,7 @@ struct AddGameView: View {
         }
 
         modelContext.insert(game)
+        Haptic.success.play()
         dismiss()
     }
 }

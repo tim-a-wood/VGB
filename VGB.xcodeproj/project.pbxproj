@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		63E8D4B855E15A47273EBEB9 /* VGBApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A24FB1195840A54D9117F8 /* VGBApp.swift */; };
 		CH11CH22CH33CH44CH55CH66 /* CheckpointHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = CH11CH22CH33CH44CH55CH67 /* CheckpointHeader.swift */; };
+		HX11HX22HX33HX44HX55HX66 /* Haptic.swift in Sources */ = {isa = PBXBuildFile; fileRef = HX11HX22HX33HX44HX55HX67 /* Haptic.swift */; };
 		55AA55BB55CC55DD55EE55FF /* BacklogListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44AA44BB44CC44DD44EE44FF /* BacklogListView.swift */; };
 		DD11AA22BB33CC44DD55EE66 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11AA22BB33CC44DD55EE67 /* Game.swift */; };
 		DD11AA22BB33CC44DD55EE68 /* GameStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11AA22BB33CC44DD55EE69 /* GameStatus.swift */; };
@@ -63,6 +64,7 @@
 /* Begin PBXFileReference section */
 		05A24FB1195840A54D9117F8 /* VGBApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VGBApp.swift; sourceTree = "<group>"; };
 		CH11CH22CH33CH44CH55CH67 /* CheckpointHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckpointHeader.swift; sourceTree = "<group>"; };
+		HX11HX22HX33HX44HX55HX67 /* Haptic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptic.swift; sourceTree = "<group>"; };
 		0BFD25FD239D36E39B81796A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		44AA44BB44CC44DD44EE44FF /* BacklogListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogListView.swift; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF11 /* GameModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameModelTests.swift; sourceTree = "<group>"; };
@@ -190,6 +192,7 @@
 			children = (
 				05A24FB1195840A54D9117F8 /* VGBApp.swift */,
 				CH11CH22CH33CH44CH55CH67 /* CheckpointHeader.swift */,
+				HX11HX22HX33HX44HX55HX67 /* Haptic.swift */,
 				77AA77BB77CC77DD77EE77FF /* Resources */,
 				SC11SC22SC33SC44SC55SC67 /* StoreConfiguration.swift */,
 				SC11SC22SC33SC44SC55SC69 /* VGB.entitlements */,
@@ -362,6 +365,7 @@
 			files = (
 				63E8D4B855E15A47273EBEB9 /* VGBApp.swift in Sources */,
 				CH11CH22CH33CH44CH55CH66 /* CheckpointHeader.swift in Sources */,
+				HX11HX22HX33HX44HX55HX66 /* Haptic.swift in Sources */,
 				SC11SC22SC33SC44SC55SC66 /* StoreConfiguration.swift in Sources */,
 				WS11WS22WS33WS44WS55WS66 /* WidgetSummaryStorage.swift in Sources */,
 				55AA55BB55CC55DD55EE55FF /* BacklogListView.swift in Sources */,

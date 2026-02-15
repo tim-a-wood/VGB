@@ -105,6 +105,11 @@ struct GameDetailView: View {
                             .multilineTextAlignment(.trailing)
                             .frame(width: 80)
                     }
+                    .onChange(of: game.personalRating) { _, newValue in
+                        if let v = newValue, (v < 0 || v > 100) {
+                            game.personalRating = min(100, max(0, v))
+                        }
+                    }
                 }
             }
 
@@ -118,6 +123,11 @@ struct GameDetailView: View {
                         .keyboardType(.decimalPad)
                         .multilineTextAlignment(.trailing)
                         .frame(width: 80)
+                }
+                .onChange(of: game.estimatedHours) { _, newValue in
+                    if let v = newValue, v < 0 {
+                        game.estimatedHours = 0
+                    }
                 }
 
                 TextField("Notes", text: $game.personalNotes, axis: .vertical)
@@ -163,6 +173,7 @@ struct GameDetailView: View {
                             }
                         }
                         .disabled(isRefreshing)
+                        .accessibilityLabel(isRefreshing ? "Refreshing metadata" : "Refresh metadata from IGDB")
                     }
                 }
 
@@ -183,10 +194,14 @@ struct GameDetailView: View {
                 ShareLink(item: shareText) {
                     Label("Share Game", systemImage: "square.and.arrow.up")
                 }
+                .accessibilityLabel("Share game")
 
                 Button("Delete Game", role: .destructive) {
+                    Haptic.warning.play()
                     modelContext.delete(game)
                 }
+                .accessibilityLabel("Delete game")
+                .accessibilityHint("Removes this game from your catalog")
             }
         }
         .overlay {
@@ -200,6 +215,7 @@ struct GameDetailView: View {
         .onChange(of: game.statusRaw) { oldValue, newValue in
             game.updatedAt = Date()
             if newValue == GameStatus.completed.rawValue && oldValue != newValue {
+                Haptic.success.play()
                 withAnimation {
                     showCelebration = true
                 }

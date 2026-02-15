@@ -132,6 +132,43 @@ final class IGDBModelsTests: XCTestCase {
         XCTAssertNil(game.primaryGenre)
     }
 
+    func testPrimaryGenreHorrorFromThemes() {
+        let game = makeGame(
+            genres: [IGDBGenre(id: 1, name: "Shooter")],
+            themes: [IGDBTheme(id: 19, name: "Horror", slug: "horror")]
+        )
+        XCTAssertEqual(game.primaryGenre, "Horror")
+    }
+
+    func testPrimaryGenreHorrorFromSurvivalTheme() {
+        let game = makeGame(
+            genres: [IGDBGenre(id: 1, name: "Adventure")],
+            themes: [IGDBTheme(id: 42, name: "Survival", slug: "survival")]
+        )
+        XCTAssertEqual(game.primaryGenre, "Horror")
+    }
+
+    func testDecodeThemesAsIds() throws {
+        let json = """
+        {
+            "id": 123,
+            "name": "Cronos: The New Dawn",
+            "themes": [19, 42]
+        }
+        """.data(using: .utf8)!
+        let game = try JSONDecoder().decode(IGDBGame.self, from: json)
+        XCTAssertEqual(game.primaryGenre, "Horror")
+    }
+
+    func testPrimaryGenreHorrorFromSummary() {
+        let game = makeGame(
+            genres: [IGDBGenre(id: 1, name: "Shooter")],
+            themes: nil,
+            summary: "A survival horror game set in a dystopian future."
+        )
+        XCTAssertEqual(game.primaryGenre, "Horror")
+    }
+
     // MARK: - Convenience: platformNames
 
     func testPlatformNamesJoinsAll() {
@@ -175,9 +212,11 @@ final class IGDBModelsTests: XCTestCase {
         coverImageId: String? = nil,
         platforms: [IGDBPlatform]? = nil,
         genres: [IGDBGenre]? = nil,
+        themes: [IGDBTheme]? = nil,
         companies: [IGDBInvolvedCompany]? = nil,
         firstReleaseDate: Int? = nil,
-        totalRating: Double? = nil
+        totalRating: Double? = nil,
+        summary: String? = nil
     ) -> IGDBGame {
         IGDBGame(
             id: id,
@@ -185,10 +224,11 @@ final class IGDBModelsTests: XCTestCase {
             cover: coverImageId.map { IGDBCover(id: 1, imageId: $0) },
             platforms: platforms,
             genres: genres,
+            themes: themes,
             involvedCompanies: companies,
             firstReleaseDate: firstReleaseDate,
             totalRating: totalRating,
-            summary: nil
+            summary: summary
         )
     }
 }

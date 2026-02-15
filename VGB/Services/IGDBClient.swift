@@ -11,8 +11,8 @@ actor IGDBClient {
     private let baseURL = URL(string: "https://api.igdb.com/v4")!
     private let auth = TwitchAuthManager.shared
 
-    /// Shared Apicalypse fields clause for game queries.
-    private let gameFields = "name,cover.image_id,platforms.name,genres.name,involved_companies.company.name,involved_companies.developer,first_release_date,total_rating,summary"
+    /// Shared Apicalypse fields clause for game queries. Include themes.* to expand relation (IGDB may return IDs only without expand).
+    private let gameFields = "name,cover.image_id,platforms.name,genres.name,themes.name,themes.slug,involved_companies.company.name,involved_companies.developer,first_release_date,total_rating,summary"
 
     private init() {}
 
