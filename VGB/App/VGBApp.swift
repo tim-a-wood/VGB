@@ -28,10 +28,36 @@ struct VGBApp: App {
 /// Root view that has access to both `scenePhase` and `modelContext`,
 /// allowing us to trigger background sync when the app comes to the foreground.
 private struct ContentRoot: View {
+    @AppStorage("VGB.hasCompletedOnboarding") private var hasCompletedOnboarding = false
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.modelContext) private var modelContext
 
     var body: some View {
+        Group {
+            if hasCompletedOnboarding {
+                mainTabs
+            } else {
+                OnboardingView(onComplete: { hasCompletedOnboarding = true })
+            }
+        }
+        .onAppear {
+            guard hasCompletedOnboarding else { return }
+            pushWidgetSummary(context: modelContext)
+            WidgetCenter.shared.reloadTimelines(ofKind: "VGBWidget")
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            guard hasCompletedOnboarding else { return }
+            if newPhase == .active {
+                Task {
+                    await GameSyncService.shared.refreshStaleGames(in: modelContext)
+                }
+                pushWidgetSummary(context: modelContext)
+                WidgetCenter.shared.reloadTimelines(ofKind: "VGBWidget")
+            }
+        }
+    }
+
+    private var mainTabs: some View {
         TabView {
             BacklogListView()
                 .tabItem {
@@ -45,19 +71,6 @@ private struct ContentRoot: View {
                 .tabItem {
                     Label("Stats", systemImage: "chart.pie")
                 }
-        }
-        .onAppear {
-            pushWidgetSummary(context: modelContext)
-            WidgetCenter.shared.reloadTimelines(ofKind: "VGBWidget")
-        }
-        .onChange(of: scenePhase) { _, newPhase in
-            if newPhase == .active {
-                Task {
-                    await GameSyncService.shared.refreshStaleGames(in: modelContext)
-                }
-                pushWidgetSummary(context: modelContext)
-                WidgetCenter.shared.reloadTimelines(ofKind: "VGBWidget")
-            }
         }
     }
 }

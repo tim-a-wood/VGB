@@ -39,6 +39,7 @@
 		A1B2C3D4E5F60606 /* GameStatus+Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60505 /* GameStatus+Color.swift */; };
 		RG11RG22RG33RG44RG55RG66 /* RadarGenreCategories.swift in Sources */ = {isa = PBXBuildFile; fileRef = RG11RG22RG33RG44RG55RG67 /* RadarGenreCategories.swift */; };
 		RV11RV22RV33RV44RV55RV66 /* RankingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV11RV22RV33RV44RV55RV67 /* RankingsView.swift */; };
+		OB11OB22OB33OB44OB55OB66 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB11OB22OB33OB44OB55OB67 /* OnboardingView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -94,6 +95,7 @@
 		A1B2C3D4E5F60505 /* GameStatus+Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameStatus+Color.swift"; sourceTree = "<group>"; };
 		RG11RG22RG33RG44RG55RG67 /* RadarGenreCategories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadarGenreCategories.swift; sourceTree = "<group>"; };
 		RV11RV22RV33RV44RV55RV67 /* RankingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankingsView.swift; sourceTree = "<group>"; };
+		OB11OB22OB33OB44OB55OB67 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -206,10 +208,19 @@
 			isa = PBXGroup;
 			children = (
 				99AA99BB99CC99DD99EE99FF /* Backlog */,
+				OB11OB22OB33OB44OB55OB68 /* Onboarding */,
 				RV11RV22RV33RV44RV55RV68 /* Rankings */,
 				A1B2C3D4E5F60707 /* Stats */,
 			);
 			path = Features;
+			sourceTree = "<group>";
+		};
+		OB11OB22OB33OB44OB55OB68 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				OB11OB22OB33OB44OB55OB67 /* OnboardingView.swift */,
+			);
+			path = Onboarding;
 			sourceTree = "<group>";
 		};
 		RV11RV22RV33RV44RV55RV68 /* Rankings */ = {
@@ -366,6 +377,7 @@
 				A1B2C3D4E5F60606 /* GameStatus+Color.swift in Sources */,
 				RG11RG22RG33RG44RG55RG66 /* RadarGenreCategories.swift in Sources */,
 				RV11RV22RV33RV44RV55RV66 /* RankingsView.swift in Sources */,
+				OB11OB22OB33OB44OB55OB66 /* OnboardingView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
