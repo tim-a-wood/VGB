@@ -45,3 +45,12 @@ xcodebuild test -project VGB.xcodeproj -scheme VGB -destination 'platform=iOS Si
 ## Project generation
 
 `project.yml` is an XcodeGen spec but **outdated** (missing widget, stats, rankings). The `VGB.xcodeproj` is the source of truth. Do not run `xcodegen generate` without updating `project.yml` first.
+
+## App Store screenshots
+
+See `screenshots/README.md`. Run the app in Simulator (iPhone 16 Pro Max), navigate to each screen, then:
+```bash
+./scripts/capture-screenshot.sh 1   # first screen
+./scripts/capture-screenshot.sh 2   # second screen
+# etc.
+```

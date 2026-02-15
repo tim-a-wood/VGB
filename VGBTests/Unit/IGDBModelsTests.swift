@@ -115,12 +115,12 @@ final class IGDBModelsTests: XCTestCase {
     // MARK: - Convenience: primaryGenre
 
     func testPrimaryGenrePicksByPriority() {
-        // When multiple genres exist, we pick by precedence (Adventure < RPG < Shooter).
+        // When multiple genres exist and text has no signal, resolver uses first DB genre.
         let game = makeGame(genres: [
             IGDBGenre(id: 1, name: "RPG"),
             IGDBGenre(id: 2, name: "Adventure"),
         ])
-        XCTAssertEqual(game.primaryGenre, "Adventure")
+        XCTAssertEqual(game.primaryGenre, "RPG")
     }
 
     func testPrimaryGenreNilWhenEmpty() {
@@ -168,6 +168,62 @@ final class IGDBModelsTests: XCTestCase {
             summary: "A survival horror game set in a dystopian future."
         )
         XCTAssertEqual(game.primaryGenre, "Horror")
+    }
+
+    func testPrimaryGenreFromSummaryOverridesDB() {
+        // IGDB often returns Adventure; resolver uses summary to infer RPG (or Action RPG).
+        let game = makeGame(
+            name: "Elden Ring",
+            genres: [IGDBGenre(id: 1, name: "Adventure"), IGDBGenre(id: 2, name: "Action")],
+            themes: nil,
+            summary: "A souls-like action RPG. Level up your character, explore dungeons, and defeat bosses."
+        )
+        let g = game.primaryGenre
+        XCTAssertTrue(g == "RPG" || g == "Action RPG", "Expected RPG or Action RPG from summary, got \(g ?? "nil")")
+    }
+
+    func testPrimaryGenreShooterForMilitaryFPS() {
+        // Battlefield-style: military FPS should resolve as Shooter, not RPG.
+        let game = makeGame(
+            name: "Battlefield 6",
+            genres: [IGDBGenre(id: 1, name: "Adventure"), IGDBGenre(id: 2, name: "Action")],
+            themes: nil,
+            summary: "Experience all-out warfare in a massive first-person shooter. Lead your squad in military combat across huge maps. FPS multiplayer with vehicles and weapons."
+        )
+        XCTAssertEqual(game.primaryGenre, "Shooter")
+    }
+
+    func testPrimaryGenreRPGForOpenWorldRPG() {
+        // Skyrim-style: open world RPG should resolve as RPG, not Adventure.
+        let game = makeGame(
+            name: "The Elder Scrolls V: Skyrim",
+            genres: [IGDBGenre(id: 1, name: "Adventure")],
+            themes: nil,
+            summary: "An open world RPG where you explore a vast land. Complete quests, learn magic, and progress your character. Role-playing with dragons and dungeons."
+        )
+        XCTAssertEqual(game.primaryGenre, "RPG")
+    }
+
+    func testPrimaryGenreStrategyForCiv() {
+        // Civilization-style 4x strategy should resolve as Strategy (Other), not RPG.
+        let game = makeGame(
+            name: "Sid Meier's Civilization VI",
+            genres: [IGDBGenre(id: 1, name: "Strategy"), IGDBGenre(id: 2, name: "Turn-based")],
+            themes: nil,
+            summary: "Build an empire in this 4x turn-based strategy game. Expand, exploit, conquer. Lead your civilization through the ages."
+        )
+        XCTAssertEqual(game.primaryGenre, "Strategy")
+    }
+
+    func testPrimaryGenreStrategyForHeroesOfMightAndMagic() {
+        // Heroes of Might and Magic has "magic" but is strategy; should resolve as Strategy (Other), not RPG.
+        let game = makeGame(
+            name: "Heroes of Might and Magic III",
+            genres: [IGDBGenre(id: 1, name: "Adventure"), IGDBGenre(id: 2, name: "RPG")],
+            themes: nil,
+            summary: "Classic turn-based strategy game. Lead your hero and army across the campaign map. Conquer towns, manage resources, and command units in tactical combat."
+        )
+        XCTAssertEqual(game.primaryGenre, "Strategy")
     }
 
     // MARK: - Convenience: platformNames

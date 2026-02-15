@@ -49,7 +49,7 @@
 - [x] Onboarding / first-launch walkthrough (2–3 screens explaining the core loop)
 - [x] UX polish (validation, loading/empty states, accessibility pass)
 - [x] App icon, launch screen
-- [ ] Store-ready screenshots
+- [ ] Store-ready screenshots (use `scripts/capture-screenshot.sh` + `screenshots/README.md`)
 - [ ] Device testing (one physical iPhone + simulator), fix bugs, performance pass
 - [ ] App Store metadata and submit v1
 

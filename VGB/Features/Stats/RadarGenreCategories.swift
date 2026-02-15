@@ -37,7 +37,7 @@ enum RadarGenreCategories {
             || lower.contains("puzzle") || lower.contains("arcade") || lower.contains("fighting")
             || lower.contains("indie") || lower.contains("simulator") || lower.contains("music")
             || lower.contains("card") || lower.contains("board") || lower.contains("quiz")
-            || lower.contains("pinball") { return 1 }
+            || lower.contains("pinball") || lower.contains("roguelike") { return 1 }
         // Check horror/survival before shooter so survival-horror (e.g. Resident Evil) isn’t classed as Shooter
         if lower.contains("horror") || lower.contains("survival") { return 5 }
         if lower.contains("shooter") { return 2 }

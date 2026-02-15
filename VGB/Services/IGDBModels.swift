@@ -103,52 +103,18 @@ struct IGDBGame: Decodable, Sendable {
             .company?.name
     }
 
-    /// Convenience: primary genre name. When IGDB returns multiple genres, we pick one by precedence.
-    /// If themes hint at Horror (e.g. "Horror", "Survival"), we mark the genre as Horror.
-    /// Fallback: if summary mentions "horror" or "survival horror", classify as Horror (IGDB metadata can be incomplete).
+    /// Primary genre for display. Uses GenreResolver to score name + summary so we don't
+    /// default to Adventure when IGDB returns inconsistent genre lists. Themes (Horror/Survival)
+    /// still override; otherwise the resolver picks the best-matching genre from text and DB.
     var primaryGenre: String? {
-        if themesHintAtHorror || summaryHintsAtHorror {
-            return "Horror"
-        }
-        guard let genres = genres, !genres.isEmpty else { return nil }
-        let names = genres.compactMap(\.name).filter { !$0.isEmpty }
-        return Self.preferredGenre(from: names)
-    }
-
-    /// True if any theme name or slug hints at the game being horror (e.g. "Horror", "Survival").
-    private var themesHintAtHorror: Bool {
-        guard let themes = themes else { return false }
-        for t in themes {
-            let name = (t.name ?? "").lowercased()
-            let slug = (t.slug ?? "").lowercased()
-            if name.contains("horror") || name.contains("survival") || slug == "horror" || slug == "survival" {
-                return true
-            }
-        }
-        return false
-    }
-
-    /// True if the summary text mentions horror (e.g. "survival horror", "horror game"). Fallback when themes are missing.
-    private var summaryHintsAtHorror: Bool {
-        guard let s = summary, !s.isEmpty else { return false }
-        let lower = s.lowercased()
-        return lower.contains("horror") || lower.contains("survival horror")
-    }
-
-    /// Picks a single genre for display when multiple exist; Adventure/Action take precedence over Shooter (and Horror/Survival over Shooter).
-    static func preferredGenre(from names: [String]) -> String? {
-        guard !names.isEmpty else { return nil }
-        return names.min(by: { genrePriority($0) < genrePriority($1) })
-    }
-
-    private static func genrePriority(_ genre: String) -> Int {
-        let lower = genre.lowercased()
-        if lower.contains("adventure") || lower.contains("action") { return 0 }
-        if lower.contains("horror") || lower.contains("survival") { return 1 }
-        if lower.contains("shooter") { return 2 }
-        if lower.contains("role-playing") || lower.contains("rpg") { return 3 }
-        if lower.contains("sport") || lower.contains("racing") { return 4 }
-        return 5
+        let genreNames = genres?.compactMap(\.name).filter { !$0.isEmpty } ?? []
+        let themeNames = themes?.compactMap { t in t.name ?? t.slug }.compactMap { $0 }.filter { !$0.isEmpty } ?? []
+        return GenreResolver.resolve(
+            name: name,
+            summary: summary,
+            genreNames: genreNames,
+            themeNames: themeNames
+        )
     }
 
     /// Convenience: primary platform name.

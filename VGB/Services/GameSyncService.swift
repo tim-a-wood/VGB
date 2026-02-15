@@ -48,10 +48,26 @@ final class GameSyncService {
 
         guard !staleGames.isEmpty else { return }
 
+        await refreshGames(staleGames, in: context)
+    }
+
+    /// Refreshes metadata from IGDB for all games that have an `externalId`.
+    /// Use for manual "refresh all" from the Game Catalog.
+    func refreshAllGames(in context: ModelContext) async {
+        let descriptor = FetchDescriptor<Game>(
+            predicate: #Predicate<Game> { game in
+                game.externalId != nil
+            }
+        )
+        guard let allLinked = try? context.fetch(descriptor), !allLinked.isEmpty else { return }
+        await refreshGames(allLinked, in: context)
+    }
+
+    private func refreshGames(_ games: [Game], in context: ModelContext) async {
         isSyncing = true
         var refreshed = 0
 
-        for game in staleGames {
+        for game in games {
             guard let externalId = game.externalId, let igdbId = Int(externalId) else { continue }
 
             do {

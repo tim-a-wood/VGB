@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		63E8D4B855E15A47273EBEB9 /* VGBApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A24FB1195840A54D9117F8 /* VGBApp.swift */; };
+		D1D2D3D4D5D6D7D8D9D0D1 /* DemoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D2D3D4D5D6D7D8D9D0D2 /* DemoData.swift */; };
 		CH11CH22CH33CH44CH55CH66 /* CheckpointHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = CH11CH22CH33CH44CH55CH67 /* CheckpointHeader.swift */; };
 		HX11HX22HX33HX44HX55HX66 /* Haptic.swift in Sources */ = {isa = PBXBuildFile; fileRef = HX11HX22HX33HX44HX55HX67 /* Haptic.swift */; };
 		55AA55BB55CC55DD55EE55FF /* BacklogListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44AA44BB44CC44DD44EE44FF /* BacklogListView.swift */; };
@@ -28,6 +29,7 @@
 		BB22CC33DD44EE55FF660041 /* IGDBModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22CC33DD44EE55FF660042 /* IGDBModels.swift */; };
 		BB22CC33DD44EE55FF660051 /* IGDBClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22CC33DD44EE55FF660052 /* IGDBClient.swift */; };
 		BB22CC33DD44EE55FF660061 /* GameSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22CC33DD44EE55FF660062 /* GameSyncService.swift */; };
+		GR11GR22GR33GR44GR55GR66 /* GenreResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = GR11GR22GR33GR44GR55GR67 /* GenreResolver.swift */; };
 		FF44AA55BB66CC77DD880011 /* VGBWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF44AA55BB66CC77DD880012 /* VGBWidget.swift */; };
 		FF44AA55BB66CC77DD880021 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11AA22BB33CC44DD55EE67 /* Game.swift */; };
 		FF44AA55BB66CC77DD880022 /* GameStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11AA22BB33CC44DD55EE69 /* GameStatus.swift */; };
@@ -63,6 +65,7 @@
 
 /* Begin PBXFileReference section */
 		05A24FB1195840A54D9117F8 /* VGBApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VGBApp.swift; sourceTree = "<group>"; };
+		D1D2D3D4D5D6D7D8D9D0D2 /* DemoData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoData.swift; sourceTree = "<group>"; };
 		CH11CH22CH33CH44CH55CH67 /* CheckpointHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckpointHeader.swift; sourceTree = "<group>"; };
 		HX11HX22HX33HX44HX55HX67 /* Haptic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptic.swift; sourceTree = "<group>"; };
 		0BFD25FD239D36E39B81796A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -78,6 +81,7 @@
 		BB22CC33DD44EE55FF660042 /* IGDBModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IGDBModels.swift; sourceTree = "<group>"; };
 		BB22CC33DD44EE55FF660052 /* IGDBClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IGDBClient.swift; sourceTree = "<group>"; };
 		BB22CC33DD44EE55FF660062 /* GameSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSyncService.swift; sourceTree = "<group>"; };
+		GR11GR22GR33GR44GR55GR67 /* GenreResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreResolver.swift; sourceTree = "<group>"; };
 		BB22CC33DD44EE55FF660099 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		DD11AA22BB33CC44DD55EE67 /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
 		DD11AA22BB33CC44DD55EE69 /* GameStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStatus.swift; sourceTree = "<group>"; };
@@ -168,6 +172,7 @@
 			isa = PBXGroup;
 			children = (
 				BB22CC33DD44EE55FF660012 /* APIConfig.swift */,
+				GR11GR22GR33GR44GR55GR67 /* GenreResolver.swift */,
 				BB22CC33DD44EE55FF660052 /* IGDBClient.swift */,
 				BB22CC33DD44EE55FF660032 /* IGDBError.swift */,
 				BB22CC33DD44EE55FF660042 /* IGDBModels.swift */,
@@ -191,6 +196,7 @@
 			isa = PBXGroup;
 			children = (
 				05A24FB1195840A54D9117F8 /* VGBApp.swift */,
+				D1D2D3D4D5D6D7D8D9D0D2 /* DemoData.swift */,
 				CH11CH22CH33CH44CH55CH67 /* CheckpointHeader.swift */,
 				HX11HX22HX33HX44HX55HX67 /* Haptic.swift */,
 				77AA77BB77CC77DD77EE77FF /* Resources */,
@@ -364,6 +370,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				63E8D4B855E15A47273EBEB9 /* VGBApp.swift in Sources */,
+				D1D2D3D4D5D6D7D8D9D0D1 /* DemoData.swift in Sources */,
 				CH11CH22CH33CH44CH55CH66 /* CheckpointHeader.swift in Sources */,
 				HX11HX22HX33HX44HX55HX66 /* Haptic.swift in Sources */,
 				SC11SC22SC33SC44SC55SC66 /* StoreConfiguration.swift in Sources */,
@@ -379,6 +386,7 @@
 				BB22CC33DD44EE55FF660041 /* IGDBModels.swift in Sources */,
 				BB22CC33DD44EE55FF660051 /* IGDBClient.swift in Sources */,
 				BB22CC33DD44EE55FF660061 /* GameSyncService.swift in Sources */,
+				GR11GR22GR33GR44GR55GR66 /* GenreResolver.swift in Sources */,
 				DD22EE33FF44AA55BB660011 /* CelebrationOverlay.swift in Sources */,
 				A1B2C3D4E5F60202 /* StatsView.swift in Sources */,
 				A1B2C3D4E5F60404 /* RadarChartView.swift in Sources */,

@@ -28,6 +28,7 @@ struct BacklogListView: View {
     @State private var showCelebration = false
     /// Which categories are collapsed on the Game Catalog (sectioned) view. Empty = all expanded.
     @State private var collapsedSections: Set<GameStatus> = []
+    @State private var isRefreshingAll = false
 
     // MARK: - Derived data
 
@@ -167,6 +168,26 @@ struct BacklogListView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     filterMenu
                         .accessibilityLabel("Filter and sort games")
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    let hasLinkedGames = games.contains { $0.externalId != nil }
+                    Button {
+                        guard hasLinkedGames, !isRefreshingAll else { return }
+                        isRefreshingAll = true
+                        Task {
+                            await GameSyncService.shared.refreshAllGames(in: modelContext)
+                            await MainActor.run { isRefreshingAll = false }
+                        }
+                    } label: {
+                        if isRefreshingAll {
+                            ProgressView()
+                                .scaleEffect(0.85)
+                        } else {
+                            Image(systemName: "arrow.clockwise")
+                        }
+                    }
+                    .disabled(!hasLinkedGames || isRefreshingAll)
+                    .accessibilityLabel(isRefreshingAll ? "Refreshing metadata" : "Refresh metadata for all games")
                 }
             }
             .sheet(isPresented: $showingAddGame) {

@@ -42,6 +42,9 @@ private struct ContentRoot: View {
         }
         .onAppear {
             guard hasCompletedOnboarding else { return }
+            if ProcessInfo.processInfo.arguments.contains("-SeedDemoData") {
+                DemoData.seed(into: modelContext)
+            }
             pushWidgetSummary(context: modelContext)
             WidgetCenter.shared.reloadTimelines(ofKind: "VGBWidget")
         }
@@ -57,22 +60,40 @@ private struct ContentRoot: View {
         }
     }
 
+    private enum AppTab: Int { case catalog = 0, rankings = 1, stats = 2 }
+
+    @State private var selectedTab: AppTab = {
+        let args = ProcessInfo.processInfo.arguments
+        if let idx = args.firstIndex(of: "-ScreenshotTab"), idx + 1 < args.count,
+           let raw = Int(args[idx + 1]), raw >= 0, raw <= 2,
+           let tab = AppTab(rawValue: raw) {
+            return tab
+        }
+        return .catalog
+    }()
+
     private var mainTabs: some View {
         VStack(spacing: 0) {
             CheckpointHeader()
-            TabView {
+            TabView(selection: Binding(
+                get: { selectedTab },
+                set: { selectedTab = $0 }
+            )) {
                 BacklogListView()
                     .tabItem {
                         Label("Game Catalog", systemImage: "books.vertical")
                     }
+                    .tag(AppTab.catalog)
                 RankingsView()
                     .tabItem {
                         Label("Rankings", systemImage: "list.number")
                     }
+                    .tag(AppTab.rankings)
                 StatsView()
                     .tabItem {
                         Label("Stats", systemImage: "chart.pie")
                     }
+                    .tag(AppTab.stats)
             }
         }
     }
