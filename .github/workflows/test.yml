@@ -42,7 +42,7 @@ jobs:
         run: |
           xcodebuild test \
             -scheme VGB \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.2' \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
             -resultBundlePath TestResults.xcresult \
             CODE_SIGNING_ALLOWED=NO \
             -quiet
