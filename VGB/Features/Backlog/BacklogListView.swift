@@ -19,6 +19,7 @@ struct BacklogListView: View {
     @Environment(\.modelContext) private var modelContext
 
     @State private var showingAddGame = false
+    @State private var addGameInitialStatus: GameStatus?
     @State private var sortMode: SortMode = .priority
     @State private var filterStatus: GameStatus?
     @State private var filterPlatform: String?
@@ -169,7 +170,10 @@ struct BacklogListView: View {
                 }
             }
             .sheet(isPresented: $showingAddGame) {
-                AddGameView(existingGameCount: games.count)
+                AddGameView(existingGameCount: games.count, initialStatus: addGameInitialStatus ?? .backlog)
+            }
+            .onChange(of: showingAddGame) { _, visible in
+                if !visible { addGameInitialStatus = nil }
             }
             .overlay {
                 if showCelebration {
@@ -336,27 +340,17 @@ struct BacklogListView: View {
     private var scrollViewSectionedList: some View {
         ScrollView {
             LazyVStack(spacing: 24) {
-                if !nowPlaying.isEmpty {
-                    sectionBlock(title: "Now Playing", systemImage: "play.fill", color: .blue, targetStatus: .playing, games: nowPlaying, isExpanded: !collapsedSections.contains(.playing), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.playing]) } }, onMoveToCompleted: nil) { game in
-                        swipeCompleted(game)
-                        swipeDropped(game)
-                    }
+                sectionBlock(title: "Now Playing", systemImage: "play.fill", color: .blue, targetStatus: .playing, games: nowPlaying, isExpanded: !collapsedSections.contains(.playing), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.playing]) } }, onMoveToCompleted: nil) { game in
+                    swipeCompleted(game)
+                    swipeDropped(game)
                 }
-                if !backlogGames.isEmpty {
-                    sectionBlock(title: "Backlog", systemImage: "list.bullet", color: .gray, targetStatus: .backlog, games: backlogGames, isExpanded: !collapsedSections.contains(.backlog), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.backlog]) } }, onMoveToCompleted: nil) { game in
-                        swipeCompleted(game)
-                        swipeDropped(game)
-                    }
+                sectionBlock(title: "Backlog", systemImage: "list.bullet", color: .gray, targetStatus: .backlog, games: backlogGames, isExpanded: !collapsedSections.contains(.backlog), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.backlog]) } }, onMoveToCompleted: nil) { game in
+                    swipeCompleted(game)
+                    swipeDropped(game)
                 }
-                if !wishlistGames.isEmpty {
-                    sectionBlock(title: "Wishlist", systemImage: "heart.fill", color: .purple, targetStatus: .wishlist, games: wishlistGames, isExpanded: !collapsedSections.contains(.wishlist), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.wishlist]) } }, onMoveToCompleted: nil)
-                }
-                if !completedGames.isEmpty {
-                    sectionBlock(title: "Completed", systemImage: "checkmark.circle.fill", color: .green, targetStatus: .completed, games: completedGames, isExpanded: !collapsedSections.contains(.completed), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.completed]) } }, onMoveToCompleted: triggerCelebration)
-                }
-                if !droppedGames.isEmpty {
-                    sectionBlock(title: "Dropped", systemImage: "xmark.circle.fill", color: .orange, targetStatus: .dropped, games: droppedGames, isExpanded: !collapsedSections.contains(.dropped), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.dropped]) } }, onMoveToCompleted: nil)
-                }
+                sectionBlock(title: "Wishlist", systemImage: "heart.fill", color: .purple, targetStatus: .wishlist, games: wishlistGames, isExpanded: !collapsedSections.contains(.wishlist), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.wishlist]) } }, onMoveToCompleted: nil)
+                sectionBlock(title: "Completed", systemImage: "checkmark.circle.fill", color: .green, targetStatus: .completed, games: completedGames, isExpanded: !collapsedSections.contains(.completed), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.completed]) } }, onMoveToCompleted: triggerCelebration)
+                sectionBlock(title: "Dropped", systemImage: "xmark.circle.fill", color: .orange, targetStatus: .dropped, games: droppedGames, isExpanded: !collapsedSections.contains(.dropped), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.dropped]) } }, onMoveToCompleted: nil)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
@@ -383,19 +377,35 @@ struct BacklogListView: View {
                 onToggle: onToggle
             )
             if isExpanded {
-                ForEach(Array(games.enumerated()), id: \.element.id) { index, game in
-                    draggableRow(
-                        for: game,
-                        targetStatus: targetStatus,
-                        sectionGames: games,
-                        sectionIndex: index,
-                        onMoveToCompleted: onMoveToCompleted,
-                        rank: targetStatus == .completed && index < 3 ? index + 1 : nil,
-                        isMostAnticipated: targetStatus == .wishlist && index == 0
-                    )
-                    if game.id != games.last?.id {
-                        Divider()
-                            .padding(.leading, 16)
+                if games.isEmpty {
+                    Button {
+                        addGameInitialStatus = targetStatus
+                        showingAddGame = true
+                    } label: {
+                        Label("Add Game", systemImage: "plus.circle.fill")
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(color)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical, 12)
+                            .padding(.horizontal, 16)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Add game to \(title)")
+                } else {
+                    ForEach(Array(games.enumerated()), id: \.element.id) { index, game in
+                        draggableRow(
+                            for: game,
+                            targetStatus: targetStatus,
+                            sectionGames: games,
+                            sectionIndex: index,
+                            onMoveToCompleted: onMoveToCompleted,
+                            rank: targetStatus == .completed && index < 3 ? index + 1 : nil,
+                            isMostAnticipated: targetStatus == .wishlist && index == 0
+                        )
+                        if game.id != games.last?.id {
+                            Divider()
+                                .padding(.leading, 16)
+                        }
                     }
                 }
             }

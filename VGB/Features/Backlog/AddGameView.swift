@@ -21,13 +21,18 @@ struct AddGameView: View {
 
     @State private var title = ""
     @State private var platform = ""
-    @State private var status: GameStatus = .backlog
+    @State private var status: GameStatus
     @State private var estimatedHours: Double?
     @State private var personalNotes = ""
     @State private var personalRating: Int?
 
     /// Current count of games so we can assign the next priority position.
     var existingGameCount: Int
+
+    init(existingGameCount: Int, initialStatus: GameStatus = .backlog) {
+        self.existingGameCount = existingGameCount
+        _status = State(initialValue: initialStatus)
+    }
 
     /// Whether the user has picked from IGDB results.
     private var hasIGDBSelection: Bool { selectedIGDBGame != nil }
