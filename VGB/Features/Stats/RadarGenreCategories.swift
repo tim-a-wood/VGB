@@ -16,6 +16,16 @@ enum RadarGenreCategories {
         "Horror & Survival",
     ]
 
+    /// SF Symbol names for each axis (same order as labels).
+    static let iconNames: [String] = [
+        "circle.grid.2x2",        // Other
+        "figure.climbing",       // Action & Adventure (person on rope / adventure)
+        "scope",                 // Shooter
+        "wand.and.stars",        // RPG (wizard / magic)
+        "trophy.fill",           // Sports & Racing
+        "eye.fill",             // Horror & Survival (creepy / watching)
+    ]
+
     /// Maps a raw genre string (e.g. from IGDB) to a category index 0..<6.
     /// Case-insensitive; genres that don't match the other five categories go to "Other" (index 0).
     static func categoryIndex(for genre: String) -> Int {

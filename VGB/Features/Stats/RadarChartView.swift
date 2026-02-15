@@ -5,6 +5,8 @@ import SwiftUI
 struct RadarChartView: View {
     /// (Axis label, value). Values are drawn scaled to max; empty data shows empty polygon.
     let data: [(label: String, value: Double)]
+    /// Optional SF Symbol names for each axis (same order as data). When provided, shown above the label.
+    var axisIcons: [String]? = nil
     /// Fill color for the polygon.
     var fillColor: Color = .accentColor
     /// Max value for scale (nil = use max of data).
@@ -65,15 +67,33 @@ struct RadarChartView: View {
     private func axisLabels(center: CGPoint, radius: CGFloat) -> some View {
         let items = Array(data)
         let n = max(2, items.count)
+        let icons = axisIcons ?? []
         return ForEach(Array(items.enumerated()), id: \.offset) { index, item in
             let angle = angleForIndex(index, count: n)
-            let labelRadius = radius + 14
+            let hasIcon = index < icons.count && !icons[index].isEmpty
+            let labelRadius = radius + (hasIcon ? 22 : 14)
             let pos = pointOnCircle(center: center, radius: labelRadius, angle: angle)
-            Text(item.label)
-                .font(.caption2)
-                .lineLimit(1)
-                .fixedSize(horizontal: true, vertical: false)
-                .position(pos)
+            let iconName = index < icons.count ? icons[index] : nil
+            Group {
+                if let iconName {
+                    VStack(spacing: 2) {
+                        Image(systemName: iconName)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Text(item.label)
+                            .font(.caption2)
+                            .lineLimit(1)
+                            .multilineTextAlignment(.center)
+                    }
+                    .fixedSize(horizontal: true, vertical: true)
+                } else {
+                    Text(item.label)
+                        .font(.caption2)
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: false)
+                }
+            }
+            .position(pos)
         }
     }
 

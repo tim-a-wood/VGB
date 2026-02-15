@@ -18,10 +18,9 @@ struct StatsView: View {
         }
     }
 
-    /// Completed games per radar category (always 6 categories for a consistent chart).
-    private var completedPerGenre: [(label: String, value: Double)] {
-        let completed = games.filter { $0.status == .completed }
-        let genreStrings = completed.compactMap { $0.genre }.filter { !$0.isEmpty }
+    /// All games (backlog, wishlist, playing, completed, dropped) per radar genre category (6 axes).
+    private var libraryPerGenre: [(label: String, value: Double)] {
+        let genreStrings = games.compactMap(\.genre).filter { !$0.isEmpty }
         return RadarGenreCategories.completedCountsByCategory(from: genreStrings)
     }
 
@@ -57,9 +56,9 @@ struct StatsView: View {
                 } else {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 24) {
+                            radarSection
                             threeRingsSection
                             statusDonutSection
-                            radarSection
                         }
                         .padding()
                     }
@@ -263,11 +262,11 @@ struct StatsView: View {
     private var radarSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             sectionHeader("Your Gamer Profile", systemImage: "point.3.connected.trianglepath.dotted")
-            Text("How your completed games break down by genre")
+            Text("How your whole library breaks down by genre")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
-            if completedPerGenre.allSatisfy({ $0.value == 0 }) {
-                Text("Complete games with genres to see your chart.")
+            if libraryPerGenre.allSatisfy({ $0.value == 0 }) {
+                Text("Add games with genres to see your chart.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
@@ -276,7 +275,8 @@ struct StatsView: View {
                 HStack {
                     Spacer(minLength: 0)
                     RadarChartView(
-                        data: completedPerGenre,
+                        data: libraryPerGenre,
+                        axisIcons: RadarGenreCategories.iconNames,
                         fillColor: GameStatus.completed.color
                     )
                     .frame(height: 220)
