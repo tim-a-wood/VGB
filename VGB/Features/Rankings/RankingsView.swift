@@ -31,17 +31,17 @@ struct RankingsView: View {
                     emptyState
                 } else {
                     List {
-                        ForEach(Array(rankedGames.enumerated()), id: \.element.id) { index, game in
-                            NavigationLink(value: game) {
-                                RankingsRowView(
-                                    game: game,
-                                    rank: index + 1,
-                                    ratingSource: ratingSource
-                                )
+                            ForEach(Array(rankedGames.enumerated()), id: \.element.id) { index, game in
+                                NavigationLink(value: game) {
+                                    RankingsRowView(
+                                        game: game,
+                                        rank: index + 1,
+                                        ratingSource: ratingSource
+                                    )
+                                }
                             }
                         }
-                    }
-                    .listStyle(.plain)
+                        .listStyle(.plain)
                 }
             }
             .navigationTitle("Rankings")

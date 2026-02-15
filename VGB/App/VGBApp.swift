@@ -58,19 +58,22 @@ private struct ContentRoot: View {
     }
 
     private var mainTabs: some View {
-        TabView {
-            BacklogListView()
-                .tabItem {
-                    Label("Game Catalog", systemImage: "books.vertical")
-                }
-            RankingsView()
-                .tabItem {
-                    Label("Rankings", systemImage: "list.number")
-                }
-            StatsView()
-                .tabItem {
-                    Label("Stats", systemImage: "chart.pie")
-                }
+        VStack(spacing: 0) {
+            CheckpointHeader()
+            TabView {
+                BacklogListView()
+                    .tabItem {
+                        Label("Game Catalog", systemImage: "books.vertical")
+                    }
+                RankingsView()
+                    .tabItem {
+                        Label("Rankings", systemImage: "list.number")
+                    }
+                StatsView()
+                    .tabItem {
+                        Label("Stats", systemImage: "chart.pie")
+                    }
+            }
         }
     }
 }
