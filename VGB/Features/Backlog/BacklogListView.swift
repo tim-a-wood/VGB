@@ -376,11 +376,8 @@ struct BacklogListView: View {
                 title: title,
                 systemImage: systemImage,
                 color: color,
-                targetStatus: targetStatus,
                 isExpanded: isExpanded,
-                onToggle: onToggle,
-                onMoveToCompleted: onMoveToCompleted,
-                modelContext: modelContext
+                onToggle: onToggle
             )
             if isExpanded {
                 ForEach(Array(games.enumerated()), id: \.element.id) { index, game in
@@ -444,35 +441,6 @@ struct BacklogListView: View {
         }
     }
 
-    // MARK: - Sectioned List (statusSections)
-
-    /// Sections by status (Now Playing, Backlog, Completed, Dropped, Wishlist) when no filter/search.
-    private var statusSections: some View {
-        Group {
-            if !nowPlaying.isEmpty {
-                statusSection(title: "Now Playing", systemImage: "play.fill", color: .blue, targetStatus: .playing, games: nowPlaying, showLeading: false, showTrailing: true, onMoveToCompleted: nil) { game in
-                    swipeCompleted(game)
-                    swipeDropped(game)
-                }
-            }
-            if !backlogGames.isEmpty {
-                statusSection(title: "Backlog", systemImage: "list.bullet", color: .gray, targetStatus: .backlog, games: backlogGames, showLeading: true, showTrailing: true, reorderable: true, onMoveToCompleted: nil) { game in
-                    swipeCompleted(game)
-                    swipeDropped(game)
-                }
-            }
-            if !wishlistGames.isEmpty {
-                statusSection(title: "Wishlist", systemImage: "heart.fill", color: .purple, targetStatus: .wishlist, games: wishlistGames, showLeading: true, showTrailing: false, onMoveToCompleted: nil)
-            }
-            if !completedGames.isEmpty {
-                statusSection(title: "Completed", systemImage: "checkmark.circle.fill", color: .green, targetStatus: .completed, games: completedGames, showLeading: true, showTrailing: false, onMoveToCompleted: triggerCelebration)
-            }
-            if !droppedGames.isEmpty {
-                statusSection(title: "Dropped", systemImage: "xmark.circle.fill", color: .orange, targetStatus: .dropped, games: droppedGames, showLeading: true, showTrailing: false, onMoveToCompleted: nil)
-            }
-        }
-    }
-
     private func triggerCelebration() {
         withAnimation { showCelebration = true }
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
@@ -493,47 +461,6 @@ struct BacklogListView: View {
                 if sortMode == .priority { reorder(from: source, to: destination) }
             }
             .onDelete(perform: delete)
-        }
-    }
-
-    private func statusSection(
-        title: String,
-        systemImage: String,
-        color: Color,
-        targetStatus: GameStatus,
-        games: [Game],
-        showLeading: Bool = false,
-        showTrailing: Bool = false,
-        reorderable: Bool = false,
-        onMoveToCompleted: (() -> Void)? = nil,
-        @ViewBuilder trailingSwipe: @escaping (Game) -> some View = { _ in EmptyView() }
-    ) -> some View {
-        Section {
-            ForEach(games) { game in
-                row(
-                    for: game,
-                    showLeading: showLeading,
-                    showTrailing: showTrailing,
-                    targetStatus: targetStatus,
-                    onMoveToCompleted: onMoveToCompleted
-                ) {
-                    trailingSwipe(game)
-                }
-            }
-            .onDelete { offsets in
-                deleteInSection(games: games, at: offsets)
-            }
-        } header: {
-            SectionHeaderDropZone(
-                title: title,
-                systemImage: systemImage,
-                color: color,
-                targetStatus: targetStatus,
-                isExpanded: true,
-                onToggle: {},
-                onMoveToCompleted: onMoveToCompleted,
-                modelContext: modelContext
-            )
         }
     }
 
@@ -606,22 +533,6 @@ struct BacklogListView: View {
         }
     }
 
-    /// Applies a drop: updates status of dragged games. Call from MainActor.
-    private func applyDrop(uuidStrings: [String], targetStatus: GameStatus, onMoveToCompleted: (() -> Void)?) -> Bool {
-        for uuidString in uuidStrings {
-            guard let droppedId = UUID(uuidString: uuidString) else { continue }
-            var descriptor = FetchDescriptor<Game>(predicate: #Predicate<Game> { $0.id == droppedId })
-            descriptor.fetchLimit = 1
-            guard let game = try? modelContext.fetch(descriptor).first else { continue }
-            game.status = targetStatus
-            game.updatedAt = Date()
-        }
-        if targetStatus == .completed, !uuidStrings.isEmpty {
-            onMoveToCompleted?()
-        }
-        return true
-    }
-
     private func reorderInSection(games: [Game], from source: IndexSet, to destination: Int, targetStatus: GameStatus) {
         var newOrder = games
         newOrder.move(fromOffsets: source, toOffset: destination)
@@ -633,13 +544,6 @@ struct BacklogListView: View {
         }
         for (index, game) in reordered.enumerated() {
             game.priorityPosition = index
-        }
-    }
-
-    private func deleteInSection(games: [Game], at offsets: IndexSet) {
-        let toDelete = offsets.map { games[$0] }
-        for game in toDelete {
-            modelContext.delete(game)
         }
     }
 
@@ -960,11 +864,8 @@ private struct SectionHeaderDropZone: View {
     let title: String
     let systemImage: String
     let color: Color
-    let targetStatus: GameStatus
     let isExpanded: Bool
     let onToggle: () -> Void
-    let onMoveToCompleted: (() -> Void)?
-    let modelContext: ModelContext
 
     var body: some View {
         HStack(spacing: 8) {
@@ -997,31 +898,22 @@ private struct RowDropModifier: ViewModifier {
     func body(content: Content) -> some View {
         if let targetStatus {
             content.dropDestination(for: String.self) { uuidStrings, _ in
-                print("[VGB Drop] dropDestination action called — targetStatus=\(targetStatus.rawValue), uuidStrings.count=\(uuidStrings.count), uuidStrings=\(uuidStrings)")
+                #if DEBUG
+                print("[VGB Drop] dropDestination — targetStatus=\(targetStatus.rawValue), count=\(uuidStrings.count)")
+                #endif
                 for uuidString in uuidStrings {
-                    guard let droppedId = UUID(uuidString: uuidString) else {
-                        print("[VGB Drop]   skip: invalid UUID '\(uuidString)'")
-                        continue
-                    }
+                    guard let droppedId = UUID(uuidString: uuidString) else { continue }
                     var descriptor = FetchDescriptor<Game>(predicate: #Predicate<Game> { $0.id == droppedId })
                     descriptor.fetchLimit = 1
-                    guard let game = try? modelContext.fetch(descriptor).first else {
-                        print("[VGB Drop]   skip: no game found for id \(droppedId)")
-                        continue
-                    }
-                    let oldStatus = game.status
+                    guard let game = try? modelContext.fetch(descriptor).first else { continue }
                     game.status = targetStatus
                     game.updatedAt = Date()
-                    print("[VGB Drop]   updated game '\(game.title)' \(oldStatus.rawValue) → \(targetStatus.rawValue)")
                 }
                 if targetStatus == .completed, !uuidStrings.isEmpty {
                     onMoveToCompleted?()
                 }
-                print("[VGB Drop] returning true")
                 return true
-            } isTargeted: { isTargeted in
-                print("[VGB Drop] isTargeted(\(targetStatus.rawValue)) = \(isTargeted)")
-            }
+            } isTargeted: { _ in }
         } else {
             content
         }

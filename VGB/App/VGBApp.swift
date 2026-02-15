@@ -8,7 +8,9 @@ struct VGBApp: App {
     let container: ModelContainer = {
         do {
             let c = try StoreConfiguration.sharedContainer()
+            #if DEBUG
             print("[VGB App] Launched — using shared container")
+            #endif
             return c
         } catch {
             fatalError("Failed to configure SwiftData container: \(error)")
@@ -58,14 +60,20 @@ private struct ContentRoot: View {
 
 /// Pushes current backlog summary to App Group UserDefaults so the widget can display it.
 private func pushWidgetSummary(context: ModelContext) {
+    #if DEBUG
     print("[VGB App] pushWidgetSummary() called")
+    #endif
     let descriptor = FetchDescriptor<Game>(sortBy: [SortDescriptor(\.priorityPosition)])
     guard let games = try? context.fetch(descriptor) else {
+        #if DEBUG
         print("[VGB App] pushWidgetSummary() fetch failed")
+        #endif
         return
     }
     let nextUp = games.first { $0.status == .backlog }
-    print("[VGB App] pushWidgetSummary() games.count=\(games.count) nextUp=\(nextUp?.title ?? "nil") completed=\(games.filter { $0.status == .completed }.count) playing=\(games.filter { $0.status == .playing }.count)")
+    #if DEBUG
+    print("[VGB App] pushWidgetSummary() games.count=\(games.count) nextUp=\(nextUp?.title ?? "nil")")
+    #endif
     WidgetSummaryStorage.write(
         nextUpTitle: nextUp?.title,
         nextUpPlatform: nextUp?.platform.isEmpty == false ? nextUp?.displayPlatform : nil,
@@ -73,5 +81,7 @@ private func pushWidgetSummary(context: ModelContext) {
         completedGames: games.filter { $0.status == .completed }.count,
         playingCount: games.filter { $0.status == .playing }.count
     )
+    #if DEBUG
     print("[VGB App] pushWidgetSummary() done, reloadTimelines next")
+    #endif
 }
