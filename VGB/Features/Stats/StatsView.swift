@@ -55,7 +55,7 @@ struct StatsView: View {
                     emptyState
                 } else {
                     ScrollView {
-                        VStack(alignment: .leading, spacing: 24) {
+                        VStack(alignment: .leading, spacing: 36) {
                             radarSection
                             threeRingsSection
                             statusDonutSection
@@ -64,7 +64,7 @@ struct StatsView: View {
                     }
                 }
             }
-            .navigationTitle("Stats")
+            .navigationTitle("Your Gamer Stats")
             .onAppear {
                 withAnimation(.easeOut(duration: 0.8)) {
                     heroRingTrim = completionRate
@@ -105,7 +105,7 @@ struct StatsView: View {
     private static let ringStroke: CGFloat = 8
 
     private var threeRingsSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 14) {
             sectionHeader("Completion & ratings", systemImage: "chart.bar.doc.horizontal")
             Text("Share completed, critic average, and your average rating")
                 .font(.caption)
@@ -217,7 +217,7 @@ struct StatsView: View {
     // MARK: - Status donut
 
     private var statusDonutSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 14) {
             sectionHeader("Library breakdown", systemImage: "chart.pie")
             Text("Where your games live — by status")
                 .font(.caption)
@@ -260,7 +260,7 @@ struct StatsView: View {
     // MARK: - Radar
 
     private var radarSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 14) {
             sectionHeader("Your Gamer Profile", systemImage: "point.3.connected.trianglepath.dotted")
             Text("How your whole library breaks down by genre")
                 .font(.caption)

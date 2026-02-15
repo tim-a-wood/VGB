@@ -89,11 +89,34 @@ private struct RankingsRowView: View {
         }
     }
 
-    private var ratingColor: Color {
-        switch ratingSource {
-        case .yourRating: Color(red: 0.35, green: 0.45, blue: 0.95)
-        case .criticRating: Color(red: 0.95, green: 0.75, blue: 0.2)
+    /// Color by score: 0–99 = dark red → red → orange → yellow → light green → dark green; 100 = gold.
+    private static func color(for value: Int) -> Color {
+        let clamped = min(100, max(0, value))
+        if clamped == 100 {
+            return Color(red: 1, green: 0.76, blue: 0) // gold
         }
+        // Six stops so 80 vs 97 are clearly different (light green vs dark green)
+        let t = Double(clamped) / 99
+        let stops: [(pos: Double, r: Double, g: Double, b: Double)] = [
+            (0.00, 0.55, 0.08, 0.08),  // dark red
+            (0.20, 0.95, 0.20, 0.20), // red
+            (0.40, 1.00, 0.45, 0.10), // orange
+            (0.60, 1.00, 0.88, 0.15), // yellow
+            (0.80, 0.55, 0.95, 0.25), // light green
+            (1.00, 0.15, 0.55, 0.15), // dark green
+        ]
+        for i in 0..<(stops.count - 1) {
+            let a = stops[i]
+            let b = stops[i + 1]
+            if t <= b.pos {
+                let u = (t - a.pos) / (b.pos - a.pos)
+                let r = a.r + (b.r - a.r) * u
+                let g = a.g + (b.g - a.g) * u
+                let bl = a.b + (b.b - a.b) * u
+                return Color(red: r, green: g, blue: bl)
+            }
+        }
+        return Color(red: stops.last!.r, green: stops.last!.g, blue: stops.last!.b)
     }
 
     var body: some View {
@@ -141,7 +164,7 @@ private struct RankingsRowView: View {
             if let value = ratingValue {
                 Text("\(value)")
                     .font(.title3.weight(.semibold))
-                    .foregroundStyle(ratingColor)
+                    .foregroundStyle(Self.color(for: value))
             }
         }
         .padding(.vertical, 4)
