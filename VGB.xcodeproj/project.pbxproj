@@ -42,6 +42,7 @@
 		A1B2C3D4E5F60404 /* RadarChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60303 /* RadarChartView.swift */; };
 		A1B2C3D4E5F60606 /* GameStatus+Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60505 /* GameStatus+Color.swift */; };
 		RG11RG22RG33RG44RG55RG66 /* RadarGenreCategories.swift in Sources */ = {isa = PBXBuildFile; fileRef = RG11RG22RG33RG44RG55RG67 /* RadarGenreCategories.swift */; };
+		RG11RG22RG33RG44RG55RG69 /* RadarGenreCategories.swift in Sources */ = {isa = PBXBuildFile; fileRef = RG11RG22RG33RG44RG55RG67 /* RadarGenreCategories.swift */; };
 		RV11RV22RV33RV44RV55RV66 /* RankingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RV11RV22RV33RV44RV55RV67 /* RankingsView.swift */; };
 		OB11OB22OB33OB44OB55OB66 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB11OB22OB33OB44OB55OB67 /* OnboardingView.swift */; };
 /* End PBXBuildFile section */
@@ -406,6 +407,7 @@
 				WS11WS22WS33WS44WS55WS68 /* WidgetSummaryStorage.swift in Sources */,
 				FF44AA55BB66CC77DD880021 /* Game.swift in Sources */,
 				FF44AA55BB66CC77DD880022 /* GameStatus.swift in Sources */,
+				RG11RG22RG33RG44RG55RG69 /* RadarGenreCategories.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

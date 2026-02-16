@@ -112,15 +112,23 @@ private func pushWidgetSummary(context: ModelContext) {
         return
     }
     let nextUp = games.first { $0.status == .backlog }
+    let playing = games.filter { $0.status == .playing }.sorted { $0.priorityPosition < $1.priorityPosition }
+    let playingFirst = playing.first
+    let genreStrings = games.compactMap(\.genre).filter { !$0.isEmpty }
+    let radarData = RadarGenreCategories.completedCountsByCategory(from: genreStrings)
+    let radarCounts = radarData.map(\.value)
     #if DEBUG
-    print("[VGB App] pushWidgetSummary() games.count=\(games.count) nextUp=\(nextUp?.title ?? "nil")")
+    print("[VGB App] pushWidgetSummary() games.count=\(games.count) nextUp=\(nextUp?.title ?? "nil") playingFirst=\(playingFirst?.title ?? "nil")")
     #endif
     WidgetSummaryStorage.write(
         nextUpTitle: nextUp?.title,
         nextUpPlatform: nextUp?.platform.isEmpty == false ? nextUp?.displayPlatform : nil,
         totalGames: games.count,
         completedGames: games.filter { $0.status == .completed }.count,
-        playingCount: games.filter { $0.status == .playing }.count
+        playingCount: playing.count,
+        playingFirstTitle: playingFirst?.title,
+        playingFirstPlatform: playingFirst?.platform.isEmpty == false ? playingFirst?.displayPlatform : nil,
+        radarGenreCounts: radarCounts
     )
     #if DEBUG
     print("[VGB App] pushWidgetSummary() done, reloadTimelines next")
