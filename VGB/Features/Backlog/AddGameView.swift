@@ -84,6 +84,7 @@ struct AddGameView: View {
                     } else if let error = searchError {
                         Text(error)
                             .foregroundStyle(.red)
+                            .accessibilityLabel("Search error: \(error)")
                     } else if hasIGDBSelection {
                         Text("Prefilled from IGDB. You can still edit fields below.")
                     }

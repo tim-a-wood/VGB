@@ -97,6 +97,7 @@ struct StatsView: View {
         } description: {
             Text("Add games to your backlog to see your stats and charts.")
         }
+        .accessibilityLabel("No stats yet. Add games to your backlog to see your stats and charts.")
     }
 
     // MARK: - Three rings (Completed %, Critic, User rating)

@@ -72,6 +72,7 @@ struct RankingsView: View {
                     : "Add games with critic scores (from IGDB) to see critic rankings here."
             )
         }
+        .accessibilityLabel("No rated games. " + (ratingSource == .yourRating ? "Rate games in the catalog to see your personal rankings." : "Add games with critic scores to see critic rankings."))
     }
 }
 

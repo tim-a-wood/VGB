@@ -213,6 +213,7 @@ struct BacklogListView: View {
         } description: {
             Text("Add a game to start tracking your backlog.")
         }
+        .accessibilityLabel("No games yet. Add a game to start tracking your backlog.")
     }
 
     // MARK: - No Results (filters/search active but nothing matches)
@@ -232,8 +233,10 @@ struct BacklogListView: View {
                     clearFilters()
                     searchText = ""
                 }
+                .accessibilityLabel("Clear filters")
             }
         }
+        .accessibilityLabel("No matches. No games match the current search or filters.")
     }
 
     // MARK: - Filter / Sort Menu

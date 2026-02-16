@@ -5,12 +5,14 @@ struct CheckpointHeader: View {
     var body: some View {
         VStack(spacing: 2) {
             Text("Checkpoint")
-                .font(.system(size: 25.5, weight: .bold))
+                .font(.title.weight(.bold))
             Text("Your video game backlog, organized.")
-                .font(.system(size: 18))
+                .font(.body)
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 8)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Checkpoint. Your video game backlog, organized.")
     }
 }

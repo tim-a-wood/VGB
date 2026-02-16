@@ -181,6 +181,7 @@ struct GameDetailView: View {
                     Text("Refresh failed. Your local data is unchanged.")
                         .font(.caption)
                         .foregroundStyle(.red)
+                        .accessibilityLabel("Refresh failed. Your local data is unchanged.")
                 }
 
                 LabeledContent("Added", value: game.createdAt, format: .dateTime.year().month().day())
