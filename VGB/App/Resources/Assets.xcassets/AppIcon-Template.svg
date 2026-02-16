@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>Checkpoint App Icon Template</title>
+  <!-- Background (replace or delete; Icon Composer may use transparency) -->
+  <rect width="1024" height="1024" fill="#1a1a1c"/>
+  
+  <!-- Safe zone: keep important content inside ~832px (81%) to avoid mask crop on iOS -->
+  <circle cx="512" cy="512" r="416" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="8 8"/>
+  
+  <!-- Optional: outer boundary at 90% -->
+  <circle cx="512" cy="512" r="460" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  
+  <!-- Placeholder: centered circle for your logo (delete and add your own layers) -->
+  <circle cx="512" cy="512" r="280" fill="none" stroke="#e8bc44" stroke-width="24"/>
+  <path d="M380 512 L472 604 L644 432" fill="none" stroke="#e8bc44" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Label (delete in final icon) -->
+  <text x="512" y="920" font-family="system-ui, sans-serif" font-size="24" fill="rgba(255,255,255,0.3)" text-anchor="middle">1024×1024 " Safe zone inside circle</text>
+</svg>

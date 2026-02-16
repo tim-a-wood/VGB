@@ -24,6 +24,7 @@ build/
 
 # Local tooling
 .tools/
+pip_vendor/
 
 # Cursor / IDE
 .cursor/
