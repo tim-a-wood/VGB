@@ -44,7 +44,7 @@ struct RankingsView: View {
                         .listStyle(.plain)
                 }
             }
-            .navigationTitle("Rankings")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Picker("Rating type", selection: $ratingSource) {

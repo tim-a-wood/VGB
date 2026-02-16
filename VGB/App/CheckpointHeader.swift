@@ -5,9 +5,9 @@ struct CheckpointHeader: View {
     var body: some View {
         VStack(spacing: 2) {
             Text("Checkpoint")
-                .font(.headline)
+                .font(.system(size: 25.5, weight: .bold))
             Text("Your video game backlog, organized.")
-                .font(.caption)
+                .font(.system(size: 18))
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)

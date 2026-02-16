@@ -155,7 +155,7 @@ struct BacklogListView: View {
                     gameList
                 }
             }
-            .navigationTitle("Game Catalog")
+            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $searchText, prompt: "Search games")
             .toolbar {

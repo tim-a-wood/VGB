@@ -64,7 +64,7 @@ struct StatsView: View {
                     }
                 }
             }
-            .navigationTitle("Your Gamer Stats")
+            .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 withAnimation(.easeOut(duration: 0.8)) {
                     heroRingTrim = completionRate
