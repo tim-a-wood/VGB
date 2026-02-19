@@ -26,25 +26,44 @@ enum RadarGenreCategories {
         "eye.fill",             // Horror & Survival (creepy / watching)
     ]
 
-    /// Maps a raw genre string (e.g. from IGDB) to a category index 0..<6.
-    /// Case-insensitive; genres that don't match the other five categories go to "Other" (index 0).
+    /// Maps a raw genre string (e.g. from IGDB or GenreResolver) to a category index 0..<6.
+    /// Uses explicit lookup first, then keyword fallback (RPG before generic action). Case-insensitive.
     static func categoryIndex(for genre: String) -> Int {
-        let lower = genre.lowercased()
-        // Check action/adventure before shooter so "Action shooter", "Adventure shooter" etc. map to Action & Adventure
+        let trimmed = genre.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else { return 0 }
+        let lower = trimmed.lowercased()
+        // 1) Explicit lookup first
+        if let idx = knownGenreToIndex[lower] { return idx }
+        for (key, idx) in knownGenreToIndex {
+            if lower == key || lower.hasPrefix(key) || key.hasPrefix(lower) { return idx }
+        }
+        // 2) Keyword fallback — RPG before generic "action" so "Action RPG" → RPG
+        if lower.contains("role-playing") || lower.contains("rpg") || lower.contains("action rpg") { return 3 }
+        if lower.contains("horror") || lower.contains("survival") { return 5 }
+        if lower.contains("shooter") { return 2 }
+        if lower.contains("sport") || lower.contains("racing") { return 4 }
         if lower.contains("adventure") || lower.contains("action") || lower.contains("platform")
             || lower.contains("hack and slash") || lower.contains("beat 'em up")
             || lower.contains("point-and-click") || lower.contains("visual novel")
             || lower.contains("puzzle") || lower.contains("arcade") || lower.contains("fighting")
             || lower.contains("indie") || lower.contains("simulator") || lower.contains("music")
-            || lower.contains("card") || lower.contains("board") || lower.contains("quiz")
             || lower.contains("pinball") || lower.contains("roguelike") { return 1 }
-        // Check horror/survival before shooter so survival-horror (e.g. Resident Evil) isn’t classed as Shooter
-        if lower.contains("horror") || lower.contains("survival") { return 5 }
-        if lower.contains("shooter") { return 2 }
-        if lower.contains("role-playing") || lower.contains("rpg") { return 3 }
-        if lower.contains("sport") || lower.contains("racing") { return 4 }
-        return 0 // Other: strategy, etc. — anything that doesn't fit above
+        return 0 // Other: strategy, tactical, etc. — anything that doesn't fit above
     }
+
+    /// Lookup: normalized genre string → radar index (0=Other, 1=Action&Adventure, 2=Shooter, 3=RPG, 4=Sports&Racing, 5=Horror&Survival)
+    private static let knownGenreToIndex: [String: Int] = [
+        "strategy": 0, "tactical": 0, "real-time strategy": 0, "turn-based strategy": 0,
+        "rts": 0, "4x": 0, "moba": 0, "simulation": 0, "other": 0,
+        "action": 1, "adventure": 1, "action-adventure": 1, "action adventure": 1,
+        "platformer": 1, "platform": 1, "fighting": 1, "puzzle": 1, "arcade": 1,
+        "roguelike": 1, "rogue-like": 1, "indie": 1, "visual novel": 1,
+        "point-and-click": 1, "hack and slash": 1, "music": 1, "card": 1, "board": 1, "quiz": 1, "pinball": 1,
+        "shooter": 2, "first-person shooter": 2, "fps": 2, "third-person shooter": 2, "tps": 2, "battle royale": 2,
+        "rpg": 3, "role-playing": 3, "action rpg": 3, "jrpg": 3, "massively multiplayer": 3, "mmorpg": 3,
+        "sports": 4, "sport": 4, "racing": 4, "driving": 4, "sports game": 4, "racing game": 4,
+        "horror": 5, "survival": 5, "survival horror": 5,
+    ]
 
     /// Returns (label, value) for all 6 categories; values are counts per category.
     static func completedCountsByCategory(from completedGenres: [String]) -> [(label: String, value: Double)] {

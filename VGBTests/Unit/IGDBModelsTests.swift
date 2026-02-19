@@ -226,6 +226,17 @@ final class IGDBModelsTests: XCTestCase {
         XCTAssertEqual(game.primaryGenre, "Strategy")
     }
 
+    func testPrimaryGenreActionWhenDB SaysActionNotStrategy() {
+        // Action/adventure games (e.g. Marvel's Wolverine) must not become Strategy due to words like "tactical" or "campaign".
+        let game = makeGame(
+            name: "Marvel's Wolverine",
+            genres: [IGDBGenre(id: 1, name: "Action"), IGDBGenre(id: 2, name: "Adventure")],
+            themes: nil,
+            summary: "An action-packed single-player campaign. Tactical combat and a story-driven adventure."
+        )
+        XCTAssertEqual(game.primaryGenre, "Action")
+    }
+
     // MARK: - Convenience: platformNames
 
     func testPlatformNamesJoinsAll() {
