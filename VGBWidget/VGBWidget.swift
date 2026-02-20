@@ -123,6 +123,22 @@ struct VGBWidgetEntry: TimelineEntry {
 
 // MARK: - Widget View
 
+/// Sizes tuned for systemSmall (~158pt) and systemMedium (~338×158pt).
+private enum WidgetLayout {
+    static let paddingSmall: CGFloat = 14
+    static let paddingMedium: CGFloat = 16
+    static let spacingSmall: CGFloat = 6
+    static let spacingMedium: CGFloat = 8
+    static let titleFontSmall: CGFloat = 11
+    static let titleFontMedium: CGFloat = 12
+    static let labelFont: CGFloat = 9
+    static let gameTitleFontSmall: CGFloat = 13
+    static let gameTitleFontMedium: CGFloat = 14
+    static let nextFont: CGFloat = 11
+    static let statsFont: CGFloat = 9
+    static let radarSizeMedium: CGFloat = 110
+}
+
 struct VGBWidgetEntryView: View {
     var entry: VGBWidgetEntry
     @Environment(\.widgetFamily) var family
@@ -138,113 +154,137 @@ struct VGBWidgetEntryView: View {
         }
     }
 
-    // MARK: - Small Widget
+    // MARK: - Small Widget (158×158: playing, next, stats — no chart)
 
     private var smallWidget: some View {
         let fg = Color.white
-        let muted = Color.white.opacity(0.6)
-        let dim = Color.white.opacity(0.4)
-        return VStack(alignment: .leading, spacing: 6) {
-            HStack {
+        let muted = Color.white.opacity(0.65)
+        let dim = Color.white.opacity(0.45)
+        return VStack(alignment: .leading, spacing: WidgetLayout.spacingSmall) {
+            HStack(spacing: 4) {
                 Image(systemName: "gamecontroller.fill")
-                    .font(.caption2)
+                    .font(.system(size: WidgetLayout.titleFontSmall, weight: .semibold))
                     .foregroundStyle(fg)
                 Text("Checkpoint")
-                    .font(.caption.weight(.semibold))
+                    .font(.system(size: WidgetLayout.titleFontSmall, weight: .semibold))
                     .foregroundStyle(fg)
             }
 
             if let title = entry.playingFirstTitle {
-                VStack(alignment: .leading, spacing: 1) {
+                VStack(alignment: .leading, spacing: 0) {
                     Text("Playing")
-                        .font(.caption2)
+                        .font(.system(size: WidgetLayout.labelFont, weight: .medium))
                         .foregroundStyle(muted)
                     Text(title)
-                        .font(.subheadline.weight(.medium))
-                        .lineLimit(3)
+                        .font(.system(size: WidgetLayout.gameTitleFontSmall, weight: .medium))
+                        .lineLimit(2)
                         .multilineTextAlignment(.leading)
-                        .fixedSize(horizontal: false, vertical: true)
                         .foregroundStyle(fg)
                 }
             } else {
-                Text("No games in progress")
-                    .font(.caption)
-                    .foregroundStyle(muted)
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Playing")
+                        .font(.system(size: WidgetLayout.labelFont, weight: .medium))
+                        .foregroundStyle(muted)
+                    Text("No games in progress")
+                        .font(.system(size: WidgetLayout.nextFont, weight: .regular))
+                        .foregroundStyle(dim)
+                }
             }
 
-            Spacer(minLength: 4)
-
-            VStack(alignment: .center, spacing: 2) {
-                Text("Gamer Profile")
-                    .font(.system(size: 9, weight: .medium))
-                    .foregroundStyle(Color.white.opacity(0.45))
-                WidgetRadarChart(values: entry.radarGenreCounts, size: 52, showLabels: true)
+            if let nextTitle = entry.nextUpTitle {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Next")
+                        .font(.system(size: WidgetLayout.labelFont, weight: .medium))
+                        .foregroundStyle(dim)
+                    Text(nextTitle)
+                        .font(.system(size: WidgetLayout.nextFont, weight: .regular))
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                        .foregroundStyle(muted)
+                }
             }
+
+            Spacer(minLength: 0)
+
+            Text("\(entry.totalGames) games · \(entry.completedGames) completed")
+                .font(.system(size: WidgetLayout.statsFont, weight: .medium))
+                .foregroundStyle(dim)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .padding(WidgetLayout.paddingSmall)
         .containerBackground(for: .widget) { Color.black }
     }
 
-    // MARK: - Medium Widget
+    // MARK: - Medium Widget (338×158: left = games, right = fixed radar)
 
     private var mediumWidget: some View {
         let fg = Color.white
-        let muted = Color.white.opacity(0.6)
-        let dim = Color.white.opacity(0.4)
-        return HStack(spacing: 14) {
-            // Left: Currently Playing + Next Up
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
+        let muted = Color.white.opacity(0.65)
+        let dim = Color.white.opacity(0.45)
+        return HStack(alignment: .top, spacing: WidgetLayout.paddingMedium) {
+            VStack(alignment: .leading, spacing: WidgetLayout.spacingMedium) {
+                HStack(spacing: 4) {
                     Image(systemName: "gamecontroller.fill")
-                        .font(.caption2)
+                        .font(.system(size: WidgetLayout.titleFontMedium, weight: .semibold))
                         .foregroundStyle(fg)
                     Text("Checkpoint")
-                        .font(.caption.weight(.semibold))
+                        .font(.system(size: WidgetLayout.titleFontMedium, weight: .semibold))
                         .foregroundStyle(fg)
                 }
 
                 if let title = entry.playingFirstTitle {
-                    VStack(alignment: .leading, spacing: 2) {
+                    VStack(alignment: .leading, spacing: 1) {
                         Text("Playing")
-                            .font(.caption2)
+                            .font(.system(size: WidgetLayout.labelFont, weight: .medium))
                             .foregroundStyle(muted)
                         Text(title)
-                            .font(.subheadline.weight(.semibold))
+                            .font(.system(size: WidgetLayout.gameTitleFontMedium, weight: .semibold))
                             .lineLimit(2)
                             .multilineTextAlignment(.leading)
-                            .fixedSize(horizontal: false, vertical: true)
                             .foregroundStyle(fg)
                     }
                 } else {
-                    Text("No games in progress")
-                        .font(.caption)
-                        .foregroundStyle(muted)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Playing")
+                            .font(.system(size: WidgetLayout.labelFont, weight: .medium))
+                            .foregroundStyle(muted)
+                        Text("No games in progress")
+                            .font(.system(size: WidgetLayout.nextFont))
+                            .foregroundStyle(dim)
+                    }
                 }
 
                 if let nextTitle = entry.nextUpTitle {
                     VStack(alignment: .leading, spacing: 1) {
                         Text("Next")
-                            .font(.caption2)
+                            .font(.system(size: WidgetLayout.labelFont, weight: .medium))
                             .foregroundStyle(dim)
                         Text(nextTitle)
-                            .font(.caption)
+                            .font(.system(size: WidgetLayout.nextFont))
                             .lineLimit(2)
                             .multilineTextAlignment(.leading)
-                            .fixedSize(horizontal: false, vertical: true)
                             .foregroundStyle(muted)
                     }
                 }
 
                 Spacer(minLength: 0)
-            }
 
-            // Right: Radar
-            VStack(alignment: .center, spacing: 4) {
-                Text("Gamer Profile")
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(Color.white.opacity(0.45))
-                WidgetRadarChart(values: entry.radarGenreCounts, size: 100, showLabels: true)
+                Text("\(entry.totalGames) games · \(entry.completedGames) completed")
+                    .font(.system(size: WidgetLayout.statsFont, weight: .medium))
+                    .foregroundStyle(dim)
             }
+            .frame(maxWidth: .infinity, alignment: .topLeading)
+
+            VStack(alignment: .center, spacing: 2) {
+                Text("Profile")
+                    .font(.system(size: WidgetLayout.labelFont, weight: .medium))
+                    .foregroundStyle(dim)
+                WidgetRadarChart(values: entry.radarGenreCounts, size: WidgetLayout.radarSizeMedium, showLabels: true)
+            }
+            .frame(width: WidgetLayout.radarSizeMedium + 24, alignment: .center)
         }
+        .padding(WidgetLayout.paddingMedium)
         .containerBackground(for: .widget) { Color.black }
     }
 }
@@ -256,6 +296,7 @@ private let radarAxisLabels = ["Other", "Action", "Shooter", "RPG", "Sports", "H
 
 private struct WidgetRadarChart: View {
     let values: [Double]
+    /// Fixed size (pt) so layout is predictable in widget.
     let size: CGFloat
     var showLabels: Bool = true
 
@@ -263,9 +304,9 @@ private struct WidgetRadarChart: View {
 
     var body: some View {
         GeometryReader { geo in
-            let s = min(geo.size.width, geo.size.height, size)
+            let s = min(size, geo.size.width, geo.size.height)
             let center = CGPoint(x: geo.size.width / 2, y: geo.size.height / 2)
-            let radius = showLabels ? s / 2 * 0.48 : s / 2 * 0.7
+            let radius = showLabels ? s / 2 * 0.5 : s / 2 * 0.72
             let maxVal = values.max() ?? 1
 
             ZStack {
@@ -304,8 +345,8 @@ private struct WidgetRadarChart: View {
                 }
                 // Axis labels (outside the chart, along each spoke)
                 if showLabels {
-                    let fontSize = max(7, min(11, size * 0.1))
-                    let labelRadius = radius + size * 0.12
+                    let fontSize = max(8, min(10, s * 0.09))
+                    let labelRadius = radius + s * 0.14
                     ForEach(0..<Self.axisCount, id: \.self) { i in
                         let angle = angleForIndex(i)
                         let labelPos = pointOnCircle(center: center, radius: labelRadius, angle: angle)
