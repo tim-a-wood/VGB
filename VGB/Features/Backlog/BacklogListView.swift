@@ -828,8 +828,6 @@ private struct GameRowView: View {
                 }
 
                 HStack(spacing: 6) {
-                    StatusBadge(status: game.status)
-
                     if game.isUnreleased {
                         UnreleasedBadge()
                     }
@@ -842,6 +840,8 @@ private struct GameRowView: View {
                         Label("Most Anticipated", systemImage: "star.fill")
                             .font(.caption2.weight(.semibold))
                             .foregroundStyle(.pink)
+                            .lineLimit(1)
+                            .fixedSize(horizontal: true, vertical: false)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 3)
                             .background(Color.pink.opacity(0.2))
@@ -880,24 +880,6 @@ private struct GameRowView: View {
             .background(color.opacity(0.2))
             .clipShape(Capsule())
     }
-}
-
-// MARK: - Status Badge
-
-private struct StatusBadge: View {
-    let status: GameStatus
-
-    var body: some View {
-        Text(status.rawValue)
-            .font(.caption2.weight(.medium))
-            .padding(.horizontal, 8)
-            .padding(.vertical, 2)
-            .background(color.opacity(0.15))
-            .foregroundStyle(color)
-            .clipShape(Capsule())
-    }
-
-    private var color: Color { status.color }
 }
 
 // MARK: - Unreleased Badge
