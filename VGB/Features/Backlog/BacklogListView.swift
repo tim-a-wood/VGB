@@ -59,6 +59,15 @@ struct BacklogListView: View {
         filterStatus != nil || filterPlatform != nil || filterGenre != nil
     }
 
+    /// Count per status (one pass over games) for the catalog summary row.
+    private var statusCounts: [GameStatus: Int] {
+        var counts: [GameStatus: Int] = [.playing: 0, .backlog: 0, .wishlist: 0, .completed: 0, .dropped: 0]
+        for game in games {
+            counts[game.status, default: 0] += 1
+        }
+        return counts
+    }
+
     /// Show status sections (Now Playing, Backlog, etc.) instead of a single list.
     private var showStatusSections: Bool {
         filterStatus == nil && searchText.trimmingCharacters(in: .whitespaces).isEmpty
@@ -150,7 +159,10 @@ struct BacklogListView: View {
                 } else if sectionedDisplay.displayed.isEmpty {
                     noResultsState
                 } else {
-                    gameList
+                    VStack(spacing: 0) {
+                        catalogSummaryRow
+                        gameList
+                    }
                 }
             }
             .navigationTitle("")
@@ -345,6 +357,38 @@ struct BacklogListView: View {
             }
         } label: {
             Image(systemName: isFiltered ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
+        }
+    }
+
+    // MARK: - Catalog Summary Row
+
+    private var catalogSummaryRow: some View {
+        let order: [GameStatus] = [.playing, .backlog, .wishlist, .completed, .dropped]
+        return HStack(spacing: 0) {
+            ForEach(order, id: \.self) { status in
+                let count = statusCounts[status] ?? 0
+                VStack(spacing: 2) {
+                    Text("\(count)")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(status.color)
+                    Text(shortLabel(for: status))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 8)
+    }
+
+    private func shortLabel(for status: GameStatus) -> String {
+        switch status {
+        case .playing: return "Playing"
+        case .backlog: return "Backlog"
+        case .wishlist: return "Wishlist"
+        case .completed: return "Completed"
+        case .dropped: return "Dropped"
         }
     }
 
