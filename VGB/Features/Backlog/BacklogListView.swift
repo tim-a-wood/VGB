@@ -460,10 +460,21 @@ struct BacklogListView: View {
         guard let droppedGame = try? modelContext.fetch(descriptor).first else { return }
         let sameSection = droppedGame.status == targetStatus
         let reorderable: Set<GameStatus> = [.playing, .backlog, .wishlist]
-        if sameSection, reorderable.contains(targetStatus), let sourceIndex = sectionGames.firstIndex(where: { $0.id == droppedId }), sourceIndex != destinationIndex {
-            reorderInSection(games: sectionGames, from: IndexSet(integer: sourceIndex), to: destinationIndex, targetStatus: targetStatus)
+        if sameSection, reorderable.contains(targetStatus), let sourceIndex = sectionGames.firstIndex(where: { $0.id == droppedId }) {
+            if sourceIndex == destinationIndex { return }
+            // When moving down, "drop on row N" means "put item below row N" → insert after N → toOffset N+1.
+            // When moving up, "drop on row N" means "put item at row N" → toOffset N.
+            let toOffset: Int
+            if sourceIndex < destinationIndex {
+                toOffset = min(destinationIndex + 1, sectionGames.count)
+            } else {
+                toOffset = destinationIndex
+            }
+            reorderInSection(games: sectionGames, from: IndexSet(integer: sourceIndex), to: toOffset, targetStatus: targetStatus)
+            Haptic.dropSnap.play()
         } else {
             applyDropToGame(droppedId, targetStatus: targetStatus, onMoveToCompleted: onMoveToCompleted)
+            Haptic.dropSnap.play()
         }
     }
 
@@ -580,8 +591,10 @@ struct BacklogListView: View {
         case .wishlist: nowPlaying + backlogGames + newOrder + completedGames + droppedGames
         default: nowPlaying + backlogGames + wishlistGames + completedGames + droppedGames
         }
-        for (index, game) in reordered.enumerated() {
-            game.priorityPosition = index
+        withAnimation(.easeInOut(duration: 0.25)) {
+            for (index, game) in reordered.enumerated() {
+                game.priorityPosition = index
+            }
         }
     }
 
@@ -703,9 +716,13 @@ private struct DraggableCatalogRow<ContextMenuContent: View>: View {
 
     var body: some View {
         ZStack(alignment: .leading) {
-            // Full-width highlight behind content
-            Rectangle()
-                .fill(isTargeted ? Color.accentColor.opacity(0.2) : Color.clear)
+            // Full-width highlight behind content; animated for smooth snap feedback
+            RoundedRectangle(cornerRadius: 10)
+                .fill(isTargeted ? Color.accentColor.opacity(0.18) : Color.clear)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .strokeBorder(isTargeted ? Color.accentColor.opacity(0.5) : Color.clear, lineWidth: 2)
+                )
                 .frame(maxWidth: .infinity)
 
             NavigationLink(value: game) {
@@ -717,6 +734,7 @@ private struct DraggableCatalogRow<ContextMenuContent: View>: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())
+        .animation(.easeInOut(duration: 0.2), value: isTargeted)
         .onDrag {
             NSItemProvider(object: game.id.uuidString as NSString)
         }
