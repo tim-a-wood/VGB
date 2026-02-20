@@ -140,9 +140,9 @@ final class GameModelTests: XCTestCase {
         XCTAssertFalse(game.isUnreleased)
     }
 
-    func testIsUnreleasedFalseWhenNoDate() {
+    func testIsUnreleasedTrueWhenNoDate() {
         let game = Game(title: "No Date")
-        XCTAssertFalse(game.isUnreleased)
+        XCTAssertTrue(game.isUnreleased)
     }
 
     // MARK: - displayPlatform

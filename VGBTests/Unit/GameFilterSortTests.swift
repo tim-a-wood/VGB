@@ -253,8 +253,10 @@ final class GameFilterSortTests: XCTestCase {
     func testUnreleasedGameDetected() {
         let games = makeSampleGames()
         let unreleased = games.filter { $0.isUnreleased }
-        XCTAssertEqual(unreleased.count, 1)
-        XCTAssertEqual(unreleased.first?.title, "GTA VI")
+        // GTA VI (future date) + Cyberpunk (no date) are unreleased
+        XCTAssertEqual(unreleased.count, 2)
+        XCTAssertTrue(unreleased.contains(where: { $0.title == "GTA VI" }))
+        XCTAssertTrue(unreleased.contains(where: { $0.title == "Cyberpunk 2077" }))
     }
 
     func testReleasedGamesNotFlaggedAsUnreleased() {

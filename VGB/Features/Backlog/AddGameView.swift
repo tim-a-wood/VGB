@@ -37,9 +37,9 @@ struct AddGameView: View {
     /// Whether the user has picked from IGDB results.
     private var hasIGDBSelection: Bool { selectedIGDBGame != nil }
 
-    /// Whether the selected game is unreleased.
+    /// Whether the selected game is unreleased (no release date or date in the future).
     private var isUnreleasedGame: Bool {
-        guard let date = selectedIGDBGame?.releaseDate else { return false }
+        guard let date = selectedIGDBGame?.releaseDate else { return true }
         return date > Date()
     }
 
@@ -277,6 +277,11 @@ struct AddGameView: View {
             game.releaseDate = igdb.releaseDate
             game.igdbRating = igdb.totalRating.map { Int($0) }
             game.lastSyncedAt = Date()
+        }
+
+        // Unreleased games (no date or future date) must be Wishlist only
+        if game.isUnreleased {
+            game.status = .wishlist
         }
 
         modelContext.insert(game)

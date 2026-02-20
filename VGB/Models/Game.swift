@@ -75,9 +75,9 @@ final class Game {
         set { statusRaw = newValue.rawValue }
     }
 
-    /// Whether this game has a release date in the future.
+    /// Whether this game is unreleased: no release date (unknown) or date in the future.
     var isUnreleased: Bool {
-        guard let date = releaseDate else { return false }
+        guard let date = releaseDate else { return true }
         return date > Date()
     }
 

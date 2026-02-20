@@ -26,6 +26,7 @@ struct BacklogListView: View {
     @State private var filterGenre: String?
     @State private var searchText = ""
     @State private var showCelebration = false
+    @State private var showUnreleasedWarning = false
     /// Which categories are collapsed on the Game Catalog (sectioned) view. Empty = all expanded.
     @State private var collapsedSections: Set<GameStatus> = []
     @State private var isRefreshingAll = false
@@ -158,6 +159,11 @@ struct BacklogListView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $searchText, prompt: "Search games")
+            .alert("This game isn't released yet!", isPresented: $showUnreleasedWarning) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Unreleased games stay in Wishlist until they have a release date.")
+            }
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button { showingAddGame = true } label: {
@@ -448,18 +454,20 @@ struct BacklogListView: View {
             onMoveToCompleted: onMoveToCompleted,
             rank: rank,
             isMostAnticipated: isMostAnticipated,
-            onHandleRowDrop: handleRowDrop,
+            onHandleRowDrop: { id, status, games, idx, onCompleted in
+                handleRowDrop(droppedId: id, targetStatus: status, sectionGames: games, destinationIndex: idx, onMoveToCompleted: onCompleted, onUnreleasedWarning: { showUnreleasedWarning = true })
+            },
             contextMenuContent: moveToContextMenu
         )
     }
 
     /// Handles drop on a row: reorder within section if same status, otherwise move to this category.
-    private func handleRowDrop(droppedId: UUID, targetStatus: GameStatus, sectionGames: [Game], destinationIndex: Int, onMoveToCompleted: (() -> Void)?) {
+    private func handleRowDrop(droppedId: UUID, targetStatus: GameStatus, sectionGames: [Game], destinationIndex: Int, onMoveToCompleted: (() -> Void)?, onUnreleasedWarning: (() -> Void)? = nil) {
         var descriptor = FetchDescriptor<Game>(predicate: #Predicate<Game> { $0.id == droppedId })
         descriptor.fetchLimit = 1
         guard let droppedGame = try? modelContext.fetch(descriptor).first else { return }
         let sameSection = droppedGame.status == targetStatus
-        let reorderable: Set<GameStatus> = [.playing, .backlog, .wishlist]
+        let reorderable: Set<GameStatus> = [.playing, .backlog, .wishlist, .completed, .dropped]
         if sameSection, reorderable.contains(targetStatus), let sourceIndex = sectionGames.firstIndex(where: { $0.id == droppedId }) {
             if sourceIndex == destinationIndex { return }
             // When moving down, "drop on row N" means "put item below row N" → insert after N → toOffset N+1.
@@ -473,18 +481,23 @@ struct BacklogListView: View {
             reorderInSection(games: sectionGames, from: IndexSet(integer: sourceIndex), to: toOffset, targetStatus: targetStatus)
             Haptic.dropSnap.play()
         } else {
-            applyDropToGame(droppedId, targetStatus: targetStatus, onMoveToCompleted: onMoveToCompleted)
+            applyDropToGame(droppedId, targetStatus: targetStatus, onMoveToCompleted: onMoveToCompleted, onUnreleasedWarning: onUnreleasedWarning)
             Haptic.dropSnap.play()
         }
     }
 
-    private func applyDropToGame(_ gameId: UUID, targetStatus: GameStatus, onMoveToCompleted: (() -> Void)?) {
+    private func applyDropToGame(_ gameId: UUID, targetStatus: GameStatus, onMoveToCompleted: (() -> Void)?, onUnreleasedWarning: (() -> Void)? = nil) {
         var descriptor = FetchDescriptor<Game>(predicate: #Predicate<Game> { $0.id == gameId })
         descriptor.fetchLimit = 1
         guard let game = try? modelContext.fetch(descriptor).first else { return }
-        game.status = targetStatus
+        // Unreleased games can only be in Wishlist
+        let effectiveStatus = game.isUnreleased ? GameStatus.wishlist : targetStatus
+        if game.isUnreleased && targetStatus != .wishlist {
+            onUnreleasedWarning?()
+        }
+        game.status = effectiveStatus
         game.updatedAt = Date()
-        if targetStatus == .completed {
+        if effectiveStatus == .completed {
             onMoveToCompleted?()
         }
     }
@@ -510,6 +523,28 @@ struct BacklogListView: View {
                 if sortMode == .priority { reorder(from: source, to: destination) }
             }
             .onDelete(perform: delete)
+        } header: {
+            if let status = filterStatus {
+                statusSectionHeader(status)
+            }
+        }
+    }
+
+    /// Header for the filtered list when a status filter is active (matches section bucket style).
+    private func statusSectionHeader(_ status: GameStatus) -> some View {
+        let (title, systemImage, color) = statusSectionTitleAndIcon(status)
+        return Label(title, systemImage: systemImage)
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(color)
+    }
+
+    private func statusSectionTitleAndIcon(_ status: GameStatus) -> (title: String, systemImage: String, color: Color) {
+        switch status {
+        case .playing: return ("Now Playing", "play.fill", .blue)
+        case .backlog: return ("Backlog", "list.bullet", .gray)
+        case .wishlist: return ("Wishlist", "heart.fill", .purple)
+        case .completed: return ("Completed", "checkmark.circle.fill", .green)
+        case .dropped: return ("Dropped", "xmark.circle.fill", .orange)
         }
     }
 
@@ -560,10 +595,14 @@ struct BacklogListView: View {
         ForEach(GameStatus.allCases, id: \.id) { status in
             if game.status != status {
                 Button {
-                    game.status = status
-                    game.updatedAt = Date()
-                    if status == .completed {
-                        triggerCelebration()
+                    if game.isUnreleased && status != .wishlist {
+                        showUnreleasedWarning = true
+                    } else {
+                        game.status = status
+                        game.updatedAt = Date()
+                        if status == .completed {
+                            triggerCelebration()
+                        }
                     }
                 } label: {
                     Label("Move to \(status.rawValue)", systemImage: statusIcon(status))
@@ -589,7 +628,8 @@ struct BacklogListView: View {
         case .playing: newOrder + backlogGames + wishlistGames + completedGames + droppedGames
         case .backlog: nowPlaying + newOrder + wishlistGames + completedGames + droppedGames
         case .wishlist: nowPlaying + backlogGames + newOrder + completedGames + droppedGames
-        default: nowPlaying + backlogGames + wishlistGames + completedGames + droppedGames
+        case .completed: nowPlaying + backlogGames + wishlistGames + newOrder + droppedGames
+        case .dropped: nowPlaying + backlogGames + wishlistGames + completedGames + newOrder
         }
         withAnimation(.easeInOut(duration: 0.25)) {
             for (index, game) in reordered.enumerated() {
@@ -796,33 +836,39 @@ private struct GameRowView: View {
                 Text(game.title)
                     .font(.headline)
                     .lineLimit(1)
+                    .truncationMode(.tail)
 
-                HStack(alignment: .center, spacing: 12) {
-                    if !game.platform.isEmpty {
-                        Text(game.displayPlatform)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
+                Text(game.displayPlatform)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .opacity(game.platform.isEmpty ? 0 : 1)
 
-                    if !game.isUnreleased {
-                        // Critic (IGDB) rating
-                        if let rating = game.igdbRating {
-                            ratingPill(icon: "star.fill", value: "\(rating)", color: .orange)
-                        }
-
-                        // User (personal) rating
-                        if let rating = game.personalRating {
-                            ratingPill(icon: "star.fill", value: "You \(rating)", color: .blue)
-                        } else {
-                            HStack(spacing: 4) {
-                                Image(systemName: "star.fill")
-                                    .font(.caption)
-                                    .foregroundStyle(.quaternary)
-                                Text("Unrated")
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
+                if !game.isUnreleased || rank.map({ (1...3).contains($0) }) == true {
+                    HStack(alignment: .center, spacing: 12) {
+                        if !game.isUnreleased {
+                            HStack(alignment: .center, spacing: 12) {
+                                if let rating = game.igdbRating {
+                                    ratingPill(icon: "star.fill", value: "\(rating)", color: .orange)
+                                }
+                                if let rating = game.personalRating {
+                                    ratingPill(icon: "star.fill", value: "You \(rating)", color: .blue)
+                                } else {
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "star.fill")
+                                            .font(.caption)
+                                            .foregroundStyle(.quaternary)
+                                        Text("Unrated")
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
                             }
+                        }
+                        Spacer(minLength: 8)
+                        if let rank, (1...3).contains(rank) {
+                            rankBadge(rank: rank)
                         }
                     }
                 }
@@ -830,10 +876,6 @@ private struct GameRowView: View {
                 HStack(spacing: 6) {
                     if game.isUnreleased {
                         UnreleasedBadge()
-                    }
-
-                    if let rank, (1...3).contains(rank) {
-                        rankBadge(rank: rank)
                     }
 
                     if isMostAnticipated {
