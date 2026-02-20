@@ -100,8 +100,11 @@ actor IGDBClient {
 // MARK: - String Sanitization
 
 private extension String {
-    /// Escapes quotes for safe use inside an IGDB query string.
+    /// Escapes backslash and quotes for safe use inside an IGDB Apicalypse query string.
+    /// Prevents query injection or malformed requests from user-supplied search text.
     var sanitizedForQuery: String {
-        self.replacingOccurrences(of: "\"", with: "\\\"")
+        self
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\"", with: "\\\"")
     }
 }

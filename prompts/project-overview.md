@@ -5,7 +5,7 @@ VGB is an iOS app for gamers to track their video game backlog and focus on fini
 
 ## Core Mechanic
 - Keep a single personal backlog.
-- Move games across a simple lifecycle: `Backlog` -> `Playing` -> `Completed` -> `Dropped`.
+- Move games across a simple lifecycle: `Wishlist` → `Backlog` → `Playing` → `Completed` / `Dropped`.
 - Reduce decision fatigue with filters, sorting, and drag-and-drop priority order.
 - Track metadata (platform, release date, estimated hours, notes, ratings) with optional refresh from the provider; show when data was last synced.
 

@@ -1,6 +1,6 @@
 # VGB — Codebase Audit
 
-**Date**: 2026-02-15 (updated)
+**Date**: 2026-02-20 (updated)
 
 ---
 
@@ -19,7 +19,7 @@
 
 - **Layout**: App, Features (Backlog, Stats, Rankings, Onboarding), Models, Services, VGBWidget are clear.
 - **Game / GameStatus**: Clear ownership (user vs provider vs system); `displayPlatform` and rating logic are consistent.
-- **Tests**: Unit tests for model, status, filter/sort, IGDB, sync.
+- **Tests**: Unit tests for model, status, filter/sort, IGDB, sync, GenreResolver, RadarGenreCategories, WidgetSummaryBuilder.
 - **Secrets**: `Secrets.xcconfig` in `.gitignore`; CI creates placeholder.
 - **Documentation**: README, prompts/, docs/ up to date.
 
@@ -33,6 +33,19 @@
 - **project.yml**: Outdated (no widget, stats, rankings). `VGB.xcodeproj` is source of truth.
 
 ---
+
+## Security (2026-02-20)
+
+- **IGDB query**: User search text is sanitized (backslash and double-quote escaped) before inclusion in Apicalypse query body to prevent query injection or malformed requests.
+- **Secrets**: Twitch client ID/secret read from `Bundle.main` (injected via `Secrets.xcconfig`); not stored in repo. Tokens kept in memory only in `TwitchAuthManager`.
+- **Cover image URLs**: Sourced from IGDB API or demo data (fixed domain); no arbitrary user-supplied URLs rendered.
+- **Data validation**: Personal rating and estimated hours clamped in UI (0–100, ≥0).
+
+## Performance (2026-02-20)
+
+- **Sync fallback**: When batch IGDB fetch fails, per-game refresh now runs with limited concurrency (5 at a time) instead of strictly sequential, reducing total wait for large libraries.
+- **Image prefetch**: `URLSessionConfiguration.httpMaximumConnectionsPerHost = 4` caps concurrent cover-image requests per host to avoid connection thrashing and potential throttling.
+- **Stats/backlog**: Single-pass aggregation and reserved array capacity where appropriate; no change needed for typical library sizes.
 
 ## Optional follow-ups
 

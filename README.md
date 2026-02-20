@@ -18,7 +18,7 @@ VGB is an iOS app for gamers to track and prioritize their video game backlog. D
 - `VGB/Features/Onboarding/` — first-launch walkthrough
 - `VGB/Services/` — IGDB client, sync, Twitch auth
 - `VGBWidget/` — home screen widget (small + medium)
-- `VGBTests/Unit/` — model, status, filter/sort, IGDB, sync tests
+- `VGBTests/Unit/` — model, status, filter/sort, IGDB, sync, GenreResolver, RadarGenreCategories, WidgetSummaryBuilder tests
 - `prompts/` — planning and status docs
 - `docs/` — codebase audit
 

@@ -95,20 +95,32 @@ final class GameSyncService {
                 }
             }
         } catch {
-            for game in games {
-                guard let externalId = game.externalId, let igdbId = Int(externalId) else { continue }
-                do {
-                    let wasUnreleasedWishlist = game.isUnreleased && game.status == .wishlist
-                    if let updated = try await IGDBClient.shared.fetchGame(id: igdbId) {
+            // Fallback: fetch per-game with limited concurrency to avoid overwhelming the API
+            let concurrentLimit = 5
+            var index = 0
+            while index < games.count {
+                let chunkIds = games[index ..< min(index + concurrentLimit, games.count)].compactMap { game -> Int? in
+                    guard let externalId = game.externalId, let igdbId = Int(externalId) else { return nil }
+                    return igdbId
+                }
+                await withTaskGroup(of: (Int, IGDBGame?).self) { group in
+                    for igdbId in chunkIds {
+                        group.addTask {
+                            let updated = try? await IGDBClient.shared.fetchGame(id: igdbId)
+                            return (igdbId, updated)
+                        }
+                    }
+                    for await (igdbId, updated) in group {
+                        guard let updated, let game = idToGame[igdbId] else { continue }
+                        let wasUnreleasedWishlist = game.isUnreleased && game.status == .wishlist
                         applyIGDBData(updated, to: game)
                         refreshed += 1
                         if wasUnreleasedWishlist && !game.isUnreleased {
                             releasedFromWishlist.append(game)
                         }
                     }
-                } catch {
-                    continue
                 }
+                index += concurrentLimit
             }
         }
 

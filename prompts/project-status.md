@@ -2,7 +2,7 @@
 
 **Purpose**: Use this file as context (e.g. `@prompts/project-status.md`) so the agent knows exactly what exists today and what's left to build. Update it as you complete work.
 
-**Last updated**: 2026-02-15
+**Last updated**: 2026-02-20
 
 ---
 
@@ -38,8 +38,8 @@ Details: see **What's implemented** and **What's not implemented** below.
   - `VGB/Features/Onboarding/` — `OnboardingView.swift`
   - `VGB/Services/` — `IGDBClient.swift`, `IGDBModels.swift`, `GameSyncService.swift`, `TwitchAuthManager.swift`, `APIConfig.swift`
   - `VGBWidget/` — widget extension (small + medium)
-  - `VGBTests/Unit/` — model, status, filter/sort, IGDB, sync tests
-- `VGB.xcodeproj` is source of truth; `project.yml` is outdated (no widget/stats)
+  - `VGBTests/Unit/` — GameModel, GameStatus, GameFilterSort, IGDBModels, GameSyncService, GenreResolver, RadarGenreCategories, WidgetSummaryBuilder tests
+- `VGB.xcodeproj` is source of truth; `project.yml` is outdated (no widget, stats, rankings)
 
 ### Features (Phase 1)
 - **Backlog list** — displays games sorted by priority; supports drag-and-drop reorder
@@ -51,7 +51,7 @@ Details: see **What's implemented** and **What's not implemented** below.
 - **Empty states** — "No Games Yet" and "No Matches" (with clear-filters action)
 - **SwiftData persistence** — `.modelContainer(for: Game.self)` wired in `VGBApp`
 - **Full-screen layout** — proper `UILaunchScreen` and `Info.plist` configuration
-- **Unit tests** — model, status, filter/sort, IGDB mapping, sync
+- **Unit tests** — model, status, filter/sort, IGDB mapping, sync, GenreResolver, RadarGenreCategories, WidgetSummaryBuilder
 
 ### Context / docs
 - **prompts/project-overview.md** — product vision, constraints, monetization direction
@@ -80,10 +80,10 @@ Full task checklist: **prompts/project-plan.md**
 | `prompts/project-overview.md` | Product brief and goals | Updated for VGB backlog tracker |
 | `prompts/project-features.md` | Scope guardrails (MVP vs post-release) | Added |
 | `prompts/project-plan.md` | Timeline and execution checklist | Phase 4 final polish |
-| `prompts/project-status.md` | Current progress snapshot | Updated — Phase 1 done |
-| `project.yml` | XcodeGen spec (optional regenerate) | Matches folder layout |
+| `prompts/project-status.md` | Current progress snapshot | Updated — Phases 1–4 done |
+| `project.yml` | XcodeGen spec (optional regenerate) | Outdated; do not run xcodegen without updating |
 | `VGB/Models/Game.swift` | SwiftData domain model | Implemented with user/provider/system field split |
-| `VGB/Models/GameStatus.swift` | Status enum | Backlog, Playing, Completed, Dropped |
+| `VGB/Models/GameStatus.swift` | Status enum | Wishlist, Backlog, Playing, Completed, Dropped |
 | `VGB/Features/Backlog/BacklogListView.swift` | Main list with filters/sort | Implemented |
 | `VGB/Features/Backlog/AddGameView.swift` | Add game form | Implemented |
 | `VGB/Features/Backlog/GameDetailView.swift` | Game detail/edit view | Implemented |

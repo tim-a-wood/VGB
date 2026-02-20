@@ -194,6 +194,11 @@ final class GameModelTests: XCTestCase {
         XCTAssertEqual(components, ["PS5", "PC"])
     }
 
+    func testPlatformComponentsSplitsSlashSeparated() {
+        let components = Game.platformComponents("PS5/PC")
+        XCTAssertEqual(components, ["PS5", "PC"])
+    }
+
     func testPlatformComponentsReturnsEmptyForEmptyString() {
         XCTAssertTrue(Game.platformComponents("").isEmpty)
         XCTAssertTrue(Game.platformComponents("   ").isEmpty)

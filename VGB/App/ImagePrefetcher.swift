@@ -19,6 +19,7 @@ enum ImagePrefetcher {
 
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .returnCacheDataElseLoad
+        config.httpMaximumConnectionsPerHost = 4
         let session = URLSession(configuration: config)
 
         for url in urls {

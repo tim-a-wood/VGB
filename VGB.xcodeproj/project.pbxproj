@@ -23,6 +23,9 @@
 		BB22CC33DD44EE55FF660061 /* GameSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22CC33DD44EE55FF660062 /* GameSyncService.swift */; };
 		CC11DD22EE33FF44AA550011 /* IGDBModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC11DD22EE33FF44AA550012 /* IGDBModelsTests.swift */; };
 		CC11DD22EE33FF44AA550021 /* GameSyncServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC11DD22EE33FF44AA550022 /* GameSyncServiceTests.swift */; };
+		GT11GT22GT33GT44GT55GT66 /* GenreResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = GT11GT22GT33GT44GT55GT67 /* GenreResolverTests.swift */; };
+		RC11RC22RC33RC44RC55RC66 /* RadarGenreCategoriesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = RC11RC22RC33RC44RC55RC67 /* RadarGenreCategoriesTests.swift */; };
+		WQ11WQ22WQ33WQ44WQ55WQ66 /* WidgetSummaryBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WQ11WQ22WQ33WQ44WQ55WQ67 /* WidgetSummaryBuilderTests.swift */; };
 		CH11CH22CH33CH44CH55CH66 /* CheckpointHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = CH11CH22CH33CH44CH55CH67 /* CheckpointHeader.swift */; };
 		D1D2D3D4D5D6D7D8D9D0D1 /* DemoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D2D3D4D5D6D7D8D9D0D2 /* DemoData.swift */; };
 		DD11AA22BB33CC44DD55EE66 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD11AA22BB33CC44DD55EE67 /* Game.swift */; };
@@ -103,6 +106,9 @@
 		BB22CC33DD44EE55FF660099 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		CC11DD22EE33FF44AA550012 /* IGDBModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IGDBModelsTests.swift; sourceTree = "<group>"; };
 		CC11DD22EE33FF44AA550022 /* GameSyncServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSyncServiceTests.swift; sourceTree = "<group>"; };
+		GT11GT22GT33GT44GT55GT67 /* GenreResolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreResolverTests.swift; sourceTree = "<group>"; };
+		RC11RC22RC33RC44RC55RC67 /* RadarGenreCategoriesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadarGenreCategoriesTests.swift; sourceTree = "<group>"; };
+		WQ11WQ22WQ33WQ44WQ55WQ67 /* WidgetSummaryBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSummaryBuilderTests.swift; sourceTree = "<group>"; };
 		CH11CH22CH33CH44CH55CH67 /* CheckpointHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckpointHeader.swift; sourceTree = "<group>"; };
 		D1D2D3D4D5D6D7D8D9D0D2 /* DemoData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoData.swift; sourceTree = "<group>"; };
 		D266180422E28B6163D27F5C /* VGB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VGB.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -235,7 +241,10 @@
 				AA11BB22CC33DD44EE55FF11 /* GameModelTests.swift */,
 				CC11DD22EE33FF44AA550022 /* GameSyncServiceTests.swift */,
 				AA11BB22CC33DD44EE55FF13 /* GameStatusTests.swift */,
+				GT11GT22GT33GT44GT55GT67 /* GenreResolverTests.swift */,
 				CC11DD22EE33FF44AA550012 /* IGDBModelsTests.swift */,
+				RC11RC22RC33RC44RC55RC67 /* RadarGenreCategoriesTests.swift */,
+				WQ11WQ22WQ33WQ44WQ55WQ67 /* WidgetSummaryBuilderTests.swift */,
 			);
 			path = Unit;
 			sourceTree = "<group>";
@@ -406,9 +415,12 @@
 			files = (
 				AA11BB22CC33DD44EE55FF16 /* GameFilterSortTests.swift in Sources */,
 				AA11BB22CC33DD44EE55FF12 /* GameModelTests.swift in Sources */,
-				AA11BB22CC33DD44EE55FF14 /* GameStatusTests.swift in Sources */,
-				CC11DD22EE33FF44AA550011 /* IGDBModelsTests.swift in Sources */,
 				CC11DD22EE33FF44AA550021 /* GameSyncServiceTests.swift in Sources */,
+				AA11BB22CC33DD44EE55FF14 /* GameStatusTests.swift in Sources */,
+				GT11GT22GT33GT44GT55GT66 /* GenreResolverTests.swift in Sources */,
+				CC11DD22EE33FF44AA550011 /* IGDBModelsTests.swift in Sources */,
+				RC11RC22RC33RC44RC55RC66 /* RadarGenreCategoriesTests.swift in Sources */,
+				WQ11WQ22WQ33WQ44WQ55WQ66 /* WidgetSummaryBuilderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

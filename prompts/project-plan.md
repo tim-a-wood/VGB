@@ -2,7 +2,7 @@
 
 **Purpose**: Ship v1 of the iOS game backlog tracker with full MVP scope (including live metadata). Timeline is flexible; aim for ~2 weeks but extend as needed to include metadata integration.
 
-**Last updated**: 2026-02-14
+**Last updated**: 2026-02-20
 
 ---
 
@@ -19,7 +19,7 @@
 - [x] Implement status updates (`Backlog`, `Playing`, `Completed`, `Dropped`)
 - [x] Add core filters (status, platform, genre) and sort (priority, IGDB critic score, release date)
 - [x] Add test target scaffold (`VGBTests`) and placeholder test
-- [x] Add lightweight unit tests for model + filter/sort behavior (41 tests, 0 failures)
+- [x] Add lightweight unit tests for model + filter/sort behavior (model, status, filter/sort, IGDB, sync, GenreResolver, RadarGenreCategories, WidgetSummaryBuilder)
 
 ### Phase 2: Live metadata integration (IGDB via Twitch OAuth2)
 - [x] Set up Twitch OAuth2 client credentials flow (token fetch + refresh)
@@ -29,7 +29,7 @@
 - [x] Auto-refresh stale games on app foreground (>7 days) + manual per-game refresh button
 - [x] Show last-synced / stale indicators in UI (green checkmark vs orange warning)
 - [x] Handle offline and API errors gracefully (local data remains source of truth)
-- [x] Add unit tests for API response mapping and sync logic (25 new tests; 66 total, 0 failures)
+- [x] Add unit tests for API response mapping and sync logic
 
 ### Phase 3: Enhanced features (bonus — ahead of schedule)
 - [x] Add cover art thumbnails to backlog list rows (`AsyncImage`)
@@ -55,9 +55,9 @@
 
 ## Recommended next steps
 
-1. App icon and launch screen
+1. Store-ready screenshots (see `docs/SHIP_CHECKLIST.md` and `scripts/capture-app-store-screenshots.sh`)
 2. Device testing (physical iPhone + simulator), fix bugs, performance pass
-3. App Store metadata and submit v1
+3. App Store metadata (name, subtitle, description, keywords, category, age rating) and submit v1
 
 ---
 
