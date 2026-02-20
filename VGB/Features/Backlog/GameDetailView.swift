@@ -17,10 +17,18 @@ struct GameDetailView: View {
         GameStatus.availableStatuses(for: game.isUnreleased)
     }
 
+    /// Completed games without rating or estimated hours: show a subtle nudge to add them.
+    private var completedWithoutRatingOrPlayTime: Bool {
+        game.status == .completed && (game.personalRating == nil || game.estimatedHours == nil)
+    }
+
     var body: some View {
         Form {
             coverSection
             statusSection
+            if completedWithoutRatingOrPlayTime {
+                completedPromptSection
+            }
             gameInfoSection
             yourDetailsSection
             metadataSection
@@ -92,6 +100,22 @@ struct GameDetailView: View {
                     Text(s.rawValue).tag(s.rawValue)
                 }
             }
+        }
+    }
+
+    /// Subtle nudge to add rating or estimated hours when a completed game is missing them.
+    private var completedPromptSection: some View {
+        Section {
+            Label {
+                Text("Add a rating or estimated hours below to get more from Stats and Rankings.")
+                    .font(.system(size: 14, weight: .regular, design: .rounded))
+                    .foregroundStyle(.secondary)
+            } icon: {
+                Image(systemName: "lightbulb")
+                    .font(.system(size: 14))
+                    .foregroundStyle(.orange.opacity(0.9))
+            }
+            .listRowBackground(Color.orange.opacity(0.06))
         }
     }
 

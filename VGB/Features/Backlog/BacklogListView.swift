@@ -32,6 +32,12 @@ struct BacklogListView: View {
     @State private var collapsedSections: Set<GameStatus> = []
     @State private var isRefreshingAll = false
     @State private var gameToRate: Game?
+    /// Set when a game is moved to Completed; after celebration we may show the rating/play-time prompt.
+    @State private var gameJustCompleted: Game?
+    /// When set, show a subtle sheet asking if the user wants to add rating or estimated hours.
+    @State private var gameToPromptForDetails: Game?
+    /// When set, present GameDetailView so user can add rating/hours (e.g. after tapping "Add details" in prompt).
+    @State private var gameToOpenForDetails: Game?
     /// Games that were unreleased in Wishlist and are now released after refresh — prompt to move to Backlog.
     @State private var gamesReleasedFromWishlist: [Game] = []
 
@@ -219,6 +225,26 @@ struct BacklogListView: View {
             .sheet(item: $gameToRate) { game in
                 RatingSheet(game: game) {
                     gameToRate = nil
+                }
+            }
+            .sheet(item: $gameToPromptForDetails) { game in
+                AddDetailsPromptSheet(
+                    game: game,
+                    onAdd: {
+                        gameToOpenForDetails = game
+                        gameToPromptForDetails = nil
+                    },
+                    onLater: { gameToPromptForDetails = nil }
+                )
+            }
+            .sheet(item: $gameToOpenForDetails, onDismiss: { gameToOpenForDetails = nil }) { game in
+                NavigationStack {
+                    GameDetailView(game: game)
+                        .toolbar {
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button("Done") { gameToOpenForDetails = nil }
+                            }
+                        }
                 }
             }
             .confirmationDialog("Games Released", isPresented: Binding(
@@ -444,7 +470,7 @@ struct BacklogListView: View {
                     swipeDropped(game)
                 }
                 sectionBlock(status: .wishlist, games: sectionedDisplay.wishlist, isExpanded: !collapsedSections.contains(.wishlist), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.wishlist]) } }, onMoveToCompleted: nil)
-                sectionBlock(status: .completed, games: sectionedDisplay.completed, isExpanded: !collapsedSections.contains(.completed), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.completed]) } }, onMoveToCompleted: triggerCelebration)
+                sectionBlock(status: .completed, games: sectionedDisplay.completed, isExpanded: !collapsedSections.contains(.completed), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.completed]) } }, onMoveToCompleted: onGameMovedToCompleted)
                 sectionBlock(status: .dropped, games: sectionedDisplay.dropped, isExpanded: !collapsedSections.contains(.dropped), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.dropped]) } }, onMoveToCompleted: nil)
             }
             .padding(.horizontal, 16)
@@ -457,7 +483,7 @@ struct BacklogListView: View {
         games: [Game],
         isExpanded: Bool,
         onToggle: @escaping () -> Void,
-        onMoveToCompleted: (() -> Void)?,
+        onMoveToCompleted: ((Game) -> Void)?,
         @ViewBuilder trailingSwipe: (Game) -> some View = { _ in EmptyView() }
     ) -> some View {
         let meta = status.sectionMetadata
@@ -508,7 +534,7 @@ struct BacklogListView: View {
     }
 
     /// Row used in ScrollView sectioned list: draggable via .onDrag, also accepts drops (move to this category or reorder within section); use context menu to change status.
-    private func draggableRow(for game: Game, targetStatus: GameStatus, sectionGames: [Game], sectionIndex: Int, onMoveToCompleted: (() -> Void)?, rank: Int? = nil, isMostAnticipated: Bool = false) -> some View {
+    private func draggableRow(for game: Game, targetStatus: GameStatus, sectionGames: [Game], sectionIndex: Int, onMoveToCompleted: ((Game) -> Void)?, rank: Int? = nil, isMostAnticipated: Bool = false) -> some View {
         DraggableCatalogRow(
             game: game,
             targetStatus: targetStatus,
@@ -526,7 +552,7 @@ struct BacklogListView: View {
     }
 
     /// Handles drop on a row: reorder within section if same status, otherwise move to this category.
-    private func handleRowDrop(droppedId: UUID, targetStatus: GameStatus, sectionGames: [Game], destinationIndex: Int, onMoveToCompleted: (() -> Void)?, onUnreleasedWarning: (() -> Void)? = nil) {
+    private func handleRowDrop(droppedId: UUID, targetStatus: GameStatus, sectionGames: [Game], destinationIndex: Int, onMoveToCompleted: ((Game) -> Void)?, onUnreleasedWarning: (() -> Void)? = nil) {
         var descriptor = FetchDescriptor<Game>(predicate: #Predicate<Game> { $0.id == droppedId })
         descriptor.fetchLimit = 1
         guard let droppedGame = try? modelContext.fetch(descriptor).first else { return }
@@ -550,7 +576,7 @@ struct BacklogListView: View {
         }
     }
 
-    private func applyDropToGame(_ gameId: UUID, targetStatus: GameStatus, onMoveToCompleted: (() -> Void)?, onUnreleasedWarning: (() -> Void)? = nil) {
+    private func applyDropToGame(_ gameId: UUID, targetStatus: GameStatus, onMoveToCompleted: ((Game) -> Void)?, onUnreleasedWarning: (() -> Void)? = nil) {
         var descriptor = FetchDescriptor<Game>(predicate: #Predicate<Game> { $0.id == gameId })
         descriptor.fetchLimit = 1
         guard let game = try? modelContext.fetch(descriptor).first else { return }
@@ -562,8 +588,14 @@ struct BacklogListView: View {
         game.status = effectiveStatus
         game.updatedAt = Date()
         if effectiveStatus == .completed {
-            onMoveToCompleted?()
+            onMoveToCompleted?(game)
         }
+    }
+
+    /// Call when a game has just been moved to Completed (from drop, context menu, or swipe).
+    private func onGameMovedToCompleted(_ game: Game) {
+        gameJustCompleted = game
+        triggerCelebration()
     }
 
     private func triggerCelebration() {
@@ -571,6 +603,10 @@ struct BacklogListView: View {
         withAnimation { showCelebration = true }
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
             withAnimation { showCelebration = false }
+            if let g = gameJustCompleted, g.personalRating == nil || g.estimatedHours == nil {
+                gameToPromptForDetails = g
+            }
+            gameJustCompleted = nil
         }
     }
 
@@ -655,7 +691,7 @@ struct BacklogListView: View {
                         game.status = status
                         game.updatedAt = Date()
                         if status == .completed {
-                            triggerCelebration()
+                            onGameMovedToCompleted(game)
                         }
                     }
                 }                 label: {
@@ -714,14 +750,8 @@ struct BacklogListView: View {
         Button {
             game.status = .completed
             game.updatedAt = Date()
-            withAnimation {
-                showCelebration = true
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                withAnimation {
-                    showCelebration = false
-                }
-            }
+            gameJustCompleted = game
+            triggerCelebration()
         } label: {
             Label("Completed", systemImage: "checkmark.circle.fill")
         }
@@ -754,8 +784,8 @@ private struct CatalogRowDropDelegate: DropDelegate {
     let targetStatus: GameStatus
     let sectionGames: [Game]
     let sectionIndex: Int
-    let onMoveToCompleted: (() -> Void)?
-    let onHandleRowDrop: (UUID, GameStatus, [Game], Int, (() -> Void)?) -> Void
+    let onMoveToCompleted: ((Game) -> Void)?
+    let onHandleRowDrop: (UUID, GameStatus, [Game], Int, ((Game) -> Void)?) -> Void
 
     func dropUpdated(info: DropInfo) -> DropProposal? {
         DropProposal(operation: .move)
@@ -795,10 +825,10 @@ private struct DraggableCatalogRow<ContextMenuContent: View>: View {
     let targetStatus: GameStatus
     let sectionGames: [Game]
     let sectionIndex: Int
-    let onMoveToCompleted: (() -> Void)?
+    let onMoveToCompleted: ((Game) -> Void)?
     let rank: Int?
     let isMostAnticipated: Bool
-    let onHandleRowDrop: (UUID, GameStatus, [Game], Int, (() -> Void)?) -> Void
+    let onHandleRowDrop: (UUID, GameStatus, [Game], Int, ((Game) -> Void)?) -> Void
     let onRateTap: (() -> Void)?
     @ViewBuilder let contextMenuContent: (Game) -> ContextMenuContent
 
@@ -1077,6 +1107,46 @@ private struct RowDropModifier: ViewModifier {
             } isTargeted: { _ in }
         } else {
             content
+        }
+    }
+}
+
+// MARK: - Add details prompt (completed game without rating or play time)
+
+private struct AddDetailsPromptSheet: View {
+    let game: Game
+    let onAdd: () -> Void
+    let onLater: () -> Void
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                Text("Add a rating or estimated hours for \(game.title) to get more from Stats and Rankings.")
+                    .font(.system(size: 16, weight: .regular, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+
+                HStack(spacing: 12) {
+                    Button("Maybe later") {
+                        onLater()
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button("Add details") {
+                        onAdd()
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                .padding(.top, 8)
+            }
+            .padding(.vertical, 24)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Done") { onLater() }
+                }
+            }
         }
     }
 }
