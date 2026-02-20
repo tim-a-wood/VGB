@@ -29,43 +29,45 @@ final class GameSyncService {
 
     /// Refreshes all games with an `externalId` whose data is stale.
     /// Call this when the app comes to the foreground.
-    func refreshStaleGames(in context: ModelContext) async {
+    /// - Returns: Games that were in Wishlist, unreleased, and are now released (user may want to move to Backlog).
+    func refreshStaleGames(in context: ModelContext) async -> [Game] {
         let cutoff = Date().addingTimeInterval(-staleThreshold)
 
-        // Fetch games that have an externalId and are stale (or never synced)
         let descriptor = FetchDescriptor<Game>(
             predicate: #Predicate<Game> { game in
                 game.externalId != nil
             }
         )
 
-        guard let allLinkedGames = try? context.fetch(descriptor) else { return }
+        guard let allLinkedGames = try? context.fetch(descriptor) else { return [] }
 
         let staleGames = allLinkedGames.filter { game in
-            guard let synced = game.lastSyncedAt else { return true } // never synced
+            guard let synced = game.lastSyncedAt else { return true }
             return synced < cutoff
         }
 
-        guard !staleGames.isEmpty else { return }
+        guard !staleGames.isEmpty else { return [] }
 
-        await refreshGames(staleGames, in: context)
+        return await refreshGames(staleGames, in: context)
     }
 
     /// Refreshes metadata from IGDB for all games that have an `externalId`.
     /// Use for manual "refresh all" from the Game Catalog.
-    func refreshAllGames(in context: ModelContext) async {
+    /// - Returns: Games that were in Wishlist, unreleased, and are now released (user may want to move to Backlog).
+    func refreshAllGames(in context: ModelContext) async -> [Game] {
         let descriptor = FetchDescriptor<Game>(
             predicate: #Predicate<Game> { game in
                 game.externalId != nil
             }
         )
-        guard let allLinked = try? context.fetch(descriptor), !allLinked.isEmpty else { return }
-        await refreshGames(allLinked, in: context)
+        guard let allLinked = try? context.fetch(descriptor), !allLinked.isEmpty else { return [] }
+        return await refreshGames(allLinked, in: context)
     }
 
-    private func refreshGames(_ games: [Game], in context: ModelContext) async {
+    private func refreshGames(_ games: [Game], in context: ModelContext) async -> [Game] {
         isSyncing = true
         var refreshed = 0
+        var releasedFromWishlist: [Game] = []
 
         let gameIds = games.compactMap { game -> Int? in
             guard let externalId = game.externalId else { return nil }
@@ -73,7 +75,7 @@ final class GameSyncService {
         }
         guard !gameIds.isEmpty else {
             isSyncing = false
-            return
+            return []
         }
 
         let idToGame = Dictionary(uniqueKeysWithValues: games.compactMap { game -> (Int, Game)? in
@@ -85,17 +87,24 @@ final class GameSyncService {
             let results = try await IGDBClient.shared.fetchGames(ids: gameIds)
             for igdb in results {
                 guard let game = idToGame[igdb.id] else { continue }
+                let wasUnreleasedWishlist = game.isUnreleased && game.status == .wishlist
                 applyIGDBData(igdb, to: game)
                 refreshed += 1
+                if wasUnreleasedWishlist && !game.isUnreleased {
+                    releasedFromWishlist.append(game)
+                }
             }
         } catch {
-            // Fallback: try one-by-one so at least some games get refreshed
             for game in games {
                 guard let externalId = game.externalId, let igdbId = Int(externalId) else { continue }
                 do {
+                    let wasUnreleasedWishlist = game.isUnreleased && game.status == .wishlist
                     if let updated = try await IGDBClient.shared.fetchGame(id: igdbId) {
                         applyIGDBData(updated, to: game)
                         refreshed += 1
+                        if wasUnreleasedWishlist && !game.isUnreleased {
+                            releasedFromWishlist.append(game)
+                        }
                     }
                 } catch {
                     continue
@@ -105,6 +114,7 @@ final class GameSyncService {
 
         lastSyncCount = refreshed
         isSyncing = false
+        return releasedFromWishlist
     }
 
     // MARK: - Manual single-game refresh

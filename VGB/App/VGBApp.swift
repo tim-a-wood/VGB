@@ -34,6 +34,8 @@ private struct ContentRoot: View {
 
     /// Splash stays visible until graphics are preloaded (cover images + minimum display time).
     @State private var isSplashComplete = false
+    /// Games that were unreleased in Wishlist and are now released after refresh — prompt to move to Backlog.
+    @State private var gamesReleasedFromWishlist: [Game] = []
 
     var body: some View {
         Group {
@@ -65,13 +67,36 @@ private struct ContentRoot: View {
             guard hasCompletedOnboarding else { return }
             if newPhase == .active {
                 Task {
-                    await GameSyncService.shared.refreshStaleGames(in: modelContext)
-                }
-                DispatchQueue.main.async {
+                    let released = await GameSyncService.shared.refreshStaleGames(in: modelContext)
+                    if !released.isEmpty {
+                        gamesReleasedFromWishlist = released
+                    }
                     pushWidgetSummary(context: modelContext)
                     WidgetCenter.shared.reloadTimelines(ofKind: "VGBWidget")
                 }
             }
+        }
+        .confirmationDialog("Games Released", isPresented: Binding(
+            get: { !gamesReleasedFromWishlist.isEmpty },
+            set: { if !$0 { gamesReleasedFromWishlist = [] } }
+        )) {
+            Button("Move to Backlog") {
+                for game in gamesReleasedFromWishlist {
+                    game.status = .backlog
+                    game.updatedAt = Date()
+                }
+                gamesReleasedFromWishlist = []
+                pushWidgetSummary(context: modelContext)
+                WidgetCenter.shared.reloadTimelines(ofKind: "VGBWidget")
+            }
+            Button("Keep in Wishlist", role: .cancel) {
+                gamesReleasedFromWishlist = []
+            }
+        } message: {
+            let count = gamesReleasedFromWishlist.count
+            let names = gamesReleasedFromWishlist.prefix(3).map(\.title).joined(separator: ", ")
+            let suffix = count > 3 ? " and \(count - 3) more" : ""
+            Text("\(count) game\(count == 1 ? "" : "s") in your wishlist \(count == 1 ? "has" : "have") been released: \(names)\(suffix). Move \(count == 1 ? "it" : "them") to Backlog?")
         }
     }
 
@@ -82,7 +107,10 @@ private struct ContentRoot: View {
         ImagePrefetcher.prefetchCoverImages(for: games)
 
         Task {
-            await GameSyncService.shared.refreshStaleGames(in: modelContext)
+            let released = await GameSyncService.shared.refreshStaleGames(in: modelContext)
+            if !released.isEmpty {
+                gamesReleasedFromWishlist = released
+            }
         }
 
         let hasCoversToPrefetch = games.contains { $0.coverImageURL != nil }

@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import UniformTypeIdentifiers
+import WidgetKit
 
 // MARK: - Sort Mode
 
@@ -31,6 +32,8 @@ struct BacklogListView: View {
     @State private var collapsedSections: Set<GameStatus> = []
     @State private var isRefreshingAll = false
     @State private var gameToRate: Game?
+    /// Games that were unreleased in Wishlist and are now released after refresh — prompt to move to Backlog.
+    @State private var gamesReleasedFromWishlist: [Game] = []
 
     // MARK: - Derived data
 
@@ -181,8 +184,13 @@ struct BacklogListView: View {
                         guard hasLinkedGames, !isRefreshingAll else { return }
                         isRefreshingAll = true
                         Task {
-                            await GameSyncService.shared.refreshAllGames(in: modelContext)
-                            await MainActor.run { isRefreshingAll = false }
+                            let released = await GameSyncService.shared.refreshAllGames(in: modelContext)
+                            await MainActor.run {
+                                isRefreshingAll = false
+                                if !released.isEmpty {
+                                    gamesReleasedFromWishlist = released
+                                }
+                            }
                         }
                     } label: {
                         if isRefreshingAll {
@@ -213,7 +221,35 @@ struct BacklogListView: View {
                     gameToRate = nil
                 }
             }
+            .confirmationDialog("Games Released", isPresented: Binding(
+                get: { !gamesReleasedFromWishlist.isEmpty },
+                set: { if !$0 { gamesReleasedFromWishlist = [] } }
+            )) {
+                Button("Move to Backlog") {
+                    for game in gamesReleasedFromWishlist {
+                        game.status = .backlog
+                        game.updatedAt = Date()
+                    }
+                    gamesReleasedFromWishlist = []
+                    pushWidgetSummaryFromContext()
+                }
+                Button("Keep in Wishlist", role: .cancel) {
+                    gamesReleasedFromWishlist = []
+                }
+            } message: {
+                let count = gamesReleasedFromWishlist.count
+                let names = gamesReleasedFromWishlist.prefix(3).map(\.title).joined(separator: ", ")
+                let suffix = count > 3 ? " and \(count - 3) more" : ""
+                Text("\(count) game\(count == 1 ? "" : "s") in your wishlist \(count == 1 ? "has" : "have") been released: \(names)\(suffix). Move \(count == 1 ? "it" : "them") to Backlog?")
+            }
         }
+    }
+
+    private func pushWidgetSummaryFromContext() {
+        let descriptor = FetchDescriptor<Game>(sortBy: [SortDescriptor(\.priorityPosition)])
+        guard let games = try? modelContext.fetch(descriptor) else { return }
+        WidgetSummaryStorage.write(WidgetSummaryBuilder.make(from: games))
+        WidgetCenter.shared.reloadTimelines(ofKind: "VGBWidget")
     }
 
     // MARK: - Empty State

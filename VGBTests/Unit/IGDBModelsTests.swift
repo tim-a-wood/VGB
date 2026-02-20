@@ -123,14 +123,16 @@ final class IGDBModelsTests: XCTestCase {
         XCTAssertEqual(game.primaryGenre, "RPG")
     }
 
-    func testPrimaryGenreNilWhenEmpty() {
+    func testPrimaryGenreOtherWhenEmpty() {
+        // No IGDB genres but we have a name → GenreResolver returns "Other"
         let game = makeGame(genres: [])
-        XCTAssertNil(game.primaryGenre)
+        XCTAssertEqual(game.primaryGenre, "Other")
     }
 
-    func testPrimaryGenreNilWhenMissing() {
+    func testPrimaryGenreOtherWhenMissing() {
+        // No IGDB genres but we have a name → GenreResolver returns "Other"
         let game = makeGame(genres: nil)
-        XCTAssertNil(game.primaryGenre)
+        XCTAssertEqual(game.primaryGenre, "Other")
     }
 
     func testPrimaryGenreHorrorFromThemes() {
@@ -226,7 +228,7 @@ final class IGDBModelsTests: XCTestCase {
         XCTAssertEqual(game.primaryGenre, "Strategy")
     }
 
-    func testPrimaryGenreActionWhenDB SaysActionNotStrategy() {
+    func testPrimaryGenreActionWhenDBSaysActionNotStrategy() {
         // Action/adventure games (e.g. Marvel's Wolverine) must not become Strategy due to words like "tactical" or "campaign".
         let game = makeGame(
             name: "Marvel's Wolverine",
