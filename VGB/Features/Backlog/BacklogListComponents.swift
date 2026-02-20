@@ -7,6 +7,7 @@ import UIKit
 
 struct CatalogSummaryRowView: View {
     let statusCounts: [GameStatus: Int]
+    var onStatusTap: ((GameStatus) -> Void)? = nil
 
     private let order: [GameStatus] = [.playing, .backlog, .wishlist, .completed, .dropped]
 
@@ -15,15 +16,24 @@ struct CatalogSummaryRowView: View {
             ForEach(Array(order.indices), id: \.self) { i in
                 let status = order[i]
                 let count = statusCounts[status] ?? 0
-                VStack(spacing: 2) {
-                    Text("\(count)")
-                        .font(.system(size: 30, weight: .semibold, design: .rounded))
-                        .foregroundStyle(status.color)
-                    Text(status.shortLabel)
-                        .font(.system(size: 11, weight: .regular, design: .rounded))
-                        .foregroundStyle(.secondary)
+                Button {
+                    onStatusTap?(status)
+                } label: {
+                    VStack(spacing: 2) {
+                        Text("\(count)")
+                            .font(.system(size: 24, weight: .bold, design: .rounded))
+                            .monospacedDigit()
+                            .foregroundStyle(status.color)
+                            .shadow(color: status.color.opacity(0.35), radius: 0, x: 0, y: 1)
+                        Text(status.shortLabel)
+                            .font(.system(size: 11, weight: .regular, design: .rounded))
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity)
                 }
-                .frame(maxWidth: .infinity)
+                .buttonStyle(.plain)
+                .accessibilityLabel("\(status.shortLabel), \(count) games")
+                .accessibilityHint("Tap to show only \(status.shortLabel) games")
             }
         }
         .padding(.vertical, 10)
@@ -172,8 +182,8 @@ struct BacklogSectionHeaderView: View {
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.vertical, 8)
-        .padding(.horizontal, 16)
+        .padding(.vertical, 6)
+        .padding(.horizontal, 12)
         .background(Color(.secondarySystemGroupedBackground))
         .contentShape(Rectangle())
         .onTapGesture(perform: onToggle)
@@ -207,8 +217,8 @@ struct BacklogSectionBlockView<RowContent: View>: View {
                             .font(.system(size: 17, weight: .regular, design: .rounded))
                             .foregroundStyle(meta.color)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.vertical, 12)
-                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                            .padding(.horizontal, 12)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("Add game to \(meta.title)")
@@ -217,7 +227,7 @@ struct BacklogSectionBlockView<RowContent: View>: View {
                         rowContent(game, index)
                         if game.id != games.last?.id {
                             Divider()
-                                .padding(.leading, 16)
+                                .padding(.leading, 10)
                         }
                     }
                 }
@@ -235,19 +245,22 @@ struct BacklogGameRowView: View, Equatable {
     var rank: Int? = nil
     var isMostAnticipated: Bool = false
     var onRateTap: (() -> Void)? = nil
+    /// 1-based position within the current group (e.g. first in Backlog = 1).
+    var priorityInGroup: Int? = nil
 
     private let gameId: UUID
 
-    init(game: Game, rank: Int? = nil, isMostAnticipated: Bool = false, onRateTap: (() -> Void)? = nil) {
+    init(game: Game, rank: Int? = nil, isMostAnticipated: Bool = false, onRateTap: (() -> Void)? = nil, priorityInGroup: Int? = nil) {
         self.game = game
         self.gameId = game.id
         self.rank = rank
         self.isMostAnticipated = isMostAnticipated
         self.onRateTap = onRateTap
+        self.priorityInGroup = priorityInGroup
     }
 
     nonisolated static func == (lhs: BacklogGameRowView, rhs: BacklogGameRowView) -> Bool {
-        lhs.gameId == rhs.gameId && lhs.rank == rhs.rank && lhs.isMostAnticipated == rhs.isMostAnticipated
+        lhs.gameId == rhs.gameId && lhs.rank == rhs.rank && lhs.isMostAnticipated == rhs.isMostAnticipated && lhs.priorityInGroup == rhs.priorityInGroup
     }
 
     @ViewBuilder
@@ -267,7 +280,15 @@ struct BacklogGameRowView: View, Equatable {
     }
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 8) {
+            if let priority = priorityInGroup {
+                Text("\(priority)")
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(.tertiary)
+                    .lineLimit(1)
+                    .frame(minWidth: 20, alignment: .leading)
+            }
             if let urlString = game.coverImageURL, let url = URL(string: urlString) {
                 AsyncImage(url: url) { image in
                     image.resizable().aspectRatio(contentMode: .fill)
@@ -343,7 +364,7 @@ struct BacklogGameRowView: View, Equatable {
                 }
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 2)
     }
 
     private func ratingPill(icon: String, value: String, color: Color) -> some View {
@@ -413,12 +434,12 @@ struct BacklogDraggableRowView<ContextMenuContent: View>: View {
                 )
                 .frame(maxWidth: .infinity)
             NavigationLink(value: game) {
-                BacklogGameRowView(game: game, rank: rank, isMostAnticipated: isMostAnticipated, onRateTap: onRateTap)
+                BacklogGameRowView(game: game, rank: rank, isMostAnticipated: isMostAnticipated, onRateTap: onRateTap, priorityInGroup: sectionIndex + 1)
                     .equatable()
             }
             .tint(.primary)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())

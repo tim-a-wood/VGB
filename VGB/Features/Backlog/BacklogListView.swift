@@ -57,7 +57,9 @@ struct BacklogListView: View {
                     )
                 } else {
                     VStack(spacing: 0) {
-                        CatalogSummaryRowView(statusCounts: statusCounts)
+                        CatalogSummaryRowView(statusCounts: statusCounts) { status in
+                        filterStatus = filterStatus == status ? nil : status
+                    }
                         gameListContent
                     }
                 }
@@ -196,8 +198,8 @@ struct BacklogListView: View {
                 sectionBlockView(status: .completed, games: display.completed, onMoveToCompleted: onGameMovedToCompleted)
                 sectionBlockView(status: .dropped, games: display.dropped, onMoveToCompleted: nil)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
         }
     }
 
@@ -238,8 +240,8 @@ struct BacklogListView: View {
 
     private var singleSectionContent: some View {
         Section {
-            ForEach(display.displayed) { game in
-                singleSectionRow(for: game) {
+            ForEach(Array(display.displayed.enumerated()), id: \.element.id) { index, game in
+                singleSectionRow(for: game, priorityInGroup: index + 1) {
                     swipeCompleted(game)
                     swipeDropped(game)
                 }
@@ -258,9 +260,9 @@ struct BacklogListView: View {
         }
     }
 
-    private func singleSectionRow(for game: Game, @ViewBuilder trailingSwipe: () -> some View) -> some View {
+    private func singleSectionRow(for game: Game, priorityInGroup: Int? = nil, @ViewBuilder trailingSwipe: () -> some View) -> some View {
         NavigationLink(value: game) {
-            BacklogGameRowView(game: game, onRateTap: { gameToRate = game })
+            BacklogGameRowView(game: game, onRateTap: { gameToRate = game }, priorityInGroup: priorityInGroup)
                 .equatable()
         }
         .draggable(game.id.uuidString)
