@@ -19,191 +19,12 @@ struct GameDetailView: View {
 
     var body: some View {
         Form {
-            // MARK: - Cover Art Header
-
-            if let urlString = game.coverImageURL, let url = URL(string: urlString) {
-                Section {
-                    HStack {
-                        Spacer()
-                        AsyncImage(url: url) { image in
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                        } placeholder: {
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(.quaternary)
-                                .aspectRatio(3/4, contentMode: .fit)
-                                .overlay {
-                                    ProgressView()
-                                }
-                        }
-                        .frame(maxHeight: 260)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .shadow(radius: 4)
-                        Spacer()
-                    }
-                    .listRowBackground(Color.clear)
-                    .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
-                }
-            }
-
-            // MARK: - Status
-
-            Section("Status") {
-                Picker("Status", selection: $game.statusRaw) {
-                    ForEach(availableStatuses, id: \.rawValue) { s in
-                        Text(s.rawValue).tag(s.rawValue)
-                    }
-                }
-            }
-
-            // MARK: - Game Info
-
-            Section("Game Info") {
-                LabeledContent("Title", value: game.title)
-
-                if !game.platform.isEmpty {
-                    LabeledContent("Platform", value: game.displayPlatform)
-                }
-
-                if let date = game.releaseDate {
-                    HStack {
-                        Text("Release Date")
-                        Spacer()
-                        Text(date, format: .dateTime.year().month().day())
-                            .foregroundStyle(.secondary)
-                        if game.isUnreleased {
-                            Text("Unreleased")
-                                .font(.caption2.weight(.medium))
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(.indigo.opacity(0.15))
-                                .foregroundStyle(.indigo)
-                                .clipShape(Capsule())
-                        }
-                    }
-                }
-
-                if let genre = game.genre, !genre.isEmpty {
-                    LabeledContent("Genre", value: genre)
-                }
-
-                if let dev = game.developer, !dev.isEmpty {
-                    LabeledContent("Developer", value: dev)
-                }
-
-                if let rating = game.igdbRating {
-                    LabeledContent("Critic Score", value: "\(rating)")
-                }
-
-                if !game.isUnreleased {
-                    HStack {
-                        Text("Your Rating")
-                        Spacer()
-                        TextField("0–100", value: $game.personalRating, format: .number)
-                            .keyboardType(.numberPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 80)
-                    }
-                    .onChange(of: game.personalRating) { _, newValue in
-                        if let v = newValue, (v < 0 || v > 100) {
-                            game.personalRating = min(100, max(0, v))
-                        }
-                    }
-                }
-            }
-
-            // MARK: - Your Details
-
-            Section("Your Details") {
-                HStack {
-                    Text("Estimated Hours")
-                    Spacer()
-                    TextField("Hours", value: $game.estimatedHours, format: .number)
-                        .keyboardType(.decimalPad)
-                        .multilineTextAlignment(.trailing)
-                        .frame(width: 80)
-                }
-                .onChange(of: game.estimatedHours) { _, newValue in
-                    if let v = newValue, v < 0 {
-                        game.estimatedHours = 0
-                    }
-                }
-
-                TextField("Notes", text: $game.personalNotes, axis: .vertical)
-                    .lineLimit(3...6)
-            }
-
-            // MARK: - Sync Info
-
-            Section {
-                HStack {
-                    if isLinked {
-                        if let synced = game.lastSyncedAt {
-                            let isStale = GameSyncService.shared.isStale(game)
-                            Label {
-                                Text("Synced \(synced, format: .relative(presentation: .named))")
-                            } icon: {
-                                Image(systemName: isStale ? "exclamationmark.arrow.circlepath" : "checkmark.circle")
-                                    .foregroundStyle(isStale ? .orange : .green)
-                            }
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        } else {
-                            Label("Never synced", systemImage: "exclamationmark.triangle")
-                                .font(.subheadline)
-                                .foregroundStyle(.orange)
-                        }
-                    } else {
-                        Label("Added manually", systemImage: "pencil")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    Spacer()
-
-                    if isLinked {
-                        Button {
-                            Task { await refreshGame() }
-                        } label: {
-                            if isRefreshing {
-                                ProgressView()
-                            } else {
-                                Image(systemName: "arrow.clockwise")
-                            }
-                        }
-                        .disabled(isRefreshing)
-                        .accessibilityLabel(isRefreshing ? "Refreshing metadata" : "Refresh metadata from IGDB")
-                    }
-                }
-
-                if refreshFailed {
-                    Text("Refresh failed. Your local data is unchanged.")
-                        .font(.caption)
-                        .foregroundStyle(.red)
-                        .accessibilityLabel("Refresh failed. Your local data is unchanged.")
-                }
-
-                LabeledContent("Added", value: game.createdAt, format: .dateTime.year().month().day())
-            } header: {
-                Text("Metadata")
-            }
-
-            // MARK: - Actions
-
-            Section {
-                ShareLink(item: shareText) {
-                    Label("Share Game", systemImage: "square.and.arrow.up")
-                }
-                .accessibilityLabel("Share game")
-
-                Button("Delete Game", role: .destructive) {
-                    Haptic.warning.play()
-                    modelContext.delete(game)
-                }
-                .accessibilityLabel("Delete game")
-                .accessibilityHint("Removes this game from your catalog")
-            }
+            coverSection
+            statusSection
+            gameInfoSection
+            yourDetailsSection
+            metadataSection
+            actionsSection
         }
         .overlay {
             if showCelebration {
@@ -235,6 +56,172 @@ struct GameDetailView: View {
         }
         .onChange(of: game.personalNotes) {
             game.updatedAt = Date()
+        }
+    }
+
+    @ViewBuilder private var coverSection: some View {
+        if let urlString = game.coverImageURL, let url = URL(string: urlString) {
+            Section {
+                HStack {
+                    Spacer()
+                    AsyncImage(url: url) { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                    } placeholder: {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(.quaternary)
+                            .aspectRatio(3/4, contentMode: .fit)
+                            .overlay { ProgressView() }
+                    }
+                    .frame(maxHeight: 260)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .shadow(radius: 4)
+                    Spacer()
+                }
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+            }
+        }
+    }
+
+    private var statusSection: some View {
+        Section("Status") {
+            Picker("Status", selection: $game.statusRaw) {
+                ForEach(availableStatuses, id: \.rawValue) { s in
+                    Text(s.rawValue).tag(s.rawValue)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder private var gameInfoSection: some View {
+        Section("Game Info") {
+            LabeledContent("Title", value: game.title)
+            if !game.platform.isEmpty {
+                LabeledContent("Platform", value: game.displayPlatform)
+            }
+            if let date = game.releaseDate {
+                HStack {
+                    Text("Release Date")
+                    Spacer()
+                    Text(date, format: .dateTime.year().month().day())
+                        .foregroundStyle(.secondary)
+                    if game.isUnreleased {
+                        Text("Unreleased")
+                            .font(.system(size: 11, weight: .medium, design: .rounded))
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(.indigo.opacity(0.15))
+                            .foregroundStyle(.indigo)
+                            .clipShape(Capsule())
+                    }
+                }
+            }
+            if let genre = game.genre, !genre.isEmpty {
+                LabeledContent("Genre", value: genre)
+            }
+            if let dev = game.developer, !dev.isEmpty {
+                LabeledContent("Developer", value: dev)
+            }
+            if let rating = game.igdbRating {
+                LabeledContent("Critic Score", value: "\(rating)")
+            }
+            if !game.isUnreleased {
+                HStack {
+                    Text("Your Rating")
+                    Spacer()
+                    TextField("0–100", value: $game.personalRating, format: .number)
+                        .keyboardType(.numberPad)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 80)
+                }
+                .onChange(of: game.personalRating) { _, newValue in
+                    if let v = newValue, (v < 0 || v > 100) {
+                        game.personalRating = min(100, max(0, v))
+                    }
+                }
+            }
+        }
+    }
+
+    private var yourDetailsSection: some View {
+        Section("Your Details") {
+            HStack {
+                Text("Estimated Hours")
+                Spacer()
+                TextField("Hours", value: $game.estimatedHours, format: .number)
+                    .keyboardType(.decimalPad)
+                    .multilineTextAlignment(.trailing)
+                    .frame(width: 80)
+            }
+            .onChange(of: game.estimatedHours) { _, newValue in
+                if let v = newValue, v < 0 { game.estimatedHours = 0 }
+            }
+            TextField("Notes", text: $game.personalNotes, axis: .vertical)
+                .lineLimit(3...6)
+        }
+    }
+
+    @ViewBuilder private var metadataSection: some View {
+        Section {
+            HStack {
+                if isLinked {
+                    if let synced = game.lastSyncedAt {
+                        let isStale = GameSyncService.shared.isStale(game)
+                        Label {
+                            Text("Synced \(synced, format: .relative(presentation: .named))")
+                        } icon: {
+                            Image(systemName: isStale ? "exclamationmark.arrow.circlepath" : "checkmark.circle")
+                                .foregroundStyle(isStale ? .orange : .green)
+                        }
+                        .font(.system(size: 17, weight: .regular, design: .rounded))
+                        .foregroundStyle(.secondary)
+                    } else {
+                        Label("Never synced", systemImage: "exclamationmark.triangle")
+                            .font(.system(size: 17, weight: .regular, design: .rounded))
+                            .foregroundStyle(.orange)
+                    }
+                } else {
+                    Label("Added manually", systemImage: "pencil")
+                        .font(.system(size: 17, weight: .regular, design: .rounded))
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                if isLinked {
+                    Button {
+                        Task { await refreshGame() }
+                    } label: {
+                        if isRefreshing { ProgressView() } else { Image(systemName: "arrow.clockwise") }
+                    }
+                    .disabled(isRefreshing)
+                    .accessibilityLabel(isRefreshing ? "Refreshing metadata" : "Refresh metadata from IGDB")
+                }
+            }
+            if refreshFailed {
+                Text("Refresh failed. Your local data is unchanged.")
+                    .font(.system(size: 12, weight: .regular, design: .rounded))
+                    .foregroundStyle(.red)
+                    .accessibilityLabel("Refresh failed. Your local data is unchanged.")
+            }
+            LabeledContent("Added", value: game.createdAt, format: .dateTime.year().month().day())
+        } header: {
+            Text("Metadata")
+        }
+    }
+
+    private var actionsSection: some View {
+        Section {
+            ShareLink(item: shareText) {
+                Label("Share Game", systemImage: "square.and.arrow.up")
+            }
+            .accessibilityLabel("Share game")
+            Button("Delete Game", role: .destructive) {
+                Haptic.warning.play()
+                modelContext.delete(game)
+            }
+            .accessibilityLabel("Delete game")
+            .accessibilityHint("Removes this game from your catalog")
         }
     }
 

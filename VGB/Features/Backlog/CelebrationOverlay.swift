@@ -26,7 +26,7 @@ struct CelebrationOverlay: View {
                         .foregroundStyle(.yellow)
 
                     Text("Game Completed!")
-                        .font(.title2.weight(.bold))
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
                         .foregroundStyle(.primary)
                 }
                 .padding(.horizontal, 32)

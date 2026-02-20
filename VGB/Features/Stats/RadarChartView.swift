@@ -68,7 +68,8 @@ struct RadarChartView: View {
         let items = Array(data)
         let n = max(2, items.count)
         let icons = axisIcons ?? []
-        return ForEach(Array(items.enumerated()), id: \.offset) { index, item in
+        return ForEach(0..<items.count, id: \.self) { index in
+            let item = items[index]
             let angle = angleForIndex(index, count: n)
             let hasIcon = index < icons.count && !icons[index].isEmpty
             let labelRadius = radius + (hasIcon ? 22 : 14)
@@ -78,17 +79,17 @@ struct RadarChartView: View {
                 if let iconName {
                     VStack(spacing: 2) {
                         Image(systemName: iconName)
-                            .font(.subheadline)
+                            .font(.system(size: 17, weight: .regular, design: .rounded))
                             .foregroundStyle(.secondary)
                         Text(item.label)
-                            .font(.caption2)
+                            .font(.system(size: 11, weight: .regular, design: .rounded))
                             .lineLimit(1)
                             .multilineTextAlignment(.center)
                     }
                     .fixedSize(horizontal: true, vertical: true)
                 } else {
                     Text(item.label)
-                        .font(.caption2)
+                        .font(.system(size: 11, weight: .regular, design: .rounded))
                         .lineLimit(1)
                         .fixedSize(horizontal: true, vertical: false)
                 }

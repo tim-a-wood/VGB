@@ -58,7 +58,7 @@ struct OnboardingView: View {
                     }
                 } label: {
                     Text(page < pageCount - 1 ? "Continue" : "Get started")
-                        .font(.headline)
+                        .font(.system(size: 17, weight: .semibold, design: .rounded))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
                 }
@@ -78,10 +78,10 @@ struct OnboardingView: View {
                 .foregroundStyle(.secondary)
             VStack(spacing: 12) {
                 Text(title)
-                    .font(.title2.weight(.semibold))
+                    .font(.system(size: 20, weight: .semibold, design: .rounded))
                     .multilineTextAlignment(.center)
                 Text(body)
-                    .font(.body)
+                    .font(.system(size: 17, weight: .regular, design: .rounded))
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)

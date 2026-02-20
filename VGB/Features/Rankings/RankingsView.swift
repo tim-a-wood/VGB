@@ -124,7 +124,7 @@ private struct RankingsRowView: View {
         HStack(spacing: 12) {
             // Rank
             Text("\(rank)")
-                .font(.headline.monospacedDigit())
+                .font(.system(size: 17, weight: .semibold, design: .rounded).monospacedDigit())
                 .foregroundStyle(.secondary)
                 .frame(width: 28, alignment: .trailing)
 
@@ -137,7 +137,7 @@ private struct RankingsRowView: View {
                 } placeholder: {
                     RoundedRectangle(cornerRadius: 6)
                         .fill(.quaternary)
-                        .overlay { Image(systemName: "gamecontroller").font(.caption).foregroundStyle(.tertiary) }
+                        .overlay { Image(systemName: "gamecontroller").font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.tertiary) }
                 }
                 .frame(width: 44, height: 58)
                 .clipShape(RoundedRectangle(cornerRadius: 6))
@@ -145,17 +145,17 @@ private struct RankingsRowView: View {
                 RoundedRectangle(cornerRadius: 6)
                     .fill(.quaternary)
                     .frame(width: 44, height: 58)
-                    .overlay { Image(systemName: "gamecontroller").font(.caption).foregroundStyle(.tertiary) }
+                    .overlay { Image(systemName: "gamecontroller").font(.system(size: 12, weight: .regular, design: .rounded)).foregroundStyle(.tertiary) }
             }
 
             // Title & platform
             VStack(alignment: .leading, spacing: 4) {
                 Text(game.title)
-                    .font(.headline)
+                    .font(.system(size: 17, weight: .semibold, design: .rounded))
                     .lineLimit(1)
                 if !game.platform.isEmpty {
                     Text(game.displayPlatform)
-                        .font(.caption)
+                        .font(.system(size: 12, weight: .regular, design: .rounded))
                         .foregroundStyle(.secondary)
                 }
             }
@@ -164,7 +164,7 @@ private struct RankingsRowView: View {
             // Rating
             if let value = ratingValue {
                 Text("\(value)")
-                    .font(.title3.weight(.semibold))
+                    .font(.system(size: 20, weight: .semibold, design: .rounded))
                     .foregroundStyle(Self.color(for: value))
             }
         }

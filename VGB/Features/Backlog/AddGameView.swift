@@ -318,13 +318,13 @@ private struct SearchResultRow: View {
             // Info
             VStack(alignment: .leading, spacing: 2) {
                 Text(game.name ?? "Unknown")
-                    .font(.subheadline.weight(.medium))
+                    .font(.system(size: 17, weight: .regular, design: .rounded))
                     .lineLimit(2)
 
                 HStack(spacing: 8) {
                     if let platforms = game.platforms, !platforms.isEmpty {
                         Text(platforms.compactMap(\.name).joined(separator: ", "))
-                            .font(.caption)
+                            .font(.system(size: 12, weight: .regular, design: .rounded))
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                     }
@@ -333,12 +333,12 @@ private struct SearchResultRow: View {
                 HStack(spacing: 8) {
                     if let date = game.releaseDate {
                         Text(date, format: .dateTime.year())
-                            .font(.caption)
+                            .font(.system(size: 12, weight: .regular, design: .rounded))
                             .foregroundStyle(.secondary)
                     }
                     if let rating = game.totalRating {
                         Label("\(Int(rating))", systemImage: "star.fill")
-                            .font(.caption)
+                            .font(.system(size: 12, weight: .regular, design: .rounded))
                             .foregroundStyle(.orange)
                     }
                 }

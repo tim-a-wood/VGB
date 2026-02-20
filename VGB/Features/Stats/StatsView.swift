@@ -131,7 +131,7 @@ struct StatsView: View {
         VStack(alignment: .leading, spacing: 14) {
             sectionHeader("Completion & ratings", systemImage: "chart.bar.doc.horizontal")
             Text("Share completed, critic average, and your average rating")
-                .font(.caption)
+                .font(.system(size: 12, weight: .regular, design: .rounded))
                 .foregroundStyle(.tertiary)
             HStack(alignment: .top, spacing: 12) {
                 completedRingTile
@@ -144,7 +144,7 @@ struct StatsView: View {
     private var completedRingTile: some View {
         VStack(spacing: 6) {
             Text("Completed %")
-                .font(.caption2.weight(.medium))
+                .font(.system(size: 11, weight: .medium, design: .rounded))
                 .foregroundStyle(.secondary)
             ZStack {
                 Circle()
@@ -156,10 +156,10 @@ struct StatsView: View {
                     .frame(width: Self.ringSize, height: Self.ringSize)
                     .rotationEffect(.degrees(-90))
                 Text("\(Int(completionRate * 100))%")
-                    .font(.subheadline.weight(.bold))
+                    .font(.system(size: 15, weight: .bold, design: .rounded))
             }
             Text("\(completedCount)/\(totalCount)")
-                .font(.caption2)
+                .font(.system(size: 11, weight: .regular, design: .rounded))
                 .foregroundStyle(.tertiary)
         }
         .frame(maxWidth: .infinity)
@@ -168,7 +168,7 @@ struct StatsView: View {
     private var criticRingTile: some View {
         VStack(spacing: 6) {
             Text("Critic score")
-                .font(.caption2.weight(.medium))
+                .font(.system(size: 11, weight: .medium, design: .rounded))
                 .foregroundStyle(.secondary)
             ZStack {
                 Circle()
@@ -181,20 +181,20 @@ struct StatsView: View {
                     .rotationEffect(.degrees(-90))
                 if let avg = averageCriticScore {
                     Text(String(format: "%.1f", avg))
-                        .font(.subheadline.weight(.bold))
+                        .font(.system(size: 15, weight: .bold, design: .rounded))
                 } else {
                     Text("—")
-                        .font(.subheadline.weight(.medium))
+                        .font(.system(size: 17, weight: .regular, design: .rounded))
                         .foregroundStyle(.tertiary)
                 }
             }
             if let _ = averageCriticScore {
                 Text("\(completedWithCriticRatingCount) rated")
-                    .font(.caption2)
+                    .font(.system(size: 11, weight: .regular, design: .rounded))
                     .foregroundStyle(.tertiary)
             } else {
                 Text("Rate games")
-                    .font(.caption2)
+                    .font(.system(size: 11, weight: .regular, design: .rounded))
                     .foregroundStyle(.tertiary)
             }
         }
@@ -204,7 +204,7 @@ struct StatsView: View {
     private var userRatingRingTile: some View {
         VStack(spacing: 6) {
             Text("Your rating")
-                .font(.caption2.weight(.medium))
+                .font(.system(size: 11, weight: .medium, design: .rounded))
                 .foregroundStyle(.secondary)
             ZStack {
                 Circle()
@@ -217,20 +217,20 @@ struct StatsView: View {
                     .rotationEffect(.degrees(-90))
                 if let avg = averageUserRating {
                     Text(String(format: "%.1f", avg))
-                        .font(.subheadline.weight(.bold))
+                        .font(.system(size: 15, weight: .bold, design: .rounded))
                 } else {
                     Text("—")
-                        .font(.subheadline.weight(.medium))
+                        .font(.system(size: 17, weight: .regular, design: .rounded))
                         .foregroundStyle(.tertiary)
                 }
             }
             if let _ = averageUserRating {
                 Text("\(completedWithUserRatingCount) rated")
-                    .font(.caption2)
+                    .font(.system(size: 11, weight: .regular, design: .rounded))
                     .foregroundStyle(.tertiary)
             } else {
                 Text("Rate games")
-                    .font(.caption2)
+                    .font(.system(size: 11, weight: .regular, design: .rounded))
                     .foregroundStyle(.tertiary)
             }
         }
@@ -243,7 +243,7 @@ struct StatsView: View {
         VStack(alignment: .leading, spacing: 14) {
             sectionHeader("Library breakdown", systemImage: "chart.pie")
             Text("Where your games live — by status")
-                .font(.caption)
+                .font(.system(size: 12, weight: .regular, design: .rounded))
                 .foregroundStyle(.tertiary)
             Chart(statusCounts, id: \.0.id) { item in
                 SectorMark(
@@ -261,15 +261,18 @@ struct StatsView: View {
     }
 
     private var statusLegend: some View {
-        HStack(spacing: 16) {
-            ForEach(GameStatus.allCases, id: \.id) { status in
+        let cases = Array(GameStatus.allCases)
+        let indices = Array(cases.indices)
+        return HStack(spacing: 16) {
+            ForEach(indices, id: \.self) { i in
+                let status = cases[i]
                 let count = games.filter { $0.status == status }.count
                 HStack(spacing: 4) {
                     Circle()
                         .fill(status.color)
                         .frame(width: 8, height: 8)
                     Text("\(status.rawValue) \(count)")
-                        .font(.caption)
+                        .font(.system(size: 12, weight: .regular, design: .rounded))
                         .foregroundStyle(.secondary)
                 }
             }
@@ -286,11 +289,11 @@ struct StatsView: View {
         VStack(alignment: .leading, spacing: 14) {
             sectionHeader("Your Gamer Profile", systemImage: "point.3.connected.trianglepath.dotted")
             Text("How your whole library breaks down by genre")
-                .font(.caption)
+                .font(.system(size: 12, weight: .regular, design: .rounded))
                 .foregroundStyle(.tertiary)
             if libraryPerGenre.allSatisfy({ $0.value == 0 }) {
                 Text("Add games with genres to see your chart.")
-                    .font(.subheadline)
+                    .font(.system(size: 17, weight: .regular, design: .rounded))
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 24)
@@ -311,7 +314,7 @@ struct StatsView: View {
 
     private func sectionHeader(_ title: String, systemImage: String) -> some View {
         Label(title, systemImage: systemImage)
-            .font(.subheadline.weight(.semibold))
+            .font(.system(size: 15, weight: .semibold, design: .rounded))
             .foregroundStyle(.secondary)
     }
 }

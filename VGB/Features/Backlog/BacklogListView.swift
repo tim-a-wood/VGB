@@ -364,15 +364,17 @@ struct BacklogListView: View {
 
     private var catalogSummaryRow: some View {
         let order: [GameStatus] = [.playing, .backlog, .wishlist, .completed, .dropped]
+        let indices = Array(order.indices)
         return HStack(spacing: 0) {
-            ForEach(order, id: \.self) { status in
+            ForEach(indices, id: \.self) { i in
+                let status = order[i]
                 let count = statusCounts[status] ?? 0
                 VStack(spacing: 2) {
                     Text("\(count)")
-                        .font(.subheadline.weight(.semibold))
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
                         .foregroundStyle(status.color)
                     Text(shortLabel(for: status))
-                        .font(.caption2)
+                        .font(.system(size: 11, weight: .regular, design: .rounded))
                         .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity)
@@ -454,7 +456,7 @@ struct BacklogListView: View {
                         showingAddGame = true
                     } label: {
                         Label("Add Game", systemImage: "plus.circle.fill")
-                            .font(.subheadline.weight(.medium))
+                            .font(.system(size: 17, weight: .regular, design: .rounded))
                             .foregroundStyle(color)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.vertical, 12)
@@ -575,7 +577,7 @@ struct BacklogListView: View {
     private func statusSectionHeader(_ status: GameStatus) -> some View {
         let (title, systemImage, color) = statusSectionTitleAndIcon(status)
         return Label(title, systemImage: systemImage)
-            .font(.subheadline.weight(.semibold))
+            .font(.system(size: 15, weight: .semibold, design: .rounded))
             .foregroundStyle(color)
     }
 
@@ -873,7 +875,7 @@ private struct GameRowView: View, Equatable {
                         .fill(.quaternary)
                         .overlay {
                             Image(systemName: "gamecontroller")
-                                .font(.caption)
+                                .font(.system(size: 12, weight: .regular, design: .rounded))
                                 .foregroundStyle(.tertiary)
                         }
                 }
@@ -885,7 +887,7 @@ private struct GameRowView: View, Equatable {
                     .frame(width: 44, height: 58)
                     .overlay {
                         Image(systemName: "gamecontroller")
-                            .font(.caption)
+                            .font(.system(size: 12, weight: .regular, design: .rounded))
                             .foregroundStyle(.tertiary)
                     }
             }
@@ -893,12 +895,12 @@ private struct GameRowView: View, Equatable {
             // Info
             VStack(alignment: .leading, spacing: 4) {
                 Text(game.title)
-                    .font(.headline)
+                    .font(.system(size: 17, weight: .semibold, design: .rounded))
                     .lineLimit(1)
                     .truncationMode(.tail)
 
                 Text(game.displayPlatform)
-                    .font(.caption)
+                    .font(.system(size: 12, weight: .regular, design: .rounded))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .truncationMode(.tail)
@@ -916,10 +918,10 @@ private struct GameRowView: View, Equatable {
                                 } else {
                                     HStack(spacing: 4) {
                                         Image(systemName: "star.fill")
-                                            .font(.caption)
+                                            .font(.system(size: 12, weight: .regular, design: .rounded))
                                             .foregroundStyle(.quaternary)
                                         Text("Unrated")
-                                            .font(.caption2)
+                                            .font(.system(size: 11, weight: .regular, design: .rounded))
                                             .foregroundStyle(.secondary)
                                     }
                                 }
@@ -939,7 +941,7 @@ private struct GameRowView: View, Equatable {
 
                     if isMostAnticipated {
                         Label("Most Anticipated", systemImage: "star.fill")
-                            .font(.caption2.weight(.semibold))
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
                             .foregroundStyle(.pink)
                             .lineLimit(1)
                             .fixedSize(horizontal: true, vertical: false)
@@ -957,10 +959,10 @@ private struct GameRowView: View, Equatable {
     private func ratingPill(icon: String, value: String, color: Color) -> some View {
         HStack(spacing: 4) {
             Image(systemName: icon)
-                .font(.caption)
+                .font(.system(size: 12, weight: .regular, design: .rounded))
                 .foregroundStyle(color)
             Text(value)
-                .font(.caption)
+                .font(.system(size: 12, weight: .regular, design: .rounded))
                 .foregroundStyle(color)
         }
     }
@@ -974,7 +976,7 @@ private struct GameRowView: View, Equatable {
         default: ("circle.fill", .gray)
         }
         Image(systemName: icon)
-            .font(.caption)
+            .font(.system(size: 12, weight: .regular, design: .rounded))
             .foregroundStyle(color)
             .padding(.horizontal, 6)
             .padding(.vertical, 3)
@@ -988,7 +990,7 @@ private struct GameRowView: View, Equatable {
 private struct UnreleasedBadge: View {
     var body: some View {
         Text("Unreleased")
-            .font(.caption2.weight(.medium))
+            .font(.system(size: 11, weight: .medium, design: .rounded))
             .padding(.horizontal, 8)
             .padding(.vertical, 2)
             .background(.indigo.opacity(0.15))
@@ -1009,11 +1011,11 @@ private struct SectionHeaderDropZone: View {
     var body: some View {
         HStack(spacing: 8) {
             Label(title, systemImage: systemImage)
-                .font(.subheadline.weight(.semibold))
+                .font(.system(size: 15, weight: .semibold, design: .rounded))
                 .foregroundStyle(color)
             Spacer(minLength: 0)
             Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
-                .font(.caption.weight(.semibold))
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
