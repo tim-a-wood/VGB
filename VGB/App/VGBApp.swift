@@ -45,8 +45,11 @@ private struct ContentRoot: View {
             if ProcessInfo.processInfo.arguments.contains("-SeedDemoData") {
                 DemoData.seed(into: modelContext)
             }
-            pushWidgetSummary(context: modelContext)
-            WidgetCenter.shared.reloadTimelines(ofKind: "VGBWidget")
+            // Defer widget update so initial UI isn't blocked by fetch
+            DispatchQueue.main.async {
+                pushWidgetSummary(context: modelContext)
+                WidgetCenter.shared.reloadTimelines(ofKind: "VGBWidget")
+            }
         }
         .onChange(of: scenePhase) { _, newPhase in
             guard hasCompletedOnboarding else { return }
@@ -54,8 +57,10 @@ private struct ContentRoot: View {
                 Task {
                     await GameSyncService.shared.refreshStaleGames(in: modelContext)
                 }
-                pushWidgetSummary(context: modelContext)
-                WidgetCenter.shared.reloadTimelines(ofKind: "VGBWidget")
+                DispatchQueue.main.async {
+                    pushWidgetSummary(context: modelContext)
+                    WidgetCenter.shared.reloadTimelines(ofKind: "VGBWidget")
+                }
             }
         }
     }

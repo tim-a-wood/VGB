@@ -59,88 +59,85 @@ struct BacklogListView: View {
         filterStatus != nil || filterPlatform != nil || filterGenre != nil
     }
 
-    /// Games currently being played (for the pinned section).
-    private var nowPlaying: [Game] {
-        displayedGames.filter { $0.status == .playing }
-    }
-
-    /// Games in backlog (when showing status sections).
-    private var backlogGames: [Game] {
-        displayedGames.filter { $0.status == .backlog }
-    }
-
-    /// Games completed (when showing status sections), ordered by user rating (highest first).
-    private var completedGames: [Game] {
-        displayedGames
-            .filter { $0.status == .completed }
-            .sorted { g1, g2 in
-                let r1 = g1.personalRating ?? -1
-                let r2 = g2.personalRating ?? -1
-                if r1 != r2 { return r1 > r2 }
-                return g1.updatedAt > g2.updatedAt
-            }
-    }
-
-    /// Games dropped (when showing status sections), ordered by user rating (highest first).
-    private var droppedGames: [Game] {
-        displayedGames
-            .filter { $0.status == .dropped }
-            .sorted { g1, g2 in
-                let r1 = g1.personalRating ?? -1
-                let r2 = g2.personalRating ?? -1
-                if r1 != r2 { return r1 > r2 }
-                return g1.updatedAt > g2.updatedAt
-            }
-    }
-
-    /// Games on wishlist (when showing status sections).
-    private var wishlistGames: [Game] {
-        displayedGames.filter { $0.status == .wishlist }
-    }
-
     /// Show status sections (Now Playing, Backlog, etc.) instead of a single list.
     private var showStatusSections: Bool {
         filterStatus == nil && searchText.trimmingCharacters(in: .whitespaces).isEmpty
     }
 
-    /// Games after applying search, filters, and sort.
-    private var displayedGames: [Game] {
+    /// Display + section arrays in one pass to avoid repeated filter/sort work.
+    private struct SectionedDisplay {
+        var displayed: [Game]
+        var nowPlaying: [Game]
+        var backlog: [Game]
+        var wishlist: [Game]
+        var completed: [Game]
+        var dropped: [Game]
+    }
+
+    /// Games after search/filter/sort plus sections, computed in a single pass.
+    private var sectionedDisplay: SectionedDisplay {
         var result = games
 
-        // Text search
         let query = searchText.trimmingCharacters(in: .whitespaces).lowercased()
         if !query.isEmpty {
             result = result.filter { $0.title.lowercased().contains(query) }
         }
-
-        // Status filter
         if let status = filterStatus {
             result = result.filter { $0.status == status }
         }
-
-        // Platform filter (match if the game's platform list contains the selected platform)
         if let platform = filterPlatform {
             result = result.filter { game in
                 Self.platformComponents(game.platform).map { Game.displayPlatform(from: $0) }.contains(platform)
             }
         }
-
-        // Genre filter
         if let genre = filterGenre {
             result = result.filter { $0.genre == genre }
         }
-
-        // Sort
         switch sortMode {
         case .priority:
-            break // already sorted by priorityPosition from @Query
+            break
         case .criticScore:
             result.sort { ($0.igdbRating ?? -1) > ($1.igdbRating ?? -1) }
         case .releaseDate:
             result.sort { ($0.releaseDate ?? .distantPast) > ($1.releaseDate ?? .distantPast) }
         }
 
-        return result
+        var nowPlaying: [Game] = []
+        var backlog: [Game] = []
+        var wishlist: [Game] = []
+        var completed: [Game] = []
+        var dropped: [Game] = []
+        nowPlaying.reserveCapacity(result.count / 5)
+        backlog.reserveCapacity(result.count / 5)
+        wishlist.reserveCapacity(result.count / 5)
+        completed.reserveCapacity(result.count / 5)
+        dropped.reserveCapacity(result.count / 5)
+        for game in result {
+            switch game.status {
+            case .playing: nowPlaying.append(game)
+            case .backlog: backlog.append(game)
+            case .wishlist: wishlist.append(game)
+            case .completed: completed.append(game)
+            case .dropped: dropped.append(game)
+            }
+        }
+        let sortByRatingThenUpdated: (Game, Game) -> Bool = { g1, g2 in
+            let r1 = g1.personalRating ?? -1
+            let r2 = g2.personalRating ?? -1
+            if r1 != r2 { return r1 > r2 }
+            return g1.updatedAt > g2.updatedAt
+        }
+        completed.sort(by: sortByRatingThenUpdated)
+        dropped.sort(by: sortByRatingThenUpdated)
+
+        return SectionedDisplay(
+            displayed: result,
+            nowPlaying: nowPlaying,
+            backlog: backlog,
+            wishlist: wishlist,
+            completed: completed,
+            dropped: dropped
+        )
     }
 
     // MARK: - Body
@@ -150,7 +147,7 @@ struct BacklogListView: View {
             Group {
                 if games.isEmpty {
                     emptyState
-                } else if displayedGames.isEmpty {
+                } else if sectionedDisplay.displayed.isEmpty {
                     noResultsState
                 } else {
                     gameList
@@ -370,17 +367,17 @@ struct BacklogListView: View {
     private var scrollViewSectionedList: some View {
         ScrollView {
             LazyVStack(spacing: 24) {
-                sectionBlock(title: "Now Playing", systemImage: "play.fill", color: .blue, targetStatus: .playing, games: nowPlaying, isExpanded: !collapsedSections.contains(.playing), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.playing]) } }, onMoveToCompleted: nil) { game in
+                sectionBlock(title: "Now Playing", systemImage: "play.fill", color: .blue, targetStatus: .playing, games: sectionedDisplay.nowPlaying, isExpanded: !collapsedSections.contains(.playing), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.playing]) } }, onMoveToCompleted: nil) { game in
                     swipeCompleted(game)
                     swipeDropped(game)
                 }
-                sectionBlock(title: "Backlog", systemImage: "list.bullet", color: .gray, targetStatus: .backlog, games: backlogGames, isExpanded: !collapsedSections.contains(.backlog), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.backlog]) } }, onMoveToCompleted: nil) { game in
+                sectionBlock(title: "Backlog", systemImage: "list.bullet", color: .gray, targetStatus: .backlog, games: sectionedDisplay.backlog, isExpanded: !collapsedSections.contains(.backlog), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.backlog]) } }, onMoveToCompleted: nil) { game in
                     swipeCompleted(game)
                     swipeDropped(game)
                 }
-                sectionBlock(title: "Wishlist", systemImage: "heart.fill", color: .purple, targetStatus: .wishlist, games: wishlistGames, isExpanded: !collapsedSections.contains(.wishlist), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.wishlist]) } }, onMoveToCompleted: nil)
-                sectionBlock(title: "Completed", systemImage: "checkmark.circle.fill", color: .green, targetStatus: .completed, games: completedGames, isExpanded: !collapsedSections.contains(.completed), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.completed]) } }, onMoveToCompleted: triggerCelebration)
-                sectionBlock(title: "Dropped", systemImage: "xmark.circle.fill", color: .orange, targetStatus: .dropped, games: droppedGames, isExpanded: !collapsedSections.contains(.dropped), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.dropped]) } }, onMoveToCompleted: nil)
+                sectionBlock(title: "Wishlist", systemImage: "heart.fill", color: .purple, targetStatus: .wishlist, games: sectionedDisplay.wishlist, isExpanded: !collapsedSections.contains(.wishlist), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.wishlist]) } }, onMoveToCompleted: nil)
+                sectionBlock(title: "Completed", systemImage: "checkmark.circle.fill", color: .green, targetStatus: .completed, games: sectionedDisplay.completed, isExpanded: !collapsedSections.contains(.completed), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.completed]) } }, onMoveToCompleted: triggerCelebration)
+                sectionBlock(title: "Dropped", systemImage: "xmark.circle.fill", color: .orange, targetStatus: .dropped, games: sectionedDisplay.dropped, isExpanded: !collapsedSections.contains(.dropped), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.dropped]) } }, onMoveToCompleted: nil)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
@@ -513,7 +510,7 @@ struct BacklogListView: View {
     /// Single list (when filtering by status or searching).
     private var singleSection: some View {
         Section {
-            ForEach(displayedGames) { game in
+            ForEach(sectionedDisplay.displayed) { game in
                 row(for: game, showLeading: true, showTrailing: true) {
                     swipeCompleted(game)
                     swipeDropped(game)
@@ -571,7 +568,7 @@ struct BacklogListView: View {
         @ViewBuilder trailingSwipe: () -> some View
     ) -> some View {
         NavigationLink(value: game) {
-            GameRowView(game: game)
+            GameRowView(game: game).equatable()
         }
         .draggable(game.id.uuidString)
         .contextMenu {
@@ -624,12 +621,13 @@ struct BacklogListView: View {
     private func reorderInSection(games: [Game], from source: IndexSet, to destination: Int, targetStatus: GameStatus) {
         var newOrder = games
         newOrder.move(fromOffsets: source, toOffset: destination)
+        let sd = sectionedDisplay
         let reordered: [Game] = switch targetStatus {
-        case .playing: newOrder + backlogGames + wishlistGames + completedGames + droppedGames
-        case .backlog: nowPlaying + newOrder + wishlistGames + completedGames + droppedGames
-        case .wishlist: nowPlaying + backlogGames + newOrder + completedGames + droppedGames
-        case .completed: nowPlaying + backlogGames + wishlistGames + newOrder + droppedGames
-        case .dropped: nowPlaying + backlogGames + wishlistGames + completedGames + newOrder
+        case .playing: newOrder + sd.backlog + sd.wishlist + sd.completed + sd.dropped
+        case .backlog: sd.nowPlaying + newOrder + sd.wishlist + sd.completed + sd.dropped
+        case .wishlist: sd.nowPlaying + sd.backlog + newOrder + sd.completed + sd.dropped
+        case .completed: sd.nowPlaying + sd.backlog + sd.wishlist + newOrder + sd.dropped
+        case .dropped: sd.nowPlaying + sd.backlog + sd.wishlist + sd.completed + newOrder
         }
         withAnimation(.easeInOut(duration: 0.25)) {
             for (index, game) in reordered.enumerated() {
@@ -647,7 +645,7 @@ struct BacklogListView: View {
     }
 
     private func delete(at offsets: IndexSet) {
-        let toDelete = offsets.map { displayedGames[$0] }
+        let toDelete = offsets.map { sectionedDisplay.displayed[$0] }
         for game in toDelete {
             modelContext.delete(game)
         }
@@ -694,7 +692,7 @@ struct BacklogListView: View {
     }
 
     private func reorder(from source: IndexSet, to destination: Int) {
-        var ordered = displayedGames
+        var ordered = sectionedDisplay.displayed
         ordered.move(fromOffsets: source, toOffset: destination)
         for (index, game) in ordered.enumerated() {
             game.priorityPosition = index
@@ -766,7 +764,7 @@ private struct DraggableCatalogRow<ContextMenuContent: View>: View {
                 .frame(maxWidth: .infinity)
 
             NavigationLink(value: game) {
-                GameRowView(game: game, rank: rank, isMostAnticipated: isMostAnticipated)
+                GameRowView(game: game, rank: rank, isMostAnticipated: isMostAnticipated).equatable()
             }
             .tint(.primary)
             .padding(.horizontal, 16)
@@ -794,12 +792,25 @@ private struct DraggableCatalogRow<ContextMenuContent: View>: View {
 
 // MARK: - Row
 
-private struct GameRowView: View {
+private struct GameRowView: View, Equatable {
     let game: Game
+    /// Stored for Equatable so we don't touch main-actor-isolated Game in ==.
+    private let gameId: UUID
     /// Top-3 rank in Completed section (1 = gold, 2 = silver, 3 = bronze).
     var rank: Int? = nil
     /// True for #1 on Wishlist (priority order).
     var isMostAnticipated: Bool = false
+
+    init(game: Game, rank: Int? = nil, isMostAnticipated: Bool = false) {
+        self.game = game
+        self.gameId = game.id
+        self.rank = rank
+        self.isMostAnticipated = isMostAnticipated
+    }
+
+    nonisolated static func == (lhs: GameRowView, rhs: GameRowView) -> Bool {
+        lhs.gameId == rhs.gameId && lhs.rank == rhs.rank && lhs.isMostAnticipated == rhs.isMostAnticipated
+    }
 
     var body: some View {
         HStack(spacing: 12) {

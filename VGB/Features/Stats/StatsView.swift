@@ -5,44 +5,66 @@ import Charts
 struct StatsView: View {
     @Query(sort: \Game.priorityPosition) private var games: [Game]
 
+    /// One-pass derivation: status counts, completed-with-rating arrays, genre labels for radar.
+    private struct StatsData {
+        var statusCounts: [GameStatus: Int]
+        var completedWithCriticRating: [Game]
+        var completedWithUserRating: [Game]
+        var libraryPerGenre: [(label: String, value: Double)]
+    }
+
+    private var statsData: StatsData {
+        var statusCounts: [GameStatus: Int] = [.wishlist: 0, .backlog: 0, .playing: 0, .completed: 0, .dropped: 0]
+        var completedWithCritic: [Game] = []
+        var completedWithUser: [Game] = []
+        var genreStrings: [String] = []
+        genreStrings.reserveCapacity(games.count)
+        completedWithCritic.reserveCapacity(games.count / 4)
+        completedWithUser.reserveCapacity(games.count / 4)
+        for game in games {
+            statusCounts[game.status, default: 0] += 1
+            if game.status == .completed {
+                if game.igdbRating != nil { completedWithCritic.append(game) }
+                if game.personalRating != nil { completedWithUser.append(game) }
+            }
+            if let g = game.genre, !g.isEmpty { genreStrings.append(g) }
+        }
+        let libraryPerGenre = RadarGenreCategories.completedCountsByCategory(from: genreStrings)
+        return StatsData(
+            statusCounts: statusCounts,
+            completedWithCriticRating: completedWithCritic,
+            completedWithUserRating: completedWithUser,
+            libraryPerGenre: libraryPerGenre
+        )
+    }
+
     private var totalCount: Int { games.count }
-    private var completedCount: Int { games.filter { $0.status == .completed }.count }
+    private var completedCount: Int { statsData.statusCounts[.completed] ?? 0 }
     private var completionRate: Double {
         guard totalCount > 0 else { return 0 }
         return Double(completedCount) / Double(totalCount)
     }
 
     private var statusCounts: [(GameStatus, Int)] {
-        GameStatus.allCases.map { status in
-            (status, games.filter { $0.status == status }.count)
-        }
+        GameStatus.allCases.map { ($0, statsData.statusCounts[$0] ?? 0) }
     }
 
-    /// All games (backlog, wishlist, playing, completed, dropped) per radar genre category (6 axes).
-    private var libraryPerGenre: [(label: String, value: Double)] {
-        let genreStrings = games.compactMap(\.genre).filter { !$0.isEmpty }
-        return RadarGenreCategories.completedCountsByCategory(from: genreStrings)
-    }
-
-    private var completedWithCriticRating: [Game] {
-        games.filter { $0.status == .completed && $0.igdbRating != nil }
-    }
+    private var libraryPerGenre: [(label: String, value: Double)] { statsData.libraryPerGenre }
 
     private var averageCriticScore: Double? {
-        let rated = completedWithCriticRating.compactMap(\.igdbRating).map(Double.init)
+        let rated = statsData.completedWithCriticRating.compactMap(\.igdbRating).map(Double.init)
         guard !rated.isEmpty else { return nil }
         return rated.reduce(0, +) / Double(rated.count)
-    }
-
-    private var completedWithUserRating: [Game] {
-        games.filter { $0.status == .completed && $0.personalRating != nil }
     }
 
     private var averageUserRating: Double? {
-        let rated = completedWithUserRating.compactMap(\.personalRating).map(Double.init)
+        let rated = statsData.completedWithUserRating.compactMap(\.personalRating).map(Double.init)
         guard !rated.isEmpty else { return nil }
         return rated.reduce(0, +) / Double(rated.count)
     }
+
+    private var completedWithCriticRatingCount: Int { statsData.completedWithCriticRating.count }
+    private var completedWithUserRatingCount: Int { statsData.completedWithUserRating.count }
 
     @State private var heroRingTrim: CGFloat = 0
     @State private var criticRingTrim: CGFloat = 0
@@ -167,7 +189,7 @@ struct StatsView: View {
                 }
             }
             if let _ = averageCriticScore {
-                Text("\(completedWithCriticRating.count) rated")
+                Text("\(completedWithCriticRatingCount) rated")
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
             } else {
@@ -203,7 +225,7 @@ struct StatsView: View {
                 }
             }
             if let _ = averageUserRating {
-                Text("\(completedWithUserRating.count) rated")
+                Text("\(completedWithUserRatingCount) rated")
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
             } else {
