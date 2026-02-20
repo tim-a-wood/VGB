@@ -86,6 +86,16 @@ final class Game {
         Self.displayPlatform(from: platform)
     }
 
+    /// Splits a combined platform string (e.g. "PS5, PC" from IGDB) into individual platforms.
+    static func platformComponents(_ platformString: String) -> [String] {
+        let trimmed = platformString.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else { return [] }
+        return trimmed
+            .components(separatedBy: CharacterSet(charactersIn: ",|/"))
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+    }
+
     /// Normalizes a raw platform string for display (e.g. "PC" not "PC (Microsoft Windows)", "PS5" not "PlayStation 5").
     static func displayPlatform(from raw: String) -> String {
         var s = raw

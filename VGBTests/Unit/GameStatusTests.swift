@@ -58,6 +58,29 @@ final class GameStatusTests: XCTestCase {
         }
     }
 
+    // MARK: - availableStatuses
+
+    func testAvailableStatusesForUnreleasedIsWishlistOnly() {
+        let statuses = GameStatus.availableStatuses(for: true)
+        XCTAssertEqual(statuses, [.wishlist])
+    }
+
+    func testAvailableStatusesForReleasedIsAllCases() {
+        let statuses = GameStatus.availableStatuses(for: false)
+        XCTAssertEqual(statuses.count, 5)
+        XCTAssertEqual(statuses, Array(GameStatus.allCases))
+    }
+
+    // MARK: - Section metadata
+
+    func testSectionTitlePlayingIsNowPlaying() {
+        XCTAssertEqual(GameStatus.playing.sectionTitle, "Now Playing")
+    }
+
+    func testSectionIconPlayingIsPlayFill() {
+        XCTAssertEqual(GameStatus.playing.sectionIcon, "play.fill")
+    }
+
     // MARK: - Codable round-trip
 
     func testCodableRoundTrip() throws {

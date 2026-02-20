@@ -67,17 +67,39 @@ final class GameSyncService {
         isSyncing = true
         var refreshed = 0
 
-        for game in games {
-            guard let externalId = game.externalId, let igdbId = Int(externalId) else { continue }
+        let gameIds = games.compactMap { game -> Int? in
+            guard let externalId = game.externalId else { return nil }
+            return Int(externalId)
+        }
+        guard !gameIds.isEmpty else {
+            isSyncing = false
+            return
+        }
 
-            do {
-                if let updated = try await IGDBClient.shared.fetchGame(id: igdbId) {
-                    applyIGDBData(updated, to: game)
-                    refreshed += 1
+        let idToGame = Dictionary(uniqueKeysWithValues: games.compactMap { game -> (Int, Game)? in
+            guard let externalId = game.externalId, let igdbId = Int(externalId) else { return nil }
+            return (igdbId, game)
+        })
+
+        do {
+            let results = try await IGDBClient.shared.fetchGames(ids: gameIds)
+            for igdb in results {
+                guard let game = idToGame[igdb.id] else { continue }
+                applyIGDBData(igdb, to: game)
+                refreshed += 1
+            }
+        } catch {
+            // Fallback: try one-by-one so at least some games get refreshed
+            for game in games {
+                guard let externalId = game.externalId, let igdbId = Int(externalId) else { continue }
+                do {
+                    if let updated = try await IGDBClient.shared.fetchGame(id: igdbId) {
+                        applyIGDBData(updated, to: game)
+                        refreshed += 1
+                    }
+                } catch {
+                    continue
                 }
-            } catch {
-                // Silently skip failures — local data remains intact
-                continue
             }
         }
 

@@ -32,6 +32,20 @@ enum WidgetSummaryStorage {
         let radarGenreCounts: [Double]
     }
 
+    /// Writes a pre-built summary to App Group UserDefaults.
+    static func write(_ summary: Summary) {
+        write(
+            nextUpTitle: summary.nextUpTitle,
+            nextUpPlatform: summary.nextUpPlatform,
+            totalGames: summary.totalGames,
+            completedGames: summary.completedGames,
+            playingCount: summary.playingCount,
+            playingFirstTitle: summary.playingFirstTitle,
+            playingFirstPlatform: summary.playingFirstPlatform,
+            radarGenreCounts: summary.radarGenreCounts
+        )
+    }
+
     static func write(
         nextUpTitle: String?,
         nextUpPlatform: String?,

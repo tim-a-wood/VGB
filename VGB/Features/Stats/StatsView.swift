@@ -266,7 +266,7 @@ struct StatsView: View {
         return HStack(spacing: 16) {
             ForEach(indices, id: \.self) { i in
                 let status = cases[i]
-                let count = games.filter { $0.status == status }.count
+                let count = statsData.statusCounts[status] ?? 0
                 HStack(spacing: 4) {
                     Circle()
                         .fill(status.color)

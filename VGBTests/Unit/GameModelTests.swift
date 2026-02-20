@@ -170,6 +170,21 @@ final class GameModelTests: XCTestCase {
         XCTAssertEqual(game.displayPlatform, "PS5, PC")
     }
 
+    func testPlatformComponentsSplitsCommaSeparated() {
+        let components = Game.platformComponents("PS5, PC, Switch")
+        XCTAssertEqual(components, ["PS5", "PC", "Switch"])
+    }
+
+    func testPlatformComponentsSplitsPipeSeparated() {
+        let components = Game.platformComponents("PS5 | PC")
+        XCTAssertEqual(components, ["PS5", "PC"])
+    }
+
+    func testPlatformComponentsReturnsEmptyForEmptyString() {
+        XCTAssertTrue(Game.platformComponents("").isEmpty)
+        XCTAssertTrue(Game.platformComponents("   ").isEmpty)
+    }
+
     // MARK: - Provider-sourced field mutation
 
     func testProviderFieldsAreMutable() {

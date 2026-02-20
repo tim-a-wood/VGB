@@ -84,22 +84,17 @@ struct VGBTimelineProvider: TimelineProvider {
             return VGBWidgetEntry(date: Date(), nextUpTitle: nil, nextUpPlatform: nil, totalGames: 0, completedGames: 0, playingCount: 0, playingFirstTitle: nil, playingFirstPlatform: nil, radarGenreCounts: [])
         }
 
-        let nextUp = games.first { $0.status == .backlog }
-        let playing = games.filter { $0.status == .playing }.sorted { $0.priorityPosition < $1.priorityPosition }
-        let playingFirst = playing.first
-        let genreStrings = games.compactMap(\.genre).filter { !$0.isEmpty }
-        let radarData = RadarGenreCategories.completedCountsByCategory(from: genreStrings)
-        let radarCounts = radarData.map(\.value)
+        let summary = WidgetSummaryBuilder.make(from: games)
         let entry = VGBWidgetEntry(
             date: Date(),
-            nextUpTitle: nextUp?.title,
-            nextUpPlatform: nextUp?.platform.isEmpty == false ? nextUp?.displayPlatform : nil,
-            totalGames: games.count,
-            completedGames: games.filter { $0.status == .completed }.count,
-            playingCount: playing.count,
-            playingFirstTitle: playingFirst?.title,
-            playingFirstPlatform: playingFirst?.platform.isEmpty == false ? playingFirst?.displayPlatform : nil,
-            radarGenreCounts: radarCounts
+            nextUpTitle: summary.nextUpTitle,
+            nextUpPlatform: summary.nextUpPlatform,
+            totalGames: summary.totalGames,
+            completedGames: summary.completedGames,
+            playingCount: summary.playingCount,
+            playingFirstTitle: summary.playingFirstTitle,
+            playingFirstPlatform: summary.playingFirstPlatform,
+            radarGenreCounts: summary.radarGenreCounts
         )
         logger.debug("fetchEntry() using SwiftData — total=\(entry.totalGames) nextUp=\(entry.nextUpTitle ?? "nil")")
         return entry

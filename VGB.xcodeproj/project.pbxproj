@@ -45,6 +45,10 @@
 		SC11SC22SC33SC44SC55SC68 /* StoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC11SC22SC33SC44SC55SC67 /* StoreConfiguration.swift */; };
 		WS11WS22WS33WS44WS55WS66 /* WidgetSummaryStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS11WS22WS33WS44WS55WS67 /* WidgetSummaryStorage.swift */; };
 		WS11WS22WS33WS44WS55WS68 /* WidgetSummaryStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = WS11WS22WS33WS44WS55WS67 /* WidgetSummaryStorage.swift */; };
+		WB11WB22WB33WB44WB55WB66 /* WidgetSummaryBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB11WB22WB33WB44WB55WB67 /* WidgetSummaryBuilder.swift */; };
+		WB11WB22WB33WB44WB55WB68 /* WidgetSummaryBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB11WB22WB33WB44WB55WB67 /* WidgetSummaryBuilder.swift */; };
+		SP11SP22SP33SP44SP55SP66 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP11SP22SP33SP44SP55SP67 /* SplashView.swift */; };
+		IP11IP22IP33IP44IP55IP66 /* ImagePrefetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = IP11IP22IP33IP44IP55IP67 /* ImagePrefetcher.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -119,6 +123,9 @@
 		SC11SC22SC33SC44SC55SC69 /* VGB.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VGB.entitlements; sourceTree = "<group>"; };
 		SC11SC22SC33SC44SC55SC70 /* VGBWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VGBWidgetExtension.entitlements; sourceTree = "<group>"; };
 		WS11WS22WS33WS44WS55WS67 /* WidgetSummaryStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSummaryStorage.swift; sourceTree = "<group>"; };
+		WB11WB22WB33WB44WB55WB67 /* WidgetSummaryBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSummaryBuilder.swift; sourceTree = "<group>"; };
+		SP11SP22SP33SP44SP55SP67 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
+		IP11IP22IP33IP44IP55IP67 /* ImagePrefetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePrefetcher.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -159,7 +166,10 @@
 				77AA77BB77CC77DD77EE77FF /* Resources */,
 				SC11SC22SC33SC44SC55SC67 /* StoreConfiguration.swift */,
 				SC11SC22SC33SC44SC55SC69 /* VGB.entitlements */,
+				WB11WB22WB33WB44WB55WB67 /* WidgetSummaryBuilder.swift */,
 				WS11WS22WS33WS44WS55WS67 /* WidgetSummaryStorage.swift */,
+				IP11IP22IP33IP44IP55IP67 /* ImagePrefetcher.swift */,
+				SP11SP22SP33SP44SP55SP67 /* SplashView.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -408,6 +418,9 @@
 				CH11CH22CH33CH44CH55CH66 /* CheckpointHeader.swift in Sources */,
 				HX11HX22HX33HX44HX55HX66 /* Haptic.swift in Sources */,
 				SC11SC22SC33SC44SC55SC66 /* StoreConfiguration.swift in Sources */,
+				IP11IP22IP33IP44IP55IP66 /* ImagePrefetcher.swift in Sources */,
+				SP11SP22SP33SP44SP55SP66 /* SplashView.swift in Sources */,
+				WB11WB22WB33WB44WB55WB66 /* WidgetSummaryBuilder.swift in Sources */,
 				WS11WS22WS33WS44WS55WS66 /* WidgetSummaryStorage.swift in Sources */,
 				55AA55BB55CC55DD55EE55FF /* BacklogListView.swift in Sources */,
 				DD11AA22BB33CC44DD55EE66 /* Game.swift in Sources */,
@@ -436,6 +449,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FF44AA55BB66CC77DD880011 /* VGBWidget.swift in Sources */,
+				WB11WB22WB33WB44WB55WB68 /* WidgetSummaryBuilder.swift in Sources */,
 				SC11SC22SC33SC44SC55SC68 /* StoreConfiguration.swift in Sources */,
 				WS11WS22WS33WS44WS55WS68 /* WidgetSummaryStorage.swift in Sources */,
 				FF44AA55BB66CC77DD880021 /* Game.swift in Sources */,

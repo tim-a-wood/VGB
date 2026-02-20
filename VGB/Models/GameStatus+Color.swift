@@ -11,4 +11,9 @@ extension GameStatus {
         case .dropped:   .orange
         }
     }
+
+    /// Section metadata (title, icon, color) for catalog headers.
+    var sectionMetadata: (title: String, systemImage: String, color: Color) {
+        (sectionTitle, sectionIcon, color)
+    }
 }

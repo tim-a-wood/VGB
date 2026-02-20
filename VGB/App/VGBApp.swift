@@ -32,10 +32,17 @@ private struct ContentRoot: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.modelContext) private var modelContext
 
+    /// Splash stays visible until graphics are preloaded (cover images + minimum display time).
+    @State private var isSplashComplete = false
+
     var body: some View {
         Group {
             if hasCompletedOnboarding {
-                mainTabs
+                if isSplashComplete {
+                    mainTabs
+                } else {
+                    SplashView()
+                }
             } else {
                 OnboardingView(onComplete: { hasCompletedOnboarding = true })
             }
@@ -45,11 +52,14 @@ private struct ContentRoot: View {
             if ProcessInfo.processInfo.arguments.contains("-SeedDemoData") {
                 DemoData.seed(into: modelContext)
             }
-            // Defer widget update so initial UI isn't blocked by fetch
-            DispatchQueue.main.async {
-                pushWidgetSummary(context: modelContext)
-                WidgetCenter.shared.reloadTimelines(ofKind: "VGBWidget")
+            runSplashAndPreload()
+        }
+        .onChange(of: hasCompletedOnboarding) { _, completed in
+            guard completed else { return }
+            if ProcessInfo.processInfo.arguments.contains("-SeedDemoData") {
+                DemoData.seed(into: modelContext)
             }
+            runSplashAndPreload()
         }
         .onChange(of: scenePhase) { _, newPhase in
             guard hasCompletedOnboarding else { return }
@@ -62,6 +72,23 @@ private struct ContentRoot: View {
                     WidgetCenter.shared.reloadTimelines(ofKind: "VGBWidget")
                 }
             }
+        }
+    }
+
+    /// Shows splash while prefetching cover images, then transitions to main content.
+    private func runSplashAndPreload() {
+        let descriptor = FetchDescriptor<Game>(sortBy: [SortDescriptor(\.priorityPosition)])
+        let games = (try? modelContext.fetch(descriptor)) ?? []
+        ImagePrefetcher.prefetchCoverImages(for: games)
+
+        let hasCoversToPrefetch = games.contains { $0.coverImageURL != nil }
+        let minimumSplashTime: TimeInterval = hasCoversToPrefetch ? 0.4 : 0.15
+        DispatchQueue.main.asyncAfter(deadline: .now() + minimumSplashTime) {
+            withAnimation(.easeOut(duration: 0.25)) {
+                isSplashComplete = true
+            }
+            pushWidgetSummary(context: modelContext)
+            WidgetCenter.shared.reloadTimelines(ofKind: "VGBWidget")
         }
     }
 
@@ -116,25 +143,11 @@ private func pushWidgetSummary(context: ModelContext) {
         #endif
         return
     }
-    let nextUp = games.first { $0.status == .backlog }
-    let playing = games.filter { $0.status == .playing }.sorted { $0.priorityPosition < $1.priorityPosition }
-    let playingFirst = playing.first
-    let genreStrings = games.compactMap(\.genre).filter { !$0.isEmpty }
-    let radarData = RadarGenreCategories.completedCountsByCategory(from: genreStrings)
-    let radarCounts = radarData.map(\.value)
+    let summary = WidgetSummaryBuilder.make(from: games)
     #if DEBUG
-    print("[VGB App] pushWidgetSummary() games.count=\(games.count) nextUp=\(nextUp?.title ?? "nil") playingFirst=\(playingFirst?.title ?? "nil")")
+    print("[VGB App] pushWidgetSummary() games.count=\(summary.totalGames) nextUp=\(summary.nextUpTitle ?? "nil") playingFirst=\(summary.playingFirstTitle ?? "nil")")
     #endif
-    WidgetSummaryStorage.write(
-        nextUpTitle: nextUp?.title,
-        nextUpPlatform: nextUp?.platform.isEmpty == false ? nextUp?.displayPlatform : nil,
-        totalGames: games.count,
-        completedGames: games.filter { $0.status == .completed }.count,
-        playingCount: playing.count,
-        playingFirstTitle: playingFirst?.title,
-        playingFirstPlatform: playingFirst?.platform.isEmpty == false ? playingFirst?.displayPlatform : nil,
-        radarGenreCounts: radarCounts
-    )
+    WidgetSummaryStorage.write(summary)
     #if DEBUG
     print("[VGB App] pushWidgetSummary() done, reloadTimelines next")
     #endif

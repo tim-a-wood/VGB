@@ -33,19 +33,9 @@ struct BacklogListView: View {
 
     // MARK: - Derived data
 
-    /// Splits a combined platform string (e.g. "PS5, PC" from IGDB) into individual platforms.
-    private static func platformComponents(_ platformString: String) -> [String] {
-        let trimmed = platformString.trimmingCharacters(in: .whitespaces)
-        guard !trimmed.isEmpty else { return [] }
-        return trimmed
-            .components(separatedBy: CharacterSet(charactersIn: ",|/"))
-            .map { $0.trimmingCharacters(in: .whitespaces) }
-            .filter { !$0.isEmpty }
-    }
-
     /// Unique individual platforms across all games (split from combined strings for filter menu), normalized for display (e.g. "PC" not "PC (Microsoft Windows)").
     private var platforms: [String] {
-        let all = games.flatMap { Self.platformComponents($0.platform) }.map { Game.displayPlatform(from: $0) }.filter { !$0.isEmpty }
+        let all = games.flatMap { Game.platformComponents($0.platform) }.map { Game.displayPlatform(from: $0) }.filter { !$0.isEmpty }
         return Array(Set(all)).sorted()
     }
 
@@ -96,7 +86,7 @@ struct BacklogListView: View {
         }
         if let platform = filterPlatform {
             result = result.filter { game in
-                Self.platformComponents(game.platform).map { Game.displayPlatform(from: $0) }.contains(platform)
+                Game.platformComponents(game.platform).map { Game.displayPlatform(from: $0) }.contains(platform)
             }
         }
         if let genre = filterGenre {
@@ -373,7 +363,7 @@ struct BacklogListView: View {
                     Text("\(count)")
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
                         .foregroundStyle(status.color)
-                    Text(shortLabel(for: status))
+                    Text(status.shortLabel)
                         .font(.system(size: 11, weight: .regular, design: .rounded))
                         .foregroundStyle(.secondary)
                 }
@@ -382,16 +372,6 @@ struct BacklogListView: View {
         }
         .padding(.vertical, 10)
         .padding(.horizontal, 8)
-    }
-
-    private func shortLabel(for status: GameStatus) -> String {
-        switch status {
-        case .playing: return "Playing"
-        case .backlog: return "Backlog"
-        case .wishlist: return "Wishlist"
-        case .completed: return "Completed"
-        case .dropped: return "Dropped"
-        }
     }
 
     // MARK: - Game List
@@ -413,17 +393,17 @@ struct BacklogListView: View {
     private var scrollViewSectionedList: some View {
         ScrollView {
             LazyVStack(spacing: 24) {
-                sectionBlock(title: "Now Playing", systemImage: "play.fill", color: .blue, targetStatus: .playing, games: sectionedDisplay.nowPlaying, isExpanded: !collapsedSections.contains(.playing), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.playing]) } }, onMoveToCompleted: nil) { game in
+                sectionBlock(status: .playing, games: sectionedDisplay.nowPlaying, isExpanded: !collapsedSections.contains(.playing), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.playing]) } }, onMoveToCompleted: nil) { game in
                     swipeCompleted(game)
                     swipeDropped(game)
                 }
-                sectionBlock(title: "Backlog", systemImage: "list.bullet", color: .gray, targetStatus: .backlog, games: sectionedDisplay.backlog, isExpanded: !collapsedSections.contains(.backlog), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.backlog]) } }, onMoveToCompleted: nil) { game in
+                sectionBlock(status: .backlog, games: sectionedDisplay.backlog, isExpanded: !collapsedSections.contains(.backlog), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.backlog]) } }, onMoveToCompleted: nil) { game in
                     swipeCompleted(game)
                     swipeDropped(game)
                 }
-                sectionBlock(title: "Wishlist", systemImage: "heart.fill", color: .purple, targetStatus: .wishlist, games: sectionedDisplay.wishlist, isExpanded: !collapsedSections.contains(.wishlist), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.wishlist]) } }, onMoveToCompleted: nil)
-                sectionBlock(title: "Completed", systemImage: "checkmark.circle.fill", color: .green, targetStatus: .completed, games: sectionedDisplay.completed, isExpanded: !collapsedSections.contains(.completed), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.completed]) } }, onMoveToCompleted: triggerCelebration)
-                sectionBlock(title: "Dropped", systemImage: "xmark.circle.fill", color: .orange, targetStatus: .dropped, games: sectionedDisplay.dropped, isExpanded: !collapsedSections.contains(.dropped), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.dropped]) } }, onMoveToCompleted: nil)
+                sectionBlock(status: .wishlist, games: sectionedDisplay.wishlist, isExpanded: !collapsedSections.contains(.wishlist), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.wishlist]) } }, onMoveToCompleted: nil)
+                sectionBlock(status: .completed, games: sectionedDisplay.completed, isExpanded: !collapsedSections.contains(.completed), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.completed]) } }, onMoveToCompleted: triggerCelebration)
+                sectionBlock(status: .dropped, games: sectionedDisplay.dropped, isExpanded: !collapsedSections.contains(.dropped), onToggle: { withAnimation(.easeInOut(duration: 0.25)) { collapsedSections.formSymmetricDifference([.dropped]) } }, onMoveToCompleted: nil)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
@@ -431,49 +411,47 @@ struct BacklogListView: View {
     }
 
     private func sectionBlock(
-        title: String,
-        systemImage: String,
-        color: Color,
-        targetStatus: GameStatus,
+        status: GameStatus,
         games: [Game],
         isExpanded: Bool,
         onToggle: @escaping () -> Void,
         onMoveToCompleted: (() -> Void)?,
         @ViewBuilder trailingSwipe: (Game) -> some View = { _ in EmptyView() }
     ) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
+        let meta = status.sectionMetadata
+        return VStack(alignment: .leading, spacing: 0) {
             SectionHeaderDropZone(
-                title: title,
-                systemImage: systemImage,
-                color: color,
+                title: meta.title,
+                systemImage: meta.systemImage,
+                color: meta.color,
                 isExpanded: isExpanded,
                 onToggle: onToggle
             )
             if isExpanded {
                 if games.isEmpty {
                     Button {
-                        addGameInitialStatus = targetStatus
+                        addGameInitialStatus = status
                         showingAddGame = true
                     } label: {
                         Label("Add Game", systemImage: "plus.circle.fill")
                             .font(.system(size: 17, weight: .regular, design: .rounded))
-                            .foregroundStyle(color)
+                            .foregroundStyle(meta.color)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.vertical, 12)
                             .padding(.horizontal, 16)
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Add game to \(title)")
+                    .accessibilityLabel("Add game to \(meta.title)")
                 } else {
                     ForEach(Array(games.enumerated()), id: \.element.id) { index, game in
                         draggableRow(
                             for: game,
-                            targetStatus: targetStatus,
+                            targetStatus: status,
                             sectionGames: games,
                             sectionIndex: index,
                             onMoveToCompleted: onMoveToCompleted,
-                            rank: targetStatus == .completed && index < 3 ? index + 1 : nil,
-                            isMostAnticipated: targetStatus == .wishlist && index == 0
+                            rank: status == .completed && index < 3 ? index + 1 : nil,
+                            isMostAnticipated: status == .wishlist && index == 0
                         )
                         if game.id != games.last?.id {
                             Divider()
@@ -575,20 +553,10 @@ struct BacklogListView: View {
 
     /// Header for the filtered list when a status filter is active (matches section bucket style).
     private func statusSectionHeader(_ status: GameStatus) -> some View {
-        let (title, systemImage, color) = statusSectionTitleAndIcon(status)
-        return Label(title, systemImage: systemImage)
+        let meta = status.sectionMetadata
+        return Label(meta.title, systemImage: meta.systemImage)
             .font(.system(size: 15, weight: .semibold, design: .rounded))
-            .foregroundStyle(color)
-    }
-
-    private func statusSectionTitleAndIcon(_ status: GameStatus) -> (title: String, systemImage: String, color: Color) {
-        switch status {
-        case .playing: return ("Now Playing", "play.fill", .blue)
-        case .backlog: return ("Backlog", "list.bullet", .gray)
-        case .wishlist: return ("Wishlist", "heart.fill", .purple)
-        case .completed: return ("Completed", "checkmark.circle.fill", .green)
-        case .dropped: return ("Dropped", "xmark.circle.fill", .orange)
-        }
+            .foregroundStyle(meta.color)
     }
 
     private func row(
@@ -647,20 +615,10 @@ struct BacklogListView: View {
                             triggerCelebration()
                         }
                     }
-                } label: {
-                    Label("Move to \(status.rawValue)", systemImage: statusIcon(status))
+                }                 label: {
+                    Label("Move to \(status.rawValue)", systemImage: status.sectionIcon)
                 }
             }
-        }
-    }
-
-    private func statusIcon(_ status: GameStatus) -> String {
-        switch status {
-        case .wishlist: return "heart.fill"
-        case .backlog: return "list.bullet"
-        case .playing: return "play.fill"
-        case .completed: return "checkmark.circle.fill"
-        case .dropped: return "xmark.circle.fill"
         }
     }
 

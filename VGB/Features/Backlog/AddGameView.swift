@@ -45,7 +45,7 @@ struct AddGameView: View {
 
     /// Statuses available for selection — unreleased games can only be Wishlist.
     private var availableStatuses: [GameStatus] {
-        isUnreleasedGame ? [.wishlist] : Array(GameStatus.allCases)
+        GameStatus.availableStatuses(for: isUnreleasedGame)
     }
 
     var body: some View {

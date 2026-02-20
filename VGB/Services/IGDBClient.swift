@@ -30,13 +30,20 @@ actor IGDBClient {
 
     /// Fetch a single game by IGDB ID with full details.
     func fetchGame(id: Int) async throws -> IGDBGame? {
+        let results = try await fetchGames(ids: [id])
+        return results.first
+    }
+
+    /// Fetch multiple games by IGDB IDs in a single API call. More efficient than sequential fetchGame calls.
+    func fetchGames(ids: [Int]) async throws -> [IGDBGame] {
+        guard !ids.isEmpty else { return [] }
+        let idList = ids.map(String.init).joined(separator: ", ")
         let body = """
         fields \(gameFields);
-        where id = \(id);
-        limit 1;
+        where id = (\(idList));
+        limit \(ids.count);
         """
-        let results: [IGDBGame] = try await post(endpoint: "games", body: body)
-        return results.first
+        return try await post(endpoint: "games", body: body)
     }
 
     // MARK: - Private
