@@ -3,8 +3,8 @@ import XCTest
 
 /// Tests the filter and sort logic used by BacklogListView.
 ///
-/// The view applies filters/sorts over plain `[Game]` arrays, so we replicate
-/// that logic here to verify correctness without needing a SwiftUI host.
+/// Uses BacklogCatalogLogic (single source of truth) so tests validate the same
+/// code path as the view.
 @MainActor
 final class GameFilterSortTests: XCTestCase {
 
@@ -37,6 +37,103 @@ final class GameFilterSortTests: XCTestCase {
         cyberpunk.genre = "RPG"
 
         return [gta6, elden, hades, zelda, cyberpunk]
+    }
+
+    // MARK: - BacklogCatalogLogic (single source of truth)
+
+    func testCatalogLogicSectionedDisplayNoFilter() {
+        let games = makeSampleGames()
+        let display = BacklogCatalogLogic.sectionedDisplay(
+            games: games,
+            searchText: "",
+            filterStatus: nil,
+            filterPlatform: nil,
+            filterGenre: nil,
+            sortMode: .priority
+        )
+        XCTAssertEqual(display.displayed.count, 5)
+        XCTAssertEqual(display.nowPlaying.count, 1)
+        XCTAssertEqual(display.nowPlaying.first?.title, "Elden Ring")
+        XCTAssertEqual(display.backlog.count, 1)
+        XCTAssertEqual(display.backlog.first?.title, "Zelda: TotK")
+        XCTAssertEqual(display.wishlist.count, 1)
+        XCTAssertEqual(display.wishlist.first?.title, "GTA VI")
+        XCTAssertEqual(display.completed.count, 1)
+        XCTAssertEqual(display.completed.first?.title, "Hades")
+        XCTAssertEqual(display.dropped.count, 1)
+        XCTAssertEqual(display.dropped.first?.title, "Cyberpunk 2077")
+    }
+
+    func testCatalogLogicFilterByStatus() {
+        let games = makeSampleGames()
+        let display = BacklogCatalogLogic.sectionedDisplay(
+            games: games,
+            searchText: "",
+            filterStatus: .playing,
+            filterPlatform: nil,
+            filterGenre: nil,
+            sortMode: .priority
+        )
+        XCTAssertEqual(display.displayed.count, 1)
+        XCTAssertEqual(display.displayed.first?.title, "Elden Ring")
+    }
+
+    func testCatalogLogicSortByCriticScore() {
+        let games = makeSampleGames()
+        let display = BacklogCatalogLogic.sectionedDisplay(
+            games: games,
+            searchText: "",
+            filterStatus: nil,
+            filterPlatform: nil,
+            filterGenre: nil,
+            sortMode: .criticScore
+        )
+        let titles = display.displayed.map(\.title)
+        XCTAssertEqual(titles.first, "Zelda: TotK") // 97
+        XCTAssertEqual(titles.last, "GTA VI") // nil → -1
+    }
+
+    func testCatalogLogicSearchByTitle() {
+        let games = makeSampleGames()
+        let display = BacklogCatalogLogic.sectionedDisplay(
+            games: games,
+            searchText: "elden",
+            filterStatus: nil,
+            filterPlatform: nil,
+            filterGenre: nil,
+            sortMode: .priority
+        )
+        XCTAssertEqual(display.displayed.count, 1)
+        XCTAssertEqual(display.displayed.first?.title, "Elden Ring")
+    }
+
+    func testCatalogLogicPlatformsFromGames() {
+        let games = makeSampleGames()
+        let platforms = BacklogCatalogLogic.platforms(from: games)
+        XCTAssertEqual(platforms.sorted(), ["PC", "PS5", "Switch"])
+    }
+
+    func testCatalogLogicGenresFromGames() {
+        let games = makeSampleGames()
+        let genres = BacklogCatalogLogic.genres(from: games)
+        XCTAssertEqual(genres.sorted(), ["Action", "RPG", "Roguelike"])
+    }
+
+    func testCatalogLogicStatusCounts() {
+        let games = makeSampleGames()
+        let counts = BacklogCatalogLogic.statusCounts(from: games)
+        XCTAssertEqual(counts[.wishlist], 1)
+        XCTAssertEqual(counts[.playing], 1)
+        XCTAssertEqual(counts[.backlog], 1)
+        XCTAssertEqual(counts[.completed], 1)
+        XCTAssertEqual(counts[.dropped], 1)
+    }
+
+    func testCatalogLogicShowStatusSections() {
+        XCTAssertTrue(BacklogCatalogLogic.showStatusSections(filterStatus: nil, searchText: ""))
+        XCTAssertTrue(BacklogCatalogLogic.showStatusSections(filterStatus: nil, searchText: "   "))
+        XCTAssertFalse(BacklogCatalogLogic.showStatusSections(filterStatus: .backlog, searchText: ""))
+        XCTAssertFalse(BacklogCatalogLogic.showStatusSections(filterStatus: nil, searchText: "elden"))
     }
 
     // MARK: - Filter by status

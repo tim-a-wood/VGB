@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		55AA55BB55CC55DD55EE55FF /* BacklogListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44AA44BB44CC44DD44EE44FF /* BacklogListView.swift */; };
+		BL11BL22BL33BL44BL55BL66 /* BacklogCatalogLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = BL11BL22BL33BL44BL55BL67 /* BacklogCatalogLogic.swift */; };
+		BL11BL22BL33BL44BL55BL68 /* BacklogListComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = BL11BL22BL33BL44BL55BL69 /* BacklogListComponents.swift */; };
 		63E8D4B855E15A47273EBEB9 /* VGBApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A24FB1195840A54D9117F8 /* VGBApp.swift */; };
 		A1B2C3D4E5F60202 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60101 /* StatsView.swift */; };
 		A1B2C3D4E5F60404 /* RadarChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60303 /* RadarChartView.swift */; };
@@ -90,6 +92,8 @@
 		05A24FB1195840A54D9117F8 /* VGBApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VGBApp.swift; sourceTree = "<group>"; };
 		0BFD25FD239D36E39B81796A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		44AA44BB44CC44DD44EE44FF /* BacklogListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogListView.swift; sourceTree = "<group>"; };
+		BL11BL22BL33BL44BL55BL67 /* BacklogCatalogLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogCatalogLogic.swift; sourceTree = "<group>"; };
+		BL11BL22BL33BL44BL55BL69 /* BacklogListComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BacklogListComponents.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60101 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60303 /* RadarChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadarChartView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60505 /* GameStatus+Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameStatus+Color.swift"; sourceTree = "<group>"; };
@@ -217,6 +221,8 @@
 			children = (
 				EE11AA22BB33CC44DD55EE71 /* AddGameView.swift */,
 				44AA44BB44CC44DD44EE44FF /* BacklogListView.swift */,
+				BL11BL22BL33BL44BL55BL67 /* BacklogCatalogLogic.swift */,
+				BL11BL22BL33BL44BL55BL69 /* BacklogListComponents.swift */,
 				RS11RS22RS33RS44RS55RS67 /* RatingSheet.swift */,
 				DD22EE33FF44AA55BB660012 /* CelebrationOverlay.swift */,
 				FF11AA22BB33CC44DD55EE73 /* GameDetailView.swift */,
@@ -438,6 +444,8 @@
 				WB11WB22WB33WB44WB55WB66 /* WidgetSummaryBuilder.swift in Sources */,
 				WS11WS22WS33WS44WS55WS66 /* WidgetSummaryStorage.swift in Sources */,
 				55AA55BB55CC55DD55EE55FF /* BacklogListView.swift in Sources */,
+				BL11BL22BL33BL44BL55BL66 /* BacklogCatalogLogic.swift in Sources */,
+				BL11BL22BL33BL44BL55BL68 /* BacklogListComponents.swift in Sources */,
 				RS11RS22RS33RS44RS55RS66 /* RatingSheet.swift in Sources */,
 				DD11AA22BB33CC44DD55EE66 /* Game.swift in Sources */,
 				DD11AA22BB33CC44DD55EE68 /* GameStatus.swift in Sources */,
