@@ -126,3 +126,5 @@ final class Game {
         self.priorityPosition = priorityPosition
     }
 }
+
+extension Game: Identifiable {}

@@ -75,11 +75,15 @@ private struct ContentRoot: View {
         }
     }
 
-    /// Shows splash while prefetching cover images, then transitions to main content.
+    /// Shows splash while prefetching cover images and refreshing game data, then transitions to main content.
     private func runSplashAndPreload() {
         let descriptor = FetchDescriptor<Game>(sortBy: [SortDescriptor(\.priorityPosition)])
         let games = (try? modelContext.fetch(descriptor)) ?? []
         ImagePrefetcher.prefetchCoverImages(for: games)
+
+        Task {
+            await GameSyncService.shared.refreshStaleGames(in: modelContext)
+        }
 
         let hasCoversToPrefetch = games.contains { $0.coverImageURL != nil }
         let minimumSplashTime: TimeInterval = hasCoversToPrefetch ? 0.4 : 0.15

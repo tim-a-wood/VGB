@@ -49,6 +49,7 @@
 		WB11WB22WB33WB44WB55WB68 /* WidgetSummaryBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB11WB22WB33WB44WB55WB67 /* WidgetSummaryBuilder.swift */; };
 		SP11SP22SP33SP44SP55SP66 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP11SP22SP33SP44SP55SP67 /* SplashView.swift */; };
 		IP11IP22IP33IP44IP55IP66 /* ImagePrefetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = IP11IP22IP33IP44IP55IP67 /* ImagePrefetcher.swift */; };
+		RS11RS22RS33RS44RS55RS66 /* RatingSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS11RS22RS33RS44RS55RS67 /* RatingSheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -118,6 +119,7 @@
 		HX11HX22HX33HX44HX55HX67 /* Haptic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptic.swift; sourceTree = "<group>"; };
 		OB11OB22OB33OB44OB55OB67 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		RG11RG22RG33RG44RG55RG67 /* RadarGenreCategories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadarGenreCategories.swift; sourceTree = "<group>"; };
+		RS11RS22RS33RS44RS55RS67 /* RatingSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingSheet.swift; sourceTree = "<group>"; };
 		RV11RV22RV33RV44RV55RV67 /* RankingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankingsView.swift; sourceTree = "<group>"; };
 		SC11SC22SC33SC44SC55SC67 /* StoreConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreConfiguration.swift; sourceTree = "<group>"; };
 		SC11SC22SC33SC44SC55SC69 /* VGB.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VGB.entitlements; sourceTree = "<group>"; };
@@ -209,6 +211,7 @@
 			children = (
 				EE11AA22BB33CC44DD55EE71 /* AddGameView.swift */,
 				44AA44BB44CC44DD44EE44FF /* BacklogListView.swift */,
+				RS11RS22RS33RS44RS55RS67 /* RatingSheet.swift */,
 				DD22EE33FF44AA55BB660012 /* CelebrationOverlay.swift */,
 				FF11AA22BB33CC44DD55EE73 /* GameDetailView.swift */,
 			);
@@ -423,6 +426,7 @@
 				WB11WB22WB33WB44WB55WB66 /* WidgetSummaryBuilder.swift in Sources */,
 				WS11WS22WS33WS44WS55WS66 /* WidgetSummaryStorage.swift in Sources */,
 				55AA55BB55CC55DD55EE55FF /* BacklogListView.swift in Sources */,
+				RS11RS22RS33RS44RS55RS66 /* RatingSheet.swift in Sources */,
 				DD11AA22BB33CC44DD55EE66 /* Game.swift in Sources */,
 				DD11AA22BB33CC44DD55EE68 /* GameStatus.swift in Sources */,
 				EE11AA22BB33CC44DD55EE70 /* AddGameView.swift in Sources */,

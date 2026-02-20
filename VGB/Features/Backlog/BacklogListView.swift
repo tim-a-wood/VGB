@@ -30,6 +30,7 @@ struct BacklogListView: View {
     /// Which categories are collapsed on the Game Catalog (sectioned) view. Empty = all expanded.
     @State private var collapsedSections: Set<GameStatus> = []
     @State private var isRefreshingAll = false
+    @State private var gameToRate: Game?
 
     // MARK: - Derived data
 
@@ -205,6 +206,11 @@ struct BacklogListView: View {
                 if showCelebration {
                     CelebrationOverlay()
                         .allowsHitTesting(false)
+                }
+            }
+            .sheet(item: $gameToRate) { game in
+                RatingSheet(game: game) {
+                    gameToRate = nil
                 }
             }
         }
@@ -478,6 +484,7 @@ struct BacklogListView: View {
             onHandleRowDrop: { id, status, games, idx, onCompleted in
                 handleRowDrop(droppedId: id, targetStatus: status, sectionGames: games, destinationIndex: idx, onMoveToCompleted: onCompleted, onUnreleasedWarning: { showUnreleasedWarning = true })
             },
+            onRateTap: { gameToRate = game },
             contextMenuContent: moveToContextMenu
         )
     }
@@ -582,7 +589,7 @@ struct BacklogListView: View {
         @ViewBuilder trailingSwipe: () -> some View
     ) -> some View {
         NavigationLink(value: game) {
-            GameRowView(game: game).equatable()
+            GameRowView(game: game, onRateTap: { gameToRate = game }).equatable()
         }
         .draggable(game.id.uuidString)
         .contextMenu {
@@ -756,6 +763,7 @@ private struct DraggableCatalogRow<ContextMenuContent: View>: View {
     let rank: Int?
     let isMostAnticipated: Bool
     let onHandleRowDrop: (UUID, GameStatus, [Game], Int, (() -> Void)?) -> Void
+    let onRateTap: (() -> Void)?
     @ViewBuilder let contextMenuContent: (Game) -> ContextMenuContent
 
     @State private var isTargeted = false
@@ -772,7 +780,7 @@ private struct DraggableCatalogRow<ContextMenuContent: View>: View {
                 .frame(maxWidth: .infinity)
 
             NavigationLink(value: game) {
-                GameRowView(game: game, rank: rank, isMostAnticipated: isMostAnticipated).equatable()
+                GameRowView(game: game, rank: rank, isMostAnticipated: isMostAnticipated, onRateTap: onRateTap).equatable()
             }
             .tint(.primary)
             .padding(.horizontal, 16)
@@ -808,16 +816,35 @@ private struct GameRowView: View, Equatable {
     var rank: Int? = nil
     /// True for #1 on Wishlist (priority order).
     var isMostAnticipated: Bool = false
+    /// Called when user taps the personal rating star. Nil = rating not tappable.
+    var onRateTap: (() -> Void)? = nil
 
-    init(game: Game, rank: Int? = nil, isMostAnticipated: Bool = false) {
+    init(game: Game, rank: Int? = nil, isMostAnticipated: Bool = false, onRateTap: (() -> Void)? = nil) {
         self.game = game
         self.gameId = game.id
         self.rank = rank
         self.isMostAnticipated = isMostAnticipated
+        self.onRateTap = onRateTap
     }
 
     nonisolated static func == (lhs: GameRowView, rhs: GameRowView) -> Bool {
         lhs.gameId == rhs.gameId && lhs.rank == rhs.rank && lhs.isMostAnticipated == rhs.isMostAnticipated
+    }
+
+    @ViewBuilder
+    private var personalRatingPill: some View {
+        if let rating = game.personalRating {
+            ratingPill(icon: "star.fill", value: "You \(rating)", color: .blue)
+        } else {
+            HStack(spacing: 4) {
+                Image(systemName: "star.fill")
+                    .font(.system(size: 12, weight: .regular, design: .rounded))
+                    .foregroundStyle(.quaternary)
+                Text("Unrated")
+                    .font(.system(size: 11, weight: .regular, design: .rounded))
+                    .foregroundStyle(.secondary)
+            }
+        }
     }
 
     var body: some View {
@@ -871,17 +898,16 @@ private struct GameRowView: View, Equatable {
                                 if let rating = game.igdbRating {
                                     ratingPill(icon: "star.fill", value: "\(rating)", color: .orange)
                                 }
-                                if let rating = game.personalRating {
-                                    ratingPill(icon: "star.fill", value: "You \(rating)", color: .blue)
-                                } else {
-                                    HStack(spacing: 4) {
-                                        Image(systemName: "star.fill")
-                                            .font(.system(size: 12, weight: .regular, design: .rounded))
-                                            .foregroundStyle(.quaternary)
-                                        Text("Unrated")
-                                            .font(.system(size: 11, weight: .regular, design: .rounded))
-                                            .foregroundStyle(.secondary)
+                                if let onTap = onRateTap {
+                                    Button {
+                                        onTap()
+                                    } label: {
+                                        personalRatingPill
                                     }
+                                    .buttonStyle(.plain)
+                                    .accessibilityHint("Tap to set or change your rating")
+                                } else {
+                                    personalRatingPill
                                 }
                             }
                         }
