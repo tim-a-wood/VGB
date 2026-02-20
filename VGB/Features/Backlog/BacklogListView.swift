@@ -429,7 +429,7 @@ struct BacklogListView: View {
                 let count = statusCounts[status] ?? 0
                 VStack(spacing: 2) {
                     Text("\(count)")
-                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .font(.system(size: 30, weight: .semibold, design: .rounded))
                         .foregroundStyle(status.color)
                     Text(status.shortLabel)
                         .font(.system(size: 11, weight: .regular, design: .rounded))
