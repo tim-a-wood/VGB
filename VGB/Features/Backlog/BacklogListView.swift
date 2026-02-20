@@ -629,7 +629,7 @@ struct BacklogListView: View {
         case .completed: sd.nowPlaying + sd.backlog + sd.wishlist + newOrder + sd.dropped
         case .dropped: sd.nowPlaying + sd.backlog + sd.wishlist + sd.completed + newOrder
         }
-        withAnimation(.easeInOut(duration: 0.25)) {
+        withAnimation(.easeOut(duration: 0.18)) {
             for (index, game) in reordered.enumerated() {
                 game.priorityPosition = index
             }
@@ -716,6 +716,10 @@ private struct CatalogRowDropDelegate: DropDelegate {
 
     func dropEntered(info: DropInfo) {
         isTargeted = true
+        // Immediate light haptic so user feels the drop target; prepare dropSnap for instant feedback on release.
+        let light = UIImpactFeedbackGenerator(style: .light)
+        light.impactOccurred()
+        UIImpactFeedbackGenerator(style: .medium).prepare()
     }
 
     func dropExited(info: DropInfo) {
@@ -725,12 +729,12 @@ private struct CatalogRowDropDelegate: DropDelegate {
     func performDrop(info: DropInfo) -> Bool {
         let providers = info.itemProviders(for: [.plainText])
         guard let provider = providers.first else { return false }
+        isTargeted = false
         provider.loadObject(ofClass: NSString.self) { object, _ in
             guard let str = object as? String,
                   let droppedId = UUID(uuidString: str) else { return }
             DispatchQueue.main.async {
                 onHandleRowDrop(droppedId, targetStatus, sectionGames, sectionIndex, onMoveToCompleted)
-                isTargeted = false
             }
         }
         return true
@@ -772,7 +776,7 @@ private struct DraggableCatalogRow<ContextMenuContent: View>: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())
-        .animation(.easeInOut(duration: 0.2), value: isTargeted)
+        .animation(.easeOut(duration: 0.1), value: isTargeted)
         .onDrag {
             NSItemProvider(object: game.id.uuidString as NSString)
         }
