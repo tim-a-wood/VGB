@@ -170,6 +170,20 @@ final class GameModelTests: XCTestCase {
         XCTAssertEqual(game.displayPlatform, "PS5, PC")
     }
 
+    func testDisplayPlatformCollapsesPCMacLinuxWindowsToPC() {
+        XCTAssertEqual(Game.displayPlatform(from: "Mac"), "PC")
+        XCTAssertEqual(Game.displayPlatform(from: "Linux"), "PC")
+        XCTAssertEqual(Game.displayPlatform(from: "Windows"), "PC")
+        XCTAssertEqual(Game.displayPlatform(from: "Microsoft Windows"), "PC")
+        XCTAssertEqual(Game.displayPlatform(from: "macOS"), "PC")
+        let gameMac = Game(title: "Test", platform: "Mac")
+        XCTAssertEqual(gameMac.displayPlatform, "PC")
+        let gameLinuxMac = Game(title: "Test", platform: "Mac, Linux")
+        XCTAssertEqual(gameLinuxMac.displayPlatform, "PC")
+        let gamePS5Mac = Game(title: "Test", platform: "PlayStation 5, Mac")
+        XCTAssertEqual(gamePS5Mac.displayPlatform, "PS5, PC")
+    }
+
     func testPlatformComponentsSplitsCommaSeparated() {
         let components = Game.platformComponents("PS5, PC, Switch")
         XCTAssertEqual(components, ["PS5", "PC", "Switch"])

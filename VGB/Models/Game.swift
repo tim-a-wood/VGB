@@ -96,8 +96,23 @@ final class Game {
             .filter { !$0.isEmpty }
     }
 
+    /// Platform names (lowercased) that are shown as a single "PC" to reduce clutter.
+    private static let pcTypePlatformNames: Set<String> = [
+        "pc", "microsoft windows", "windows", "mac", "macos", "os mac", "linux", "steam os", "steamos",
+    ]
+
     /// Normalizes a raw platform string for display (e.g. "PC" not "PC (Microsoft Windows)", "PS5" not "PlayStation 5").
+    /// PC, Mac, Linux, Windows (and variants) are all shown as "PC".
     static func displayPlatform(from raw: String) -> String {
+        let components = platformComponents(raw)
+        let normalized = components.map { normalizePlatformComponent($0) }
+        var seen = Set<String>()
+        let deduped = normalized.filter { seen.insert($0).inserted }
+        return deduped.joined(separator: ", ")
+    }
+
+    /// Normalizes one platform component and collapses PC-type platforms to "PC".
+    private static func normalizePlatformComponent(_ raw: String) -> String {
         var s = raw
             .replacingOccurrences(of: " (Microsoft Windows)", with: "")
         for (full, short) in [
@@ -109,7 +124,11 @@ final class Game {
         ] {
             s = s.replacingOccurrences(of: full, with: short)
         }
-        return s.trimmingCharacters(in: .whitespaces)
+        s = s.trimmingCharacters(in: .whitespaces)
+        if pcTypePlatformNames.contains(s.lowercased()) {
+            return "PC"
+        }
+        return s
     }
 
     // MARK: - Init
